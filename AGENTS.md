@@ -1,5 +1,12 @@
 # Agent Instructions for bitbuddies.me
 
+
+
+
+You don't need to create any documentation with the implementation. I will tell you when to create the documentation. You only provide me a short summary with what was done.
+Before implementing anything think that the structure and code is as simple as possible and secure.
+
+
 ## Commands
 - Dev: `bun run dev` (runs on port 3000)
 - Build: `bun run build`
@@ -31,6 +38,7 @@ bunx shadcn@latest add button
 ```
 Use lucide-react for icons
 
+The website needs to use the themes settings from styles.css, if I change them there to be reflected everywhere.
 
 ## Demo Components to see how is Working
 
