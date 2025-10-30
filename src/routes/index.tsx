@@ -1,118 +1,153 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {
-  Zap,
-  Server,
-  Route as RouteIcon,
-  Shield,
-  Waves,
-  Sparkles,
-} from 'lucide-react'
+import { createFileRoute } from "@tanstack/react-router";
+import { Award, BookOpen, Code, Rocket, Users, Zap } from "lucide-react";
+import { LogoIcon } from "@/components/common/logo";
+import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute("/")({ component: App });
 
 function App() {
-  const features = [
-    {
-      icon: <Zap className="w-12 h-12 text-cyan-400" />,
-      title: 'Powerful Server Functions',
-      description:
-        'Write server-side code that seamlessly integrates with your client components. Type-safe, secure, and simple.',
-    },
-    {
-      icon: <Server className="w-12 h-12 text-cyan-400" />,
-      title: 'Flexible Server Side Rendering',
-      description:
-        'Full-document SSR, streaming, and progressive enhancement out of the box. Control exactly what renders where.',
-    },
-    {
-      icon: <RouteIcon className="w-12 h-12 text-cyan-400" />,
-      title: 'API Routes',
-      description:
-        'Build type-safe API endpoints alongside your application. No separate backend needed.',
-    },
-    {
-      icon: <Shield className="w-12 h-12 text-cyan-400" />,
-      title: 'Strongly Typed Everything',
-      description:
-        'End-to-end type safety from server to client. Catch errors before they reach production.',
-    },
-    {
-      icon: <Waves className="w-12 h-12 text-cyan-400" />,
-      title: 'Full Streaming Support',
-      description:
-        'Stream data from server to client progressively. Perfect for AI applications and real-time updates.',
-    },
-    {
-      icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
-      title: 'Next Generation Ready',
-      description:
-        'Built from the ground up for modern web applications. Deploy anywhere JavaScript runs.',
-    },
-  ]
+	const features = [
+		{
+			icon: <BookOpen className="w-10 h-10" />,
+			title: "Expert-Led Courses",
+			description:
+				"Learn from industry professionals with real-world experience. Our courses are designed to take you from beginner to expert.",
+		},
+		{
+			icon: <Users className="w-10 h-10" />,
+			title: "Vibrant Community",
+			description:
+				"Connect with thousands of developers worldwide. Share knowledge, collaborate on projects, and grow together.",
+		},
+		{
+			icon: <Zap className="w-10 h-10" />,
+			title: "Hands-On Workshops",
+			description:
+				"Practice makes perfect. Join live workshops and build real projects while learning cutting-edge technologies.",
+		},
+		{
+			icon: <Code className="w-10 h-10" />,
+			title: "Modern Tech Stack",
+			description:
+				"Stay ahead of the curve with courses on the latest frameworks, tools, and best practices in software development.",
+		},
+		{
+			icon: <Rocket className="w-10 h-10" />,
+			title: "Career Growth",
+			description:
+				"Advance your career with portfolio-worthy projects and certifications recognized by top tech companies.",
+		},
+		{
+			icon: <Award className="w-10 h-10" />,
+			title: "Lifetime Access",
+			description:
+				"Once you enroll, the content is yours forever. Learn at your own pace and revisit materials anytime.",
+		},
+	];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
-        <div className="relative max-w-5xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
-            />
-            <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
-              <span className="text-gray-300">TANSTACK</span>{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                START
-              </span>
-            </h1>
-          </div>
-          <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
-            The framework for next generation AI applications
-          </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-            Full-stack framework powered by TanStack Router for React and Solid.
-            Build modern applications with server functions, streaming, and type
-            safety.
-          </p>
-          <div className="flex flex-col items-center gap-4">
-            <a
-              href="https://tanstack.com/start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/50"
-            >
-              Documentation
-            </a>
-            <p className="text-gray-400 text-sm mt-2">
-              Begin your TanStack Start journey by editing{' '}
-              <code className="px-2 py-1 bg-slate-700 rounded text-cyan-400">
-                /src/routes/index.tsx
-              </code>
-            </p>
-          </div>
-        </div>
-      </section>
+	return (
+		<div className="flex flex-col w-full">
+			{/* Hero Section */}
+			<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-20 md:py-32">
+				<div className="container mx-auto px-4">
+					<div className="mx-auto max-w-4xl text-center">
+						<div className="mb-8 flex justify-center">
+							<div className="rounded-2xl bg-primary/10 p-6">
+								<LogoIcon className="h-20 w-auto" />
+							</div>
+						</div>
+						<h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+							Welcome to{" "}
+							<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+								BitBuddies
+							</span>
+						</h1>
+						<p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
+							Empowering developers to build amazing things together
+						</p>
+						<p className="mx-auto mb-12 max-w-2xl text-base text-muted-foreground md:text-lg">
+							Join thousands of developers learning, building, and growing their
+							careers with expert-led courses, hands-on workshops, and a
+							supportive community.
+						</p>
+						<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+							<Button size="lg" className="w-full sm:w-auto" asChild>
+								<a href="#features">Explore Courses</a>
+							</Button>
+							<Button
+								size="lg"
+								variant="outline"
+								className="w-full sm:w-auto"
+								asChild
+							>
+								<a href="#community">Join Community</a>
+							</Button>
+						</div>
+					</div>
+				</div>
 
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  )
+				{/* Decorative elements */}
+				<div className="absolute left-0 top-0 -z-10 h-full w-full">
+					<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+					<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
+				</div>
+			</section>
+
+			{/* Features Section */}
+			<section id="features" className="py-20 md:py-32">
+				<div className="container mx-auto px-4">
+					<div className="mb-16 text-center">
+						<h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+							Why Choose BitBuddies?
+						</h2>
+						<p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+							Everything you need to accelerate your development journey and
+							achieve your career goals.
+						</p>
+					</div>
+
+					<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+						{features.map((feature, index) => (
+							<div
+								key={index}
+								className="group relative rounded-lg border border-border bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
+							>
+								<div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+									{feature.icon}
+								</div>
+								<h3 className="mb-3 text-xl font-semibold">{feature.title}</h3>
+								<p className="text-muted-foreground">{feature.description}</p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+
+			{/* CTA Section */}
+			<section
+				id="get-started"
+				className="bg-gradient-to-b from-background to-primary/5 py-20 md:py-32"
+			>
+				<div className="container mx-auto px-4">
+					<div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 text-center shadow-lg md:p-12">
+						<h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
+							Ready to Start Your Journey?
+						</h2>
+						<p className="mb-8 text-lg text-muted-foreground">
+							Join BitBuddies today and get access to premium courses, exclusive
+							workshops, and a thriving community of developers.
+						</p>
+						<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+							<Button size="lg" className="w-full sm:w-auto">
+								Get Started Free
+							</Button>
+							<Button size="lg" variant="outline" className="w-full sm:w-auto">
+								View Pricing
+							</Button>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	);
 }

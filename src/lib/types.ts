@@ -32,11 +32,7 @@ export const SUBSCRIPTION_EVENTS = [
 ] as const;
 export type SubscriptionEvent = (typeof SUBSCRIPTION_EVENTS)[number];
 
-export const CONTENT_LEVELS = [
-	"beginner",
-	"intermediate",
-	"advanced",
-] as const;
+export const CONTENT_LEVELS = ["beginner", "intermediate", "advanced"] as const;
 export type ContentLevel = (typeof CONTENT_LEVELS)[number];
 
 export const ACCESS_LEVELS = [
