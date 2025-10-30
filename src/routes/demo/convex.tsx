@@ -1,54 +1,68 @@
-import { useCallback, useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery, useMutation } from 'convex/react'
-import { Trash2, Plus, Check, Circle } from 'lucide-react'
+import { useCallback, useState } from "react"
+import { createFileRoute } from "@tanstack/react-router"
+import { useMutation, useQuery } from "convex/react"
+import { Trash2, Plus, Check, Circle } from "lucide-react"
 
-import { api } from '../../../convex/_generated/api'
-import { Id } from '../../../convex/_generated/dataModel'
+import type { Doc, Id } from "../../../convex/_generated/dataModel"
 
-export const Route = createFileRoute('/demo/convex')({
+type Todo = Doc<"todos">
+type QueryRef = Parameters<typeof useQuery>[0]
+type MutationRef = Parameters<typeof useMutation>[0]
+
+export const Route = createFileRoute("/demo/convex")({
   ssr: false,
   component: ConvexTodos,
 })
 
 function ConvexTodos() {
-  const todos = useQuery(api.todos.list)
-  const addTodo = useMutation(api.todos.add)
-  const toggleTodo = useMutation(api.todos.toggle)
-  const removeTodo = useMutation(api.todos.remove)
+  const listRef = "todos:list" as unknown as QueryRef
+  const addRef = "todos:add" as unknown as MutationRef
+  const toggleRef = "todos:toggle" as unknown as MutationRef
+  const removeRef = "todos:remove" as unknown as MutationRef
 
-  const [newTodo, setNewTodo] = useState('')
+  const todos = useQuery(listRef) as Todo[] | undefined
+  const addTodo = useMutation(addRef) as (args: {
+    text: string
+  }) => Promise<Id<"todos">>
+  const toggleTodo = useMutation(toggleRef) as (args: {
+    id: Id<"todos">
+  }) => Promise<void>
+  const removeTodo = useMutation(removeRef) as (args: {
+    id: Id<"todos">
+  }) => Promise<void>
+
+  const [newTodo, setNewTodo] = useState("")
 
   const handleAddTodo = useCallback(async () => {
     if (newTodo.trim()) {
       await addTodo({ text: newTodo.trim() })
-      setNewTodo('')
+      setNewTodo("")
     }
   }, [addTodo, newTodo])
 
   const handleToggleTodo = useCallback(
-    async (id: Id<'todos'>) => {
+    async (id: Id<"todos">) => {
       await toggleTodo({ id })
     },
     [toggleTodo],
   )
 
   const handleRemoveTodo = useCallback(
-    async (id: Id<'todos'>) => {
+    async (id: Id<"todos">) => {
       await removeTodo({ id })
     },
     [removeTodo],
   )
-
-  const completedCount = todos?.filter((todo) => todo.completed).length || 0
-  const totalCount = todos?.length || 0
+  const completedCount =
+    todos?.filter((todo: Todo) => todo.completed).length ?? 0
+  const totalCount = todos?.length ?? 0
 
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
       style={{
         background:
-          'linear-gradient(135deg, #667a56 0%, #8fbc8f 25%, #90ee90 50%, #98fb98 75%, #f0fff0 100%)',
+          "linear-gradient(135deg, #667a56 0%, #8fbc8f 25%, #90ee90 50%, #98fb98 75%, #f0fff0 100%)",
       }}
     >
       <div className="w-full max-w-2xl">
@@ -80,7 +94,7 @@ function ConvexTodos() {
               value={newTodo}
               onChange={(e) => setNewTodo(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   handleAddTodo()
                 }
               }}
@@ -117,11 +131,11 @@ function ConvexTodos() {
             </div>
           ) : (
             <div className="divide-y divide-green-100">
-              {todos.map((todo, index) => (
+              {todos.map((todo: Todo, index: number) => (
                 <div
                   key={todo._id}
                   className={`p-4 flex items-center gap-4 hover:bg-green-50/50 transition-colors ${
-                    todo.completed ? 'opacity-75' : ''
+                    todo.completed ? "opacity-75" : ""
                   }`}
                   style={{
                     animationDelay: `${index * 50}ms`,
@@ -131,8 +145,8 @@ function ConvexTodos() {
                     onClick={() => handleToggleTodo(todo._id)}
                     className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                       todo.completed
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-green-300 hover:border-green-400 text-transparent hover:text-green-400'
+                        ? "bg-green-500 border-green-500 text-white"
+                        : "border-green-300 hover:border-green-400 text-transparent hover:text-green-400"
                     }`}
                   >
                     <Check size={14} />
@@ -141,8 +155,8 @@ function ConvexTodos() {
                   <span
                     className={`flex-1 text-lg transition-all duration-200 ${
                       todo.completed
-                        ? 'line-through text-gray-500'
-                        : 'text-gray-800'
+                        ? "line-through text-gray-500"
+                        : "text-gray-800"
                     }`}
                   >
                     {todo.text}

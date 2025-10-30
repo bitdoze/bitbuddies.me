@@ -8,7 +8,13 @@
  * @module
  */
 
+import type * as courses from "../courses.js";
+import type * as enrollments from "../enrollments.js";
+import type * as posts from "../posts.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as todos from "../todos.js";
+import type * as utils from "../utils.js";
+import type * as workshops from "../workshops.js";
 
 import type {
   ApiFromModules,
@@ -25,7 +31,13 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  courses: typeof courses;
+  enrollments: typeof enrollments;
+  posts: typeof posts;
+  subscriptions: typeof subscriptions;
   todos: typeof todos;
+  utils: typeof utils;
+  workshops: typeof workshops;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

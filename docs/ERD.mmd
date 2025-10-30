@@ -1,0 +1,219 @@
+erDiagram
+    USERS ||--o| PROFILES : "has"
+    USERS ||--o| SUBSCRIPTIONS : "has"
+    USERS ||--o{ ENROLLMENTS : "has"
+    USERS ||--o{ COURSES : "instructs"
+    USERS ||--o{ WORKSHOPS : "instructs"
+    USERS ||--o{ POSTS : "authors"
+
+    SUBSCRIPTIONS ||--o{ SUBSCRIPTION_HISTORY : "tracks"
+
+    COURSES ||--o{ LESSONS : "contains"
+    COURSES ||--o{ ENROLLMENTS : "enrolled_in"
+
+    WORKSHOPS ||--o{ ENROLLMENTS : "enrolled_in"
+
+    ENROLLMENTS ||--o{ PROGRESS : "tracks"
+    LESSONS ||--o{ PROGRESS : "tracked_by"
+
+    USERS {
+        id _id PK
+        string clerkId UK
+        string email
+        enum role "user|admin"
+        boolean isActive
+        number lastLoginAt
+        number createdAt
+        number updatedAt
+    }
+
+    PROFILES {
+        id _id PK
+        id userId FK
+        string firstName
+        string lastName
+        string displayName
+        string bio
+        string avatarUrl
+        string website
+        string twitter
+        string linkedin
+        string github
+        boolean emailNotifications
+        number updatedAt
+    }
+
+    SUBSCRIPTIONS {
+        id _id PK
+        id userId FK
+        enum tier "free|basic|premium"
+        enum status "active|cancelled|expired|trial"
+        string stripeCustomerId
+        string stripeSubscriptionId
+        string priceId
+        string currency
+        number amount
+        number startDate
+        number endDate
+        number trialEndDate
+        number cancelledAt
+        number createdAt
+        number updatedAt
+    }
+
+    SUBSCRIPTION_HISTORY {
+        id _id PK
+        id userId FK
+        id subscriptionId FK
+        enum tier "free|basic|premium"
+        enum status "active|cancelled|expired|trial"
+        enum event "created|updated|cancelled|expired|renewed"
+        number amount
+        string currency
+        number eventDate
+        number createdAt
+    }
+
+    COURSES {
+        id _id PK
+        string title
+        string slug UK
+        string description
+        string shortDescription
+        id imageStorageId FK
+        string imageUrl
+        enum level "beginner|intermediate|advanced"
+        number duration
+        string category
+        array tags
+        enum accessLevel "public|authenticated|subscription"
+        enum requiredTier "basic|premium"
+        boolean isPublished
+        boolean isFeatured
+        id instructorId FK
+        string instructorName
+        number enrollmentCount
+        number completionCount
+        boolean isDeleted
+        number deletedAt
+        number publishedAt
+        number createdAt
+        number updatedAt
+    }
+
+    LESSONS {
+        id _id PK
+        id courseId FK
+        string title
+        string slug
+        string description
+        string content "HTML"
+        enum videoProvider "youtube|bunny"
+        string videoId
+        string videoUrl
+        number videoDuration
+        array attachments "storageId,filename,filesize,mimeType,url"
+        number order
+        boolean isPublished
+        boolean isFree
+        boolean isDeleted
+        number deletedAt
+        number publishedAt
+        number createdAt
+        number updatedAt
+    }
+
+    WORKSHOPS {
+        id _id PK
+        string title
+        string slug UK
+        string description
+        string shortDescription
+        id imageStorageId FK
+        string imageUrl
+        string content "HTML"
+        number duration
+        enum level "beginner|intermediate|advanced"
+        string category
+        array tags
+        boolean isLive
+        number startDate
+        number endDate
+        number maxParticipants
+        number currentParticipants
+        enum videoProvider "youtube|bunny"
+        string videoId
+        string videoUrl
+        enum accessLevel "public|authenticated|subscription"
+        enum requiredTier "basic|premium"
+        boolean isPublished
+        boolean isFeatured
+        id instructorId FK
+        string instructorName
+        number enrollmentCount
+        boolean isDeleted
+        number deletedAt
+        number publishedAt
+        number createdAt
+        number updatedAt
+    }
+
+    POSTS {
+        id _id PK
+        string title
+        string slug UK
+        string excerpt
+        string content "HTML"
+        id imageStorageId FK
+        string imageUrl
+        string category
+        array tags
+        number readTime
+        enum accessLevel "public|authenticated|subscription"
+        enum requiredTier "basic|premium"
+        boolean isPublished
+        boolean isFeatured
+        id authorId FK
+        string authorName
+        number viewCount
+        number likeCount
+        string metaTitle
+        string metaDescription
+        boolean isDeleted
+        number deletedAt
+        number publishedAt
+        number createdAt
+        number updatedAt
+    }
+
+    ENROLLMENTS {
+        id _id PK
+        id userId FK
+        enum contentType "course|workshop"
+        id courseId FK
+        id workshopId FK
+        enum status "active|completed|dropped"
+        number progressPercentage
+        number completedLessons
+        number totalLessons
+        number enrolledAt
+        number completedAt
+        number lastAccessedAt
+        number createdAt
+        number updatedAt
+    }
+
+    PROGRESS {
+        id _id PK
+        id enrollmentId FK
+        id userId FK
+        id lessonId FK
+        boolean isCompleted
+        number completionPercentage
+        number watchedDuration
+        number startedAt
+        number completedAt
+        number lastWatchedAt
+        number createdAt
+        number updatedAt
+    }
