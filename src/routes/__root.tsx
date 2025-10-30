@@ -9,6 +9,7 @@ import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
 
 import ClerkProvider from "../integrations/clerk/provider";
 import ConvexProvider from "../integrations/convex/provider";
+import { UserSyncProvider } from "../components/common/UserSyncProvider";
 
 import appCss from "../styles.css?url";
 
@@ -42,6 +43,17 @@ export const Route = createRootRoute({
 		],
 	}),
 
+	notFoundComponent: () => (
+		<div className="container mx-auto py-8">
+			<div className="text-center space-y-4">
+				<h1 className="text-4xl font-bold">404 - Page Not Found</h1>
+				<p className="text-muted-foreground">
+					The page you're looking for doesn't exist.
+				</p>
+			</div>
+		</div>
+	),
+
 	shellComponent: RootDocument,
 });
 
@@ -55,25 +67,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<ThemeProvider defaultTheme="system" storageKey="bitbuddies-ui-theme">
 					<ClerkProvider>
 						<ConvexProvider>
-							<SidebarProvider>
-								<AppSidebar />
-								<SidebarInset className="flex flex-col min-h-screen">
-									<Header />
-									<main className="flex-1 w-full">{children}</main>
-									<Footer />
-								</SidebarInset>
-							</SidebarProvider>
-							<TanStackDevtools
-								config={{
-									position: "bottom-right",
-								}}
-								plugins={[
-									{
-										name: "Tanstack Router",
-										render: <TanStackRouterDevtoolsPanel />,
-									},
-								]}
-							/>
+							<UserSyncProvider>
+								<SidebarProvider>
+									<AppSidebar />
+									<SidebarInset className="flex flex-col min-h-screen">
+										<Header />
+										<main className="flex-1 w-full">{children}</main>
+										<Footer />
+									</SidebarInset>
+								</SidebarProvider>
+								<TanStackDevtools
+									config={{
+										position: "bottom-right",
+									}}
+									plugins={[
+										{
+											name: "Tanstack Router",
+											render: <TanStackRouterDevtoolsPanel />,
+										},
+									]}
+								/>
+							</UserSyncProvider>
 						</ConvexProvider>
 					</ClerkProvider>
 				</ThemeProvider>

@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server"
+import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 import { ensureUniqueSlug } from "./utils"
 
@@ -225,5 +225,57 @@ export const softDelete = mutation({
 			deletedAt: Date.now(),
 			updatedAt: Date.now(),
 		})
+	},
+})
+
+export const list = query({
+	args: {
+		limit: v.optional(v.number()),
+		publishedOnly: v.optional(v.boolean()),
+	},
+	handler: async (ctx, args) => {
+		const limit = args.limit ?? 50
+		const publishedOnly = args.publishedOnly ?? true
+
+		let query = ctx.db
+			.query("workshops")
+			.withIndex("by_is_deleted", (q) => q.eq("isDeleted", false))
+			.order("desc")
+
+		const workshops = await query.take(limit)
+
+		return workshops.filter(
+			(w) => !publishedOnly || w.isPublished,
+		)
+	},
+})
+
+export const getBySlug = query({
+	args: {
+		slug: v.string(),
+	},
+	handler: async (ctx, args) => {
+		const workshop = await ctx.db
+			.query("workshops")
+			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
+			.filter((q) => q.eq(q.field("isDeleted"), false))
+			.first()
+
+		return workshop
+	},
+})
+
+export const getById = query({
+	args: {
+		workshopId: v.id("workshops"),
+	},
+	handler: async (ctx, args) => {
+		const workshop = await ctx.db.get(args.workshopId)
+
+		if (!workshop || workshop.isDeleted) {
+			return null
+		}
+
+		return workshop
 	},
 })

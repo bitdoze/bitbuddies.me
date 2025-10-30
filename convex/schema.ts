@@ -345,6 +345,20 @@ export default defineSchema({
 			filterFields: ["isPublished", "isDeleted"],
 		}),
 
+	/**
+	 * Workshop attachments - downloadable resources linked to workshops
+	 */
+	workshopAttachments: defineTable({
+		workshopId: v.id("workshops"),
+		assetId: v.id("mediaAssets"),
+		displayName: v.string(),
+		sortOrder: v.number(),
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index("by_workshop_id", ["workshopId"])
+		.index("by_asset_id", ["assetId"]),
+
 	// ============================================================================
 	// POSTS (BLOG)
 	// ============================================================================

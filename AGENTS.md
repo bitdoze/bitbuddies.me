@@ -32,82 +32,53 @@ bitbuddies.me/
 ├── convex/                        # Convex backend schema + server functions
 │   ├── schema.ts                  # Database schema definitions with `v` validators
 │   ├── courses.ts                 # CRUD + queries for course content
-│   ├── workshops.ts               # CRUD + queries for workshop content
+│   ├── workshops.ts               # CRUD + queries for workshop content (IMPLEMENTED)
+│   ├── workshopAttachments.ts     # Workshop attachments management (IMPLEMENTED)
 │   ├── posts.ts                   # CRUD + queries for micro-posts
-│   ├── users.ts                   # User management helpers (profiles, roles)
+│   ├── users.ts                   # User management + Clerk sync (IMPLEMENTED)
 │   ├── enrollments.ts             # Enrollment lookups and mutations
-│   └── tools.ts                   # Placeholder for future AI/utility endpoints
+│   ├── subscriptions.ts           # Subscription management
+│   ├── todos.ts                   # Demo table for testing
+│   └── utils.ts                   # Utility functions (slug validation, etc.)
 └── src/                           # TanStack Start application source
     ├── styles.css                 # Global Tailwind theme tokens + base styles
     ├── main.tsx                   # Client entry; mounts router/app
     ├── app.config.ts              # TanStack Start configuration (router, themes, metadata)
     ├── components/                # Reusable UI building blocks
-    │   ├── ui/                    # Generated shadcn components (Button, Dialog, etc.)
-    │   ├── common/                # Cross-domain pieces (SEO, shared headers, empty states)
-    │   │   ├── SEO.tsx            # Head tags wrapper for per-page metadata
-    │   │   ├── PageHeader.tsx     # Generic page header with title/CTA slot
-    │   │   └── EmptyState.tsx     # Generic empty-state renderer with icon/message
-    │   ├── layout/                # Global layout primitives
-    │   │   ├── Header.tsx         # Top navigation bar (logo, auth, theme toggle)
-    │   │   ├── Footer.tsx         # Site footer with links/legal
-    │   │   └── Sidebar.tsx        # Optional sidebar for dashboard/admin views
-    │   ├── courses/               # Course-specific presentation components
-    │   │   ├── CourseCard.tsx     # Compact course summary card
-    │   │   ├── CourseList.tsx     # Grid/list layout for multiple courses
-    │   │   └── CourseDetail.tsx   # Detailed course view with syllabus
-    │   ├── workshops/             # Workshop-specific presentation components
-    │   │   ├── WorkshopCard.tsx   # Workshop teaser card
-    │   │   └── WorkshopList.tsx   # Listing layout for workshops
-    │   ├── posts/                 # Blog/post presentation components
-    │   │   ├── PostCard.tsx       # Post preview card
-    │   │   └── PostList.tsx       # List renderer for posts/feed
-    │   ├── profile/               # Profile/account UI pieces
-    │   │   ├── ProfileHeader.tsx  # Cover/profile summary header
-    │   │   ├── ProfileInfo.tsx    # Detailed profile info panel
-    │   │   ├── EnrollmentsList.tsx# Enrolled courses/workshops table
-    │   │   └── ProfileSettings.tsx# Settings form for account preferences
-    │   └── admin/                 # Admin dashboard widgets
-    │       ├── AdminNav.tsx       # Admin sidebar/top navigation
-    │       ├── ContentEditor.tsx  # Rich editor for managing content entries
-    │       └── ContentTable.tsx   # Table view for filtering and bulk actions
-    ├── routes/                    # File-based TanStack Start routes
-    │   ├── __root.tsx             # Root layout, theme provider, persistent shells
-    │   ├── index.tsx              # Landing page route
-    │   ├── courses/               # Public course routes
-    │   │   ├── index.tsx          # `/courses` listing route
-    │   │   └── $courseId.tsx      # `/courses/:courseId` detail route
-    │   ├── workshops/             # Public workshop routes
-    │   │   ├── index.tsx          # `/workshops` listing route
-    │   │   └── $workshopId.tsx    # `/workshops/:workshopId` detail route
-    │   ├── posts/                 # Public post routes
-    │   │   ├── index.tsx          # `/posts` listing route
-    │   │   └── $postId.tsx        # `/posts/:postId` detail route
-    │   ├── profile/               # Authenticated profile routes
-    │   │   ├── index.tsx          # `/profile` current-user dashboard
-    │   │   ├── settings.tsx       # `/profile/settings` preferences page
-    │   │   └── $userId.tsx        # `/profile/:userId` public profile view
-    │   ├── admin/                 # Admin-only routes
-    │   │   ├── index.tsx          # `/admin` overview
-    │   │   ├── courses.tsx        # `/admin/courses` management panel
-    │   │   ├── workshops.tsx      # `/admin/workshops` management panel
-    │   │   └── posts.tsx          # `/admin/posts` management panel
-    │   └── demo/                  # Demo pages for component/system checks
+    │   ├── ui/                    # Generated shadcn components (Button, Dialog, Card, Form, etc.)
+    │   ├── common/                # Cross-domain pieces (IMPLEMENTED)
+    │   │   ├── theme-provider.tsx # Theme provider for dark/light mode (IMPLEMENTED)
+    │   │   ├── UserSyncProvider.tsx # Auto-sync Clerk users to Convex (IMPLEMENTED)
+    │   │   └── UserSyncDebug.tsx  # Debug component for user sync (IMPLEMENTED)
+    │   ├── layout/                # Global layout primitives (IMPLEMENTED)
+    │   │   ├── Header.tsx         # Top navigation bar with auth (IMPLEMENTED)
+    │   │   ├── Footer.tsx         # Site footer (IMPLEMENTED)
+    │   │   └── Sidebar.tsx        # App sidebar navigation (IMPLEMENTED)
+    │   └── demo.FormComponents.tsx # Demo form components for testing
+    ├── routes/                    # File-based TanStack Start routes (use dot notation: admin.workshops.tsx)
+    │   ├── __root.tsx             # Root layout with providers (IMPLEMENTED)
+    │   ├── index.tsx              # Landing page route (IMPLEMENTED)
+    │   ├── workshops.$slug.tsx    # `/workshops/:slug` - View workshop (IMPLEMENTED, auth required)
+    │   ├── workshops.index.tsx    # `/workshops` - List workshops (IMPLEMENTED, auth required)
+    │   ├── admin.workshops.tsx    # `/admin/workshops` - Layout with <Outlet /> (IMPLEMENTED)
+    │   ├── admin.workshops.index.tsx # `/admin/workshops/` - List/manage workshops (IMPLEMENTED)
+    │   ├── admin.workshops.create.tsx # `/admin/workshops/create` - Create workshop (IMPLEMENTED)
+    │   ├── admin.workshops.$id.edit.tsx # `/admin/workshops/:id/edit` - Edit workshop (IMPLEMENTED)
+    │   ├── debug.user-sync.tsx    # `/debug/user-sync` - Debug user sync (IMPLEMENTED)
+    │   └── debug.workshops-video.tsx # `/debug/workshops-video` - Debug/fix video embeds (IMPLEMENTED)
     ├── hooks/                     # Domain-specific React hooks
-    │   ├── useAuth.ts             # Clerk-based auth helpers and user info
-    │   ├── useCourses.ts          # Course fetching/caching via Convex + React Query
-    │   ├── useWorkshops.ts        # Workshop fetching/caching helpers
-    │   ├── usePosts.ts            # Post fetching/caching helpers
-    │   └── useEnrollments.ts      # Enrollment status and mutations
+    │   ├── useAuth.ts             # Clerk auth + Convex user integration (IMPLEMENTED)
+    │   ├── useWorkshops.ts        # Workshop + attachment queries/mutations (IMPLEMENTED)
+    │   ├── use-mobile.ts          # Mobile detection hook (IMPLEMENTED)
+    │   └── demo.form*.ts          # Demo form hooks for testing
     ├── integrations/              # External service initializers
-    │   ├── clerk.ts               # Clerk client setup, providers, helpers
-    │   ├── convex.ts              # Convex client and query/mutation adapters
-    │   └── analytics.ts           # Analytics/tracking bootstrap (optional)
-    ├── lib/                       # Typed utility functions
-    │   ├── seo.ts                 # SEO helper utilities shared across routes
-    │   ├── utils.ts               # General-purpose helpers (formatting, guards)
-    │   └── formatters.ts          # String/date/number formatting utilities
-    └── store/                     # TanStack Store slices
-        └── index.ts               # Central store configuration (auth/ui slices)
+    │   ├── clerk/                 # Clerk authentication (IMPLEMENTED)
+    │   │   ├── provider.tsx       # ClerkProvider wrapper (IMPLEMENTED)
+    │   │   └── header-user.tsx    # User menu component (IMPLEMENTED)
+    │   └── convex/                # Convex backend integration (IMPLEMENTED)
+    │       └── provider.tsx       # ConvexProvider wrapper (IMPLEMENTED)
+    └── lib/                       # Typed utility functions
+        └── utils.ts               # General-purpose helpers (cn, etc.) (IMPLEMENTED)
 
 ```
 
@@ -130,6 +101,37 @@ Use lucide-react for icons
 
 The website needs to use the themes settings from styles.css, if I change them there to be reflected everywhere.
 
-## Demo Components to see how is Working
+## Important Notes
 
-The demo code is under `src/routs/demo`
+### File-Based Routing (TanStack Start)
+- Use **dot notation** for nested routes: `admin.workshops.tsx` creates `/admin/workshops`
+- Use **dollar sign** for dynamic params: `workshops.$slug.tsx` creates `/workshops/:slug`
+- Use **underscore** to prevent nesting: `admin.workshops_.create.tsx` prevents it from being a child
+- Parent routes with children need `<Outlet />` component
+- Routes auto-generate types in `src/routeTree.gen.ts`
+
+### User Authentication Flow
+1. User signs in via Clerk
+2. `UserSyncProvider` (in `__root.tsx`) automatically syncs to Convex
+3. Creates record in `users` table with Clerk ID
+4. Creates associated `profiles` record
+5. `useAuth()` hook provides both Clerk user and Convex user
+
+### Workshop Features (IMPLEMENTED)
+- ✅ Create/Edit/Delete workshops (admin only)
+- ✅ List and view workshops (authenticated users only)
+- ✅ YouTube video embedding (auto-converts URLs to embed format)
+- ✅ Workshop attachments support
+- ✅ Rich content with HTML support
+- ✅ Live workshop scheduling with participant limits
+- ✅ Access level controls (public/authenticated/subscription)
+
+### Video Embedding Best Practices
+- Paste YouTube URL in Video URL field: `https://www.youtube.com/watch?v=VIDEO_ID`
+- OR use Video ID field with just the ID: `VIDEO_ID` (select YouTube provider)
+- System auto-converts to embed format: `https://www.youtube.com/embed/VIDEO_ID`
+- **Don't paste iframe HTML** - use `/debug/workshops-video` to fix if needed
+
+### Debug Tools
+- `/debug/user-sync` - Inspect and manually sync Clerk users to Convex
+- `/debug/workshops-video` - Fix video embed issues, extract IDs from iframe HTML

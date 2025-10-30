@@ -1,6 +1,7 @@
-import { Home, BookOpen, Calendar, Users, Settings, X } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
-
+import { Link } from "@tanstack/react-router";
+import { BookOpen, Calendar, Home, Settings, Users, X } from "lucide-react";
+import { Logo } from "@/components/common/logo";
+import { Button } from "@/components/ui/button";
 import {
 	Sidebar,
 	SidebarContent,
@@ -14,10 +15,8 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 	useSidebar,
-} from '@/components/ui/sidebar'
-import { Logo } from '@/components/common/logo'
-import HeaderUser from '@/integrations/clerk/header-user'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/sidebar";
+import HeaderUser from "@/integrations/clerk/header-user";
 
 const menuItems = [
 	{
@@ -53,7 +52,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-	const { toggleSidebar } = useSidebar()
+	const { toggleSidebar } = useSidebar();
 
 	return (
 		<Sidebar>
@@ -102,7 +101,9 @@ export function AppSidebar() {
 			<SidebarFooter className="border-t border-sidebar-border p-4">
 				<div className="flex flex-col gap-2">
 					<HeaderUser />
-					<p className="text-xs text-sidebar-foreground/60">© 2024 BitBuddies</p>
+					<p className="text-xs text-sidebar-foreground/60">
+						© 2024 BitBuddies
+					</p>
 				</div>
 			</SidebarFooter>
 			<SidebarRail />

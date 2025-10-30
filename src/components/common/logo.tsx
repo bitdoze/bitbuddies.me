@@ -27,7 +27,14 @@ export function Logo({ className = "" }: { className?: string }) {
 
 			{/* Icon */}
 			<g>
-				<rect width="56" height="56" x="4" y="4" rx="18" fill="url(#bitbuddiesGradient)" />
+				<rect
+					width="56"
+					height="56"
+					x="4"
+					y="4"
+					rx="18"
+					fill="url(#bitbuddiesGradient)"
+				/>
 				<g fill="#f8fafc">
 					<circle cx="24" cy="26.5" r="7" />
 					<circle cx="40" cy="26.5" r="7" />
@@ -102,7 +109,14 @@ export function LogoHeader({ className = "" }: { className?: string }) {
 
 			{/* Icon */}
 			<g>
-				<rect width="56" height="56" x="4" y="4" rx="18" fill="url(#bitbuddiesGradientHeader)" />
+				<rect
+					width="56"
+					height="56"
+					x="4"
+					y="4"
+					rx="18"
+					fill="url(#bitbuddiesGradientHeader)"
+				/>
 				<g fill="#f8fafc">
 					<circle cx="24" cy="26.5" r="7" />
 					<circle cx="40" cy="26.5" r="7" />
@@ -174,7 +188,14 @@ export function LogoIcon({ className = "" }: { className?: string }) {
 					<stop offset="100%" stopColor="#a855f7" />
 				</linearGradient>
 			</defs>
-			<rect width="56" height="56" x="4" y="4" rx="18" fill="url(#bitbuddiesGradientIcon)" />
+			<rect
+				width="56"
+				height="56"
+				x="4"
+				y="4"
+				rx="18"
+				fill="url(#bitbuddiesGradientIcon)"
+			/>
 			<g fill="#f8fafc">
 				<circle cx="24" cy="26.5" r="7" />
 				<circle cx="40" cy="26.5" r="7" />

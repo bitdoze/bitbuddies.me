@@ -13,7 +13,9 @@ import type * as enrollments from "../enrollments.js";
 import type * as posts from "../posts.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as todos from "../todos.js";
+import type * as users from "../users.js";
 import type * as utils from "../utils.js";
+import type * as workshopAttachments from "../workshopAttachments.js";
 import type * as workshops from "../workshops.js";
 
 import type {
@@ -36,7 +38,9 @@ declare const fullApi: ApiFromModules<{
   posts: typeof posts;
   subscriptions: typeof subscriptions;
   todos: typeof todos;
+  users: typeof users;
   utils: typeof utils;
+  workshopAttachments: typeof workshopAttachments;
   workshops: typeof workshops;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

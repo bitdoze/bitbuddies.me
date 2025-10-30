@@ -10,33 +10,136 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
+import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
+import { Route as DebugWorkshopsVideoRouteImport } from './routes/debug.workshops-video'
+import { Route as DebugUserSyncRouteImport } from './routes/debug.user-sync'
+import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
+import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshops.index'
+import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin.workshops.create'
+import { Route as AdminWorkshopsIdEditRouteImport } from './routes/admin.workshops.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkshopsIndexRoute = WorkshopsIndexRouteImport.update({
+  id: '/workshops/',
+  path: '/workshops/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
+  id: '/workshops/$slug',
+  path: '/workshops/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugWorkshopsVideoRoute = DebugWorkshopsVideoRouteImport.update({
+  id: '/debug/workshops-video',
+  path: '/debug/workshops-video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugUserSyncRoute = DebugUserSyncRouteImport.update({
+  id: '/debug/user-sync',
+  path: '/debug/user-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminWorkshopsRoute = AdminWorkshopsRouteImport.update({
+  id: '/admin/workshops',
+  path: '/admin/workshops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminWorkshopsIndexRoute = AdminWorkshopsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminWorkshopsRoute,
+} as any)
+const AdminWorkshopsCreateRoute = AdminWorkshopsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminWorkshopsRoute,
+} as any)
+const AdminWorkshopsIdEditRoute = AdminWorkshopsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminWorkshopsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/debug/user-sync': typeof DebugUserSyncRoute
+  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
+  '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/workshops': typeof WorkshopsIndexRoute
+  '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/debug/user-sync': typeof DebugUserSyncRoute
+  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
+  '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/workshops': typeof WorkshopsIndexRoute
+  '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/workshops': typeof AdminWorkshopsIndexRoute
+  '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/debug/user-sync': typeof DebugUserSyncRoute
+  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
+  '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/workshops/': typeof WorkshopsIndexRoute
+  '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin/workshops'
+    | '/debug/user-sync'
+    | '/debug/workshops-video'
+    | '/workshops/$slug'
+    | '/workshops'
+    | '/admin/workshops/create'
+    | '/admin/workshops/'
+    | '/admin/workshops/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/debug/user-sync'
+    | '/debug/workshops-video'
+    | '/workshops/$slug'
+    | '/workshops'
+    | '/admin/workshops/create'
+    | '/admin/workshops'
+    | '/admin/workshops/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin/workshops'
+    | '/debug/user-sync'
+    | '/debug/workshops-video'
+    | '/workshops/$slug'
+    | '/workshops/'
+    | '/admin/workshops/create'
+    | '/admin/workshops/'
+    | '/admin/workshops/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
+  DebugUserSyncRoute: typeof DebugUserSyncRoute
+  DebugWorkshopsVideoRoute: typeof DebugWorkshopsVideoRoute
+  WorkshopsSlugRoute: typeof WorkshopsSlugRoute
+  WorkshopsIndexRoute: typeof WorkshopsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +151,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workshops/': {
+      id: '/workshops/'
+      path: '/workshops'
+      fullPath: '/workshops'
+      preLoaderRoute: typeof WorkshopsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workshops/$slug': {
+      id: '/workshops/$slug'
+      path: '/workshops/$slug'
+      fullPath: '/workshops/$slug'
+      preLoaderRoute: typeof WorkshopsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug/workshops-video': {
+      id: '/debug/workshops-video'
+      path: '/debug/workshops-video'
+      fullPath: '/debug/workshops-video'
+      preLoaderRoute: typeof DebugWorkshopsVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug/user-sync': {
+      id: '/debug/user-sync'
+      path: '/debug/user-sync'
+      fullPath: '/debug/user-sync'
+      preLoaderRoute: typeof DebugUserSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/workshops': {
+      id: '/admin/workshops'
+      path: '/admin/workshops'
+      fullPath: '/admin/workshops'
+      preLoaderRoute: typeof AdminWorkshopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/workshops/': {
+      id: '/admin/workshops/'
+      path: '/'
+      fullPath: '/admin/workshops/'
+      preLoaderRoute: typeof AdminWorkshopsIndexRouteImport
+      parentRoute: typeof AdminWorkshopsRoute
+    }
+    '/admin/workshops/create': {
+      id: '/admin/workshops/create'
+      path: '/create'
+      fullPath: '/admin/workshops/create'
+      preLoaderRoute: typeof AdminWorkshopsCreateRouteImport
+      parentRoute: typeof AdminWorkshopsRoute
+    }
+    '/admin/workshops/$id/edit': {
+      id: '/admin/workshops/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/workshops/$id/edit'
+      preLoaderRoute: typeof AdminWorkshopsIdEditRouteImport
+      parentRoute: typeof AdminWorkshopsRoute
+    }
   }
 }
 
+interface AdminWorkshopsRouteChildren {
+  AdminWorkshopsCreateRoute: typeof AdminWorkshopsCreateRoute
+  AdminWorkshopsIndexRoute: typeof AdminWorkshopsIndexRoute
+  AdminWorkshopsIdEditRoute: typeof AdminWorkshopsIdEditRoute
+}
+
+const AdminWorkshopsRouteChildren: AdminWorkshopsRouteChildren = {
+  AdminWorkshopsCreateRoute: AdminWorkshopsCreateRoute,
+  AdminWorkshopsIndexRoute: AdminWorkshopsIndexRoute,
+  AdminWorkshopsIdEditRoute: AdminWorkshopsIdEditRoute,
+}
+
+const AdminWorkshopsRouteWithChildren = AdminWorkshopsRoute._addFileChildren(
+  AdminWorkshopsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
+  DebugUserSyncRoute: DebugUserSyncRoute,
+  DebugWorkshopsVideoRoute: DebugWorkshopsVideoRoute,
+  WorkshopsSlugRoute: WorkshopsSlugRoute,
+  WorkshopsIndexRoute: WorkshopsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
