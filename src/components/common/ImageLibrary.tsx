@@ -186,7 +186,9 @@ function ImageCard({ asset, isSelected, onSelect }: ImageCardProps) {
 					<p className="text-xs text-center mb-1">
 						{formatFileSize(asset.filesize)}
 					</p>
-					<p className="text-xs text-center">{formatDate(asset._creationTime)}</p>
+					<p className="text-xs text-center">
+						{formatDate(asset._creationTime)}
+					</p>
 				</div>
 			</div>
 		</div>

@@ -3,6 +3,27 @@
 You don't need to create any documentation with the implementation. I will tell you when to create the documentation. You only provide me a short summary with what was done.
 Before implementing anything think that the structure and code is as simple as possible and secure.
 
+## Architecture Review (Implemented - December 2024)
+
+### ✅ Security Improvements (COMPLETED)
+1. **Protected Convex Mutations** - All admin mutations now require `clerkId` and verify `role=admin`
+   - `workshopAttachments.ts` - create/update/remove require admin
+   - `mediaAssets.ts` - create/update/remove require admin
+   - `users.setUserRole` - requires caller to be admin
+2. **Eliminated N+1 Queries** - Workshop queries return enriched data with `coverAsset` included
+3. **SPA Navigation** - Replaced all internal `<a href>` with `<Link to>` in Header, Sidebar, Footer, and routes
+4. **Server-Side Data Prefetching** - Implemented TanStack Router loaders for workshops pages
+
+### 🔄 Future Improvements (TODO)
+1. **Testing** - Establish baseline Vitest suite for mutations and utilities
+2. **Shared Utilities** - Extract repeated date/status helpers into shared modules
+3. **Error Handling** - Replace `alert()` with toast notifications and add error boundaries
+4. **Build Optimization** - Lazy-load dev tools in production builds
+5. **Environment Protection** - Gate debug routes behind environment variable checks
+6. **Type Safety** - Replace remaining `any` types with proper TypeScript types
+7. **Accessibility** - Add keyboard event handlers to interactive div elements
+8. **Structured Logging** - Implement observability around Convex failures
+
 ## Commands
 
 - Dev: `bun run dev` (runs on port 3000)
@@ -17,7 +38,8 @@ Before implementing anything think that the structure and code is as simple as p
 - **Backend**: Convex (schema in `convex/schema.ts`, functions in `convex/`)
 - **Auth**: Clerk (requires `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local`)
 - **Styling**: Tailwind CSS v4 + shadcn components (add via `bunx shadcn@latest add <component>`)
-- **State**: TanStack Router loaders + React Query + TanStack Store
+- **State**: TanStack Router loaders (server-side prefetch) + React Query + TanStack Store
+- **Data Fetching**: Server-side prefetch via loaders using ConvexHttpClient, client-side reactivity via useQuery
 - **Structure**: `src/components/`, `src/hooks/`, `src/lib/`, `src/integrations/`
 
 ```
@@ -117,6 +139,40 @@ The website needs to use the themes settings from styles.css, if I change them t
 4. Creates associated `profiles` record
 5. `useAuth()` hook provides both Clerk user and Convex user
 
+### TanStack Router Loaders (IMPLEMENTED)
+- **Server-Side Data Prefetching**: Routes prefetch data on the server for faster initial load
+- **Pattern**: Use ConvexHttpClient in loader, fallback to useQuery on client
+- **Implementation**:
+  ```typescript
+  export const Route = createFileRoute("/workshops/")({
+    component: WorkshopsPage,
+    loader: async () => {
+      const convexUrl = import.meta.env.VITE_CONVEX_URL;
+      const client = new ConvexHttpClient(convexUrl);
+      const workshops = await client.query(api.workshops.list, {
+        publishedOnly: true,
+      });
+      return { workshops };
+    },
+  });
+
+  function WorkshopsPage() {
+    const loaderData = Route.useLoaderData();
+    const clientWorkshops = useWorkshops({ publishedOnly: true });
+    const workshops = loaderData?.workshops ?? clientWorkshops;
+    // ...
+  }
+  ```
+- **Benefits**:
+  - No loading spinners on initial page load
+  - Better SEO with server-rendered data
+  - Faster perceived performance
+  - Hydration with data already available
+- **Implemented on**:
+  - `/workshops` - List workshops with prefetch
+  - `/workshops/:slug` - Workshop detail with prefetch
+  - `/admin/workshops` - Admin workshop list with prefetch
+
 ### Admin Access Control (IMPLEMENTED)
 - **Backend Authorization**: All admin mutations (create/update/delete workshops) require `role=admin` in Convex users table
 - **Frontend Protection**: Admin routes (`/admin/*`) check `isAdmin` from `useAuth()` hook
@@ -128,9 +184,11 @@ The website needs to use the themes settings from styles.css, if I change them t
   - `useAuth()` returns `isAdmin` boolean (true if user role is "admin")
   - `useRequireAdmin()` throws error if not admin (for route guards)
 - **Backend Functions**:
-  - `users.setUserRole()` - Set user role by Clerk ID
+  - `users.setUserRole()` - Set user role by Clerk ID (requires caller to be admin)
   - All workshop mutations require `clerkId` parameter for authorization
-  - `requireAdmin()` helper validates admin role before mutations
+  - All workshopAttachments mutations require `clerkId` and admin verification
+  - All mediaAssets mutations require `clerkId` and admin verification
+  - `requireAdmin()` helper validates admin role before mutations (used across all protected mutations)
 
 ### Workshop Features (IMPLEMENTED)
 - ✅ Create/Edit/Delete workshops (admin only)
@@ -172,6 +230,33 @@ The website needs to use the themes settings from styles.css, if I change them t
 - **File validation**: max 10MB, images only
 - **Recommended dimensions**: 1200×675 pixels (16:9 ratio)
 - **Automatic URL generation** from storage ID
+- **Authorization**: All upload/modify/delete operations require admin role
+
+### Data Loading Optimization (IMPLEMENTED)
+- **Enriched Queries**: Workshop queries return complete data including cover assets
+- **Eliminated N+1**: Single query returns workshop + coverAsset (no separate lookups)
+- **Pattern**: Backend joins asset data, frontend receives enriched objects
+- **Performance**: 10 workshops = 1 query (was 11 queries before)
+- **Implementation**:
+  ```typescript
+  // In convex/workshops.ts
+  const enriched = await Promise.all(
+    workshops.map(async (workshop) => {
+      let coverAsset = null;
+      if (workshop.coverAssetId) {
+        coverAsset = await ctx.db.get(workshop.coverAssetId);
+      }
+      return { ...workshop, coverAsset };
+    }),
+  );
+  ```
+
+### Navigation Best Practices (IMPLEMENTED)
+- **Use `<Link>` for internal routes**: All SPA navigation uses TanStack Router `<Link>` component
+- **Use `<a>` for external links**: Social media, external resources use standard anchors
+- **Proper route patterns**: Dynamic routes use params object `<Link to="/workshops/$slug" params={{ slug }}>`
+- **Active states**: Use `activeProps` for highlighting current page
+- **Implementation**: Header, Sidebar, Footer, and all route components use proper navigation
 
 ### Video Embedding Best Practices
 - Paste YouTube URL in Video URL field: `https://www.youtube.com/watch?v=VIDEO_ID`
@@ -291,3 +376,67 @@ The image library provides a centralized way to manage and reuse uploaded images
 - SEO-friendly public pages
 - Clear value proposition before sign-in
 - Professional user experience
+
+## Security Best Practices
+
+### Always Verify Authorization
+- **Pattern**: Every mutation that modifies data must verify the caller's identity and role
+- **Implementation**: Pass `clerkId` as parameter, call `requireAdmin(ctx, clerkId)` at start of handler
+- **Example**:
+  ```typescript
+  export const create = mutation({
+    args: {
+      clerkId: v.string(),
+      // ... other args
+    },
+    handler: async (ctx, args) => {
+      await requireAdmin(ctx, args.clerkId);
+      // ... proceed with mutation
+    },
+  });
+  ```
+
+### Never Trust Client Input
+- **Validate all data**: Use Convex validators (`v.*`) for all mutation arguments
+- **Sanitize user content**: HTML content should be sanitized before storage/display
+- **Check relationships**: Verify user owns resource before allowing modifications
+
+### Protect Debug Routes
+- **Production**: Remove or gate debug routes behind environment checks
+- **Example routes to protect**: `/debug/*`, `/admin-setup`
+- **Pattern**: Check `import.meta.env.MODE === "development"` in loader
+
+## Performance Best Practices
+
+### Server-Side Data Prefetching
+- **Always use loaders**: Prefetch data on server for initial page loads
+- **Pattern**: ConvexHttpClient in loader, useQuery for reactivity
+- **Fallback**: Always provide client-side fallback for when loader fails
+
+### Avoid N+1 Queries
+- **Join data in backend**: Return enriched objects from Convex queries
+- **Don't**: Call useQuery in map/loops for related data
+- **Do**: Fetch related data in backend, return as single enriched response
+
+### Use Proper Indexes
+- **Index foreign keys**: All fields used in `.withIndex()` should have indexes
+- **Index filters**: Fields used in `.filter()` benefit from indexes
+- **Check schema**: Convex schema.ts defines all indexes
+
+## Code Quality Guidelines
+
+### TypeScript
+- **Avoid `any`**: Use proper types or `unknown` with type guards
+- **Type Convex responses**: Use generated types from `convex/_generated/dataModel`
+- **Strict mode**: Keep TypeScript strict mode enabled
+
+### React Patterns
+- **Avoid premature optimization**: Profile before optimizing
+- **Use proper hooks**: Follow React hooks rules (dependencies, etc.)
+- **Error boundaries**: Wrap route components in error boundaries
+
+### Accessibility
+- **Interactive elements**: Use button/anchor, not div with onClick
+- **Keyboard navigation**: Add onKeyDown handlers where onClick exists
+- **ARIA labels**: Provide labels for screen readers
+- **Alt text**: Describe images without redundant words (avoid "image of")

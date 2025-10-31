@@ -7,10 +7,7 @@ export function useMediaAsset(assetId?: Id<"mediaAssets">) {
 }
 
 export function useMediaAssetUrl(storageId?: Id<"_storage">) {
-	return useQuery(
-		api.mediaAssets.getUrl,
-		storageId ? { storageId } : "skip",
-	);
+	return useQuery(api.mediaAssets.getUrl, storageId ? { storageId } : "skip");
 }
 
 export function useListMediaAssets(options?: {

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
+import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "../components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -30,13 +30,15 @@ function WorkshopsVideoDebugPage() {
 	const [selectedWorkshop, setSelectedWorkshop] = useState<string>("");
 	const [videoUrl, setVideoUrl] = useState("");
 	const [videoId, setVideoId] = useState("");
-	const [videoProvider, setVideoProvider] = useState<"youtube" | "bunny">("youtube");
+	const [videoProvider, setVideoProvider] = useState<"youtube" | "bunny">(
+		"youtube",
+	);
 
 	const workshop = workshops?.find((w) => w._id === selectedWorkshop);
 
 	const extractVideoId = (url: string) => {
 		const match = url.match(
-			/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+			/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
 		);
 		return match ? match[1] : null;
 	};
@@ -47,7 +49,7 @@ function WorkshopsVideoDebugPage() {
 		if (srcMatch) {
 			const src = srcMatch[1];
 			// Remove query parameters like ?si=...
-			return src.split('?')[0];
+			return src.split("?")[0];
 		}
 		return null;
 	};
@@ -63,14 +65,16 @@ function WorkshopsVideoDebugPage() {
 	const handleExtractId = () => {
 		if (videoUrl) {
 			// First check if it's an iframe HTML
-			if (videoUrl.includes('<iframe')) {
+			if (videoUrl.includes("<iframe")) {
 				const embedUrl = extractEmbedUrlFromIframe(videoUrl);
 				if (embedUrl) {
 					setVideoUrl(embedUrl);
 					const id = extractVideoId(embedUrl);
 					if (id) {
 						setVideoId(id);
-						alert(`Extracted from iframe!\nEmbed URL: ${embedUrl}\nVideo ID: ${id}`);
+						alert(
+							`Extracted from iframe!\nEmbed URL: ${embedUrl}\nVideo ID: ${id}`,
+						);
 						return;
 					}
 				}
@@ -112,20 +116,20 @@ function WorkshopsVideoDebugPage() {
 	const getEmbedUrl = (
 		videoUrl?: string,
 		videoId?: string,
-		videoProvider?: string
+		videoProvider?: string,
 	) => {
 		if (videoUrl) {
 			// Check if it's iframe HTML
-			if (videoUrl.includes('<iframe')) {
+			if (videoUrl.includes("<iframe")) {
 				const embedUrl = extractEmbedUrlFromIframe(videoUrl);
 				if (embedUrl) {
-					return embedUrl.split('?')[0]; // Remove query params
+					return embedUrl.split("?")[0]; // Remove query params
 				}
 				return null;
 			}
 
 			if (videoUrl.includes("/embed/")) {
-				return videoUrl.split('?')[0]; // Remove query params
+				return videoUrl.split("?")[0]; // Remove query params
 			}
 			const id = extractVideoId(videoUrl);
 			if (id) {
@@ -185,7 +189,7 @@ function WorkshopsVideoDebugPage() {
 										generatedEmbedUrl: workshopEmbedUrl,
 									},
 									null,
-									2
+									2,
 								)}
 							</pre>
 							<Button onClick={handleLoadFromWorkshop} variant="outline">
@@ -260,7 +264,7 @@ function WorkshopsVideoDebugPage() {
 						<Button onClick={handleUpdate} disabled={!selectedWorkshop}>
 							Update Workshop
 						</Button>
-						{workshop?.videoUrl?.includes('<iframe') && (
+						{workshop?.videoUrl?.includes("<iframe") && (
 							<Button
 								onClick={async () => {
 									if (!workshop?.videoUrl) return;
@@ -323,7 +327,11 @@ function WorkshopsVideoDebugPage() {
 				<CardContent>
 					<div className="space-y-2">
 						{workshops?.map((w) => {
-							const embedUrl = getEmbedUrl(w.videoUrl, w.videoId, w.videoProvider);
+							const embedUrl = getEmbedUrl(
+								w.videoUrl,
+								w.videoId,
+								w.videoProvider,
+							);
 							return (
 								<div
 									key={w._id}

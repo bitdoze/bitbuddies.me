@@ -1,8 +1,9 @@
 import { useMutation } from "convex/react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { ImageLibrary } from "./ImageLibrary";
@@ -22,6 +23,7 @@ export function ImageUpload({
 	label = "Image",
 	disabled = false,
 }: ImageUploadProps) {
+	const { user } = useAuth();
 	const generateUploadUrl = useMutation(api.mediaAssets.generateUploadUrl);
 	const createAsset = useMutation(api.mediaAssets.create);
 	const removeAsset = useMutation(api.mediaAssets.remove);
@@ -60,6 +62,11 @@ export function ImageUpload({
 	const handleUpload = async () => {
 		if (!selectedFile) return;
 
+		if (!user) {
+			alert("You must be signed in to upload images");
+			return;
+		}
+
 		setIsUploading(true);
 		try {
 			// Step 1: Get upload URL
@@ -80,6 +87,7 @@ export function ImageUpload({
 
 			// Step 3: Create media asset record
 			const assetId = await createAsset({
+				clerkId: user.id,
 				storageId,
 				mimeType: selectedFile.type,
 				filesize: selectedFile.size,
@@ -106,10 +114,15 @@ export function ImageUpload({
 	const handleRemove = async () => {
 		if (!value) return;
 
+		if (!user) {
+			alert("You must be signed in to remove images");
+			return;
+		}
+
 		if (!confirm("Are you sure you want to remove this image?")) return;
 
 		try {
-			await removeAsset({ assetId: value });
+			await removeAsset({ clerkId: user.id, assetId: value });
 			onChange(undefined);
 			setSelectedFile(null);
 			setPreviewUrl(null);
@@ -260,8 +273,8 @@ export function ImageUpload({
 			)}
 			{selectedFile && !previewUrl && (
 				<p className="text-sm text-muted-foreground">
-					Selected: {selectedFile.name} (
-					{(selectedFile.size / 1024).toFixed(1)} KB)
+					Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)}{" "}
+					KB)
 				</p>
 			)}
 		</div>

@@ -1,5 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, Users, ImageIcon, Lock } from "lucide-react";
+import {
+	ArrowRight,
+	Calendar,
+	Clock,
+	ImageIcon,
+	Lock,
+	Users,
+} from "lucide-react";
+import {
+	generateStructuredData,
+	SEO,
+	SEO_CONFIGS,
+} from "../components/common/SEO";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -12,15 +24,39 @@ import {
 } from "../components/ui/card";
 import { useAuth } from "../hooks/useAuth";
 import { useWorkshops } from "../hooks/useWorkshops";
-import { useMediaAsset } from "../hooks/useMediaAssets";
-import { SEO, SEO_CONFIGS, generateStructuredData } from "../components/common/SEO";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/workshops/")({
 	component: WorkshopsPage,
+	loader: async () => {
+		// Prefetch workshops data on the server
+		try {
+			const convexUrl = import.meta.env.VITE_CONVEX_URL;
+			if (!convexUrl) {
+				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				return { workshops: null };
+			}
+
+			const client = new ConvexHttpClient(convexUrl);
+			const workshops = await client.query(api.workshops.list, {
+				publishedOnly: true,
+			});
+			return { workshops };
+		} catch (error) {
+			console.error("Failed to prefetch workshops:", error);
+			return { workshops: null };
+		}
+	},
 });
 
 function WorkshopsPage() {
-	const workshops = useWorkshops({ publishedOnly: true });
+	// Use prefetched data from loader, fallback to client-side fetch
+	const loaderData = Route.useLoaderData();
+	const clientWorkshops = useWorkshops({ publishedOnly: true });
+
+	// Prefer loader data, fallback to client fetch
+	const workshops = loaderData?.workshops ?? clientWorkshops;
 
 	if (workshops === undefined) {
 		return (
@@ -29,29 +65,6 @@ function WorkshopsPage() {
 			</div>
 		);
 	}
-
-	const formatDate = (timestamp?: number) => {
-		if (!timestamp) return null;
-		return new Date(timestamp).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-		});
-	};
-
-	const getWorkshopStatus = (workshop: any) => {
-		if (!workshop.isLive || !workshop.startDate) return null;
-
-		const now = Date.now();
-		if (workshop.startDate > now) return "upcoming";
-		if (workshop.endDate && workshop.endDate < now) return "past";
-		if (
-			workshop.startDate <= now &&
-			(!workshop.endDate || workshop.endDate >= now)
-		)
-			return "live";
-		return null;
-	};
 
 	const featuredWorkshops = workshops?.filter((w) => w.isFeatured) || [];
 	const regularWorkshops = workshops?.filter((w) => !w.isFeatured) || [];
@@ -78,7 +91,10 @@ function WorkshopsPage() {
 						"@type": "ListItem",
 						position: 2,
 						name: "Workshops",
-						item: typeof window !== "undefined" ? `${window.location.origin}/workshops` : "",
+						item:
+							typeof window !== "undefined"
+								? `${window.location.origin}/workshops`
+								: "",
 					},
 				],
 			})}
@@ -91,55 +107,55 @@ function WorkshopsPage() {
 					</p>
 				</div>
 
-			{/* Featured Workshops */}
-			{featuredWorkshops.length > 0 && (
-				<div className="space-y-4">
-					<h2 className="text-2xl font-semibold">Featured Workshops</h2>
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{featuredWorkshops.map((workshop) => (
-							<WorkshopCard key={workshop._id} workshop={workshop} />
-						))}
-					</div>
-				</div>
-			)}
-
-			{/* All Workshops */}
-			<div className="space-y-4">
-				<h2 className="text-2xl font-semibold">
-					{featuredWorkshops.length > 0
-						? "All Workshops"
-						: "Available Workshops"}
-				</h2>
-				{regularWorkshops.length === 0 && featuredWorkshops.length === 0 ? (
-					<Card>
-						<CardContent className="py-12">
-							<div className="text-center space-y-2">
-								<p className="text-muted-foreground">
-									No workshops available at the moment.
-								</p>
-								<p className="text-sm text-muted-foreground">
-									Check back soon for new workshops!
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-				) : regularWorkshops.length === 0 ? (
-					<Card>
-						<CardContent className="py-8">
-							<p className="text-center text-muted-foreground">
-								All available workshops are featured above.
-							</p>
-						</CardContent>
-					</Card>
-				) : (
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{regularWorkshops.map((workshop) => (
-							<WorkshopCard key={workshop._id} workshop={workshop} />
-						))}
+				{/* Featured Workshops */}
+				{featuredWorkshops.length > 0 && (
+					<div className="space-y-4">
+						<h2 className="text-2xl font-semibold">Featured Workshops</h2>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{featuredWorkshops.map((workshop) => (
+								<WorkshopCard key={workshop._id} workshop={workshop} />
+							))}
+						</div>
 					</div>
 				)}
+
+				{/* All Workshops */}
+				<div className="space-y-4">
+					<h2 className="text-2xl font-semibold">
+						{featuredWorkshops.length > 0
+							? "All Workshops"
+							: "Available Workshops"}
+					</h2>
+					{regularWorkshops.length === 0 && featuredWorkshops.length === 0 ? (
+						<Card>
+							<CardContent className="py-12">
+								<div className="text-center space-y-2">
+									<p className="text-muted-foreground">
+										No workshops available at the moment.
+									</p>
+									<p className="text-sm text-muted-foreground">
+										Check back soon for new workshops!
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+					) : regularWorkshops.length === 0 ? (
+						<Card>
+							<CardContent className="py-8">
+								<p className="text-center text-muted-foreground">
+									All available workshops are featured above.
+								</p>
+							</CardContent>
+						</Card>
+					) : (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{regularWorkshops.map((workshop) => (
+								<WorkshopCard key={workshop._id} workshop={workshop} />
+							))}
+						</div>
+					)}
+				</div>
 			</div>
-		</div>
 		</>
 	);
 }
@@ -147,7 +163,6 @@ function WorkshopsPage() {
 function WorkshopCard({ workshop }: { workshop: any }) {
 	const { isAuthenticated } = useAuth();
 	const status = getWorkshopStatus(workshop);
-	const coverAsset = useMediaAsset(workshop.coverAssetId);
 
 	const formatDate = (timestamp?: number) => {
 		if (!timestamp) return null;
@@ -161,16 +176,19 @@ function WorkshopCard({ workshop }: { workshop: any }) {
 	return (
 		<Card className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
 			{/* Cover Image with 16:9 aspect ratio */}
-			{coverAsset?.url ? (
+			{workshop.coverAsset?.url ? (
 				<div className="w-full relative" style={{ paddingBottom: "56.25%" }}>
 					<img
-						src={coverAsset.url}
+						src={workshop.coverAsset.url}
 						alt={workshop.title}
 						className="absolute inset-0 w-full h-full object-cover"
 					/>
 				</div>
 			) : (
-				<div className="w-full relative bg-muted" style={{ paddingBottom: "56.25%" }}>
+				<div
+					className="w-full relative bg-muted"
+					style={{ paddingBottom: "56.25%" }}
+				>
 					<div className="absolute inset-0 flex items-center justify-center">
 						<ImageIcon className="h-12 w-12 text-muted-foreground" />
 					</div>
@@ -248,17 +266,17 @@ function WorkshopCard({ workshop }: { workshop: any }) {
 			<CardFooter>
 				{isAuthenticated ? (
 					<Button asChild className="w-full">
-						<a href={`/workshops/${workshop.slug}`}>
+						<Link to="/workshops/$slug" params={{ slug: workshop.slug }}>
 							View Workshop
 							<ArrowRight className="ml-2 h-4 w-4" />
-						</a>
+						</Link>
 					</Button>
 				) : (
 					<Button asChild className="w-full" variant="outline">
-						<a href={`/workshops/${workshop.slug}`}>
+						<Link to="/workshops/$slug" params={{ slug: workshop.slug }}>
 							<Lock className="mr-2 h-4 w-4" />
 							Sign In to View
-						</a>
+						</Link>
 					</Button>
 				)}
 			</CardFooter>

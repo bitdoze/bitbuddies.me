@@ -3,14 +3,13 @@ import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "../components/common/theme-provider";
+import { UserSyncProvider } from "../components/common/UserSyncProvider";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import { AppSidebar } from "../components/layout/Sidebar";
 import { SidebarInset, SidebarProvider } from "../components/ui/sidebar";
-
 import ClerkProvider from "../integrations/clerk/provider";
 import ConvexProvider from "../integrations/convex/provider";
-import { UserSyncProvider } from "../components/common/UserSyncProvider";
 
 import appCss from "../styles.css?url";
 

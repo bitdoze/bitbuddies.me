@@ -2,6 +2,26 @@ import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
 /**
+ * Helper to verify admin role
+ */
+async function requireAdmin(ctx: any, clerkId: string) {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
+		.first()
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Admin access required")
+	}
+
+	return user
+}
+
+/**
  * Generate an upload URL for image uploads
  * This can be called by authenticated users
  */
@@ -17,6 +37,7 @@ export const generateUploadUrl = mutation({
  */
 export const create = mutation({
 	args: {
+		clerkId: v.string(),
 		storageId: v.id("_storage"),
 		mimeType: v.string(),
 		filesize: v.number(),
@@ -26,6 +47,9 @@ export const create = mutation({
 		createdBy: v.optional(v.id("users")),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const now = Date.now()
 
 		// Get the URL for the uploaded file
@@ -105,11 +129,15 @@ export const list = query({
  */
 export const update = mutation({
 	args: {
+		clerkId: v.string(),
 		assetId: v.id("mediaAssets"),
 		altText: v.optional(v.string()),
 		caption: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const asset = await ctx.db.get(args.assetId)
 		if (!asset) {
 			throw new Error("Asset not found")
@@ -128,9 +156,13 @@ export const update = mutation({
  */
 export const remove = mutation({
 	args: {
+		clerkId: v.string(),
 		assetId: v.id("mediaAssets"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const asset = await ctx.db.get(args.assetId)
 		if (!asset) {
 			throw new Error("Asset not found")

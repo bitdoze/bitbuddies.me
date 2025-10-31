@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 
@@ -63,12 +64,12 @@ export default function Footer() {
 								</a>
 							</li>
 							<li>
-								<a
-									href="/workshops"
+								<Link
+									to="/workshops"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
 									Workshops
-								</a>
+								</Link>
 							</li>
 							<li>
 								<a

@@ -1,14 +1,38 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
+/**
+ * Helper to verify admin role
+ */
+async function requireAdmin(ctx: any, clerkId: string) {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
+		.first()
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Admin access required")
+	}
+
+	return user
+}
+
 export const create = mutation({
 	args: {
+		clerkId: v.string(),
 		workshopId: v.id("workshops"),
 		assetId: v.id("mediaAssets"),
 		displayName: v.string(),
 		sortOrder: v.number(),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const now = Date.now()
 
 		return ctx.db.insert("workshopAttachments", {
@@ -24,11 +48,15 @@ export const create = mutation({
 
 export const update = mutation({
 	args: {
+		clerkId: v.string(),
 		attachmentId: v.id("workshopAttachments"),
 		displayName: v.optional(v.string()),
 		sortOrder: v.optional(v.number()),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const attachment = await ctx.db.get(args.attachmentId)
 		if (!attachment) {
 			throw new Error("Attachment not found")
@@ -50,9 +78,13 @@ export const update = mutation({
 
 export const remove = mutation({
 	args: {
+		clerkId: v.string(),
 		attachmentId: v.id("workshopAttachments"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const attachment = await ctx.db.get(args.attachmentId)
 		if (!attachment) {
 			throw new Error("Attachment not found")

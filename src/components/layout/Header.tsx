@@ -33,12 +33,16 @@ export default function Header() {
 					>
 						Courses
 					</a>
-					<a
-						href="/workshops"
+					<Link
+						to="/workshops"
 						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+						activeProps={{
+							className:
+								"text-sm font-medium text-foreground transition-colors",
+						}}
 					>
 						Workshops
-					</a>
+					</Link>
 					<a
 						href="/community"
 						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"

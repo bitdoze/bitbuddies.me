@@ -1,6 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { Edit, Eye, Plus, Trash2, ImageIcon } from "lucide-react";
+import { Edit, Eye, ImageIcon, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { SEO } from "../components/common/SEO";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -29,28 +30,53 @@ import {
 } from "../components/ui/table";
 import { useAuth } from "../hooks/useAuth";
 import { useDeleteWorkshop, useWorkshops } from "../hooks/useWorkshops";
-import { useMediaAsset } from "../hooks/useMediaAssets";
-import { SEO } from "../components/common/SEO";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/admin/workshops/")({
 	component: AdminWorkshopsPage,
+	loader: async () => {
+		// Prefetch all workshops (including unpublished) on the server
+		try {
+			const convexUrl = import.meta.env.VITE_CONVEX_URL;
+			if (!convexUrl) {
+				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				return { workshops: null };
+			}
+
+			const client = new ConvexHttpClient(convexUrl);
+			const workshops = await client.query(api.workshops.list, {
+				publishedOnly: false,
+			});
+			return { workshops };
+		} catch (error) {
+			console.error("Failed to prefetch workshops:", error);
+			return { workshops: null };
+		}
+	},
 });
 
 function AdminWorkshopsPage() {
 	const { isAuthenticated, isLoading, isAdmin, user } = useAuth();
-	const workshops = useWorkshops({ publishedOnly: false });
+
+	// Use prefetched data from loader, fallback to client-side fetch
+	const loaderData = Route.useLoaderData();
+	const clientWorkshops = useWorkshops({ publishedOnly: false });
+
+	// Prefer loader data, fallback to client fetch
+	const workshops = loaderData?.workshops ?? clientWorkshops;
 	const deleteWorkshop = useDeleteWorkshop();
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(
 		null,
-	)
+	);
 
 	if (isLoading) {
 		return (
 			<div className="container mx-auto py-8">
 				<div className="text-center">Loading...</div>
 			</div>
-		)
+		);
 	}
 
 	if (!isAuthenticated) {
@@ -65,7 +91,7 @@ function AdminWorkshopsPage() {
 					</CardHeader>
 				</Card>
 			</div>
-		)
+		);
 	}
 
 	if (!isAdmin) {
@@ -80,7 +106,7 @@ function AdminWorkshopsPage() {
 					</CardHeader>
 				</Card>
 			</div>
-		)
+		);
 	}
 
 	const handleDelete = async () => {
@@ -90,18 +116,18 @@ function AdminWorkshopsPage() {
 			await deleteWorkshop({
 				clerkId: user.id,
 				workshopId: selectedWorkshopId as any,
-			})
+			});
 			setDeleteDialogOpen(false);
 			setSelectedWorkshopId(null);
 		} catch (error) {
 			console.error("Failed to delete workshop:", error);
 		}
-	}
+	};
 
 	const formatDate = (timestamp?: number) => {
 		if (!timestamp) return "N/A";
 		return new Date(timestamp).toLocaleDateString();
-	}
+	};
 
 	return (
 		<>
@@ -112,68 +138,83 @@ function AdminWorkshopsPage() {
 			/>
 			<div className="container mx-auto py-8 space-y-6">
 				<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold">Manage Workshops</h1>
-					<p className="text-muted-foreground mt-2">
-						Create and manage workshop content
-					</p>
+					<div>
+						<h1 className="text-3xl font-bold">Manage Workshops</h1>
+						<p className="text-muted-foreground mt-2">
+							Create and manage workshop content
+						</p>
+					</div>
+					<Button asChild>
+						<a href="/admin/workshops/create">
+							<Plus className="mr-2 h-4 w-4" />
+							New Workshop
+						</a>
+					</Button>
 				</div>
-				<Button asChild>
-					<a href="/admin/workshops/create">
-						<Plus className="mr-2 h-4 w-4" />
-						New Workshop
-					</a>
-				</Button>
-			</div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>All Workshops</CardTitle>
-					<CardDescription>
-						{workshops?.length ?? 0} workshop(s) total
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					{!workshops || workshops.length === 0 ? (
-						<div className="text-center py-8 text-muted-foreground">
-							No workshops found. Create your first workshop to get started.
-						</div>
-					) : (
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Image</TableHead>
-									<TableHead>Title</TableHead>
-									<TableHead>Level</TableHead>
-									<TableHead>Status</TableHead>
-									<TableHead>Start Date</TableHead>
-									<TableHead>Participants</TableHead>
-									<TableHead className="text-right">Actions</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{workshops.map((workshop) => (
-									<WorkshopRow key={workshop._id} workshop={workshop} handleDelete={handleDelete} setSelectedWorkshopId={setSelectedWorkshopId} setDeleteDialogOpen={setDeleteDialogOpen} deleteDialogOpen={deleteDialogOpen} selectedWorkshopId={selectedWorkshopId} formatDate={formatDate} />
-								))}
-							</TableBody>
-						</Table>
-					)}
-				</CardContent>
-			</Card>
+				<Card>
+					<CardHeader>
+						<CardTitle>All Workshops</CardTitle>
+						<CardDescription>
+							{workshops?.length ?? 0} workshop(s) total
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						{!workshops || workshops.length === 0 ? (
+							<div className="text-center py-8 text-muted-foreground">
+								No workshops found. Create your first workshop to get started.
+							</div>
+						) : (
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Image</TableHead>
+										<TableHead>Title</TableHead>
+										<TableHead>Level</TableHead>
+										<TableHead>Status</TableHead>
+										<TableHead>Start Date</TableHead>
+										<TableHead>Participants</TableHead>
+										<TableHead className="text-right">Actions</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{workshops.map((workshop) => (
+										<WorkshopRow
+											key={workshop._id}
+											workshop={workshop}
+											handleDelete={handleDelete}
+											setSelectedWorkshopId={setSelectedWorkshopId}
+											setDeleteDialogOpen={setDeleteDialogOpen}
+											deleteDialogOpen={deleteDialogOpen}
+											selectedWorkshopId={selectedWorkshopId}
+											formatDate={formatDate}
+										/>
+									))}
+								</TableBody>
+							</Table>
+						)}
+					</CardContent>
+				</Card>
 			</div>
 		</>
-	)
+	);
 }
 
-function WorkshopRow({ workshop, handleDelete, setSelectedWorkshopId, setDeleteDialogOpen, deleteDialogOpen, selectedWorkshopId, formatDate }: any) {
-	const coverAsset = useMediaAsset(workshop.coverAssetId);
-
+function WorkshopRow({
+	workshop,
+	handleDelete,
+	setSelectedWorkshopId,
+	setDeleteDialogOpen,
+	deleteDialogOpen,
+	selectedWorkshopId,
+	formatDate,
+}: any) {
 	return (
 		<TableRow>
 			<TableCell>
-				{coverAsset?.url ? (
+				{workshop.coverAsset?.url ? (
 					<img
-						src={coverAsset.url}
+						src={workshop.coverAsset.url}
 						alt={workshop.title}
 						className="w-16 h-16 object-cover rounded"
 					/>
@@ -209,8 +250,7 @@ function WorkshopRow({ workshop, handleDelete, setSelectedWorkshopId, setDeleteD
 			<TableCell>{formatDate(workshop.startDate)}</TableCell>
 			<TableCell>
 				{workshop.currentParticipants}
-				{workshop.maxParticipants &&
-					" / ${workshop.maxParticipants}"}
+				{workshop.maxParticipants && " / ${workshop.maxParticipants}"}
 			</TableCell>
 			<TableCell className="text-right space-x-2">
 				<Button variant="ghost" size="icon" asChild>
@@ -224,13 +264,10 @@ function WorkshopRow({ workshop, handleDelete, setSelectedWorkshopId, setDeleteD
 					</a>
 				</Button>
 				<Dialog
-					open={
-						deleteDialogOpen &&
-						selectedWorkshopId === workshop._id
-					}
+					open={deleteDialogOpen && selectedWorkshopId === workshop._id}
 					onOpenChange={(open) => {
-						setDeleteDialogOpen(open)
-						if (!open) setSelectedWorkshopId(null)
+						setDeleteDialogOpen(open);
+						if (!open) setSelectedWorkshopId(null);
 					}}
 				>
 					<DialogTrigger asChild>
@@ -254,16 +291,13 @@ function WorkshopRow({ workshop, handleDelete, setSelectedWorkshopId, setDeleteD
 							<Button
 								variant="outline"
 								onClick={() => {
-									setDeleteDialogOpen(false)
-									setSelectedWorkshopId(null)
+									setDeleteDialogOpen(false);
+									setSelectedWorkshopId(null);
 								}}
 							>
 								Cancel
 							</Button>
-							<Button
-								variant="destructive"
-								onClick={handleDelete}
-							>
+							<Button variant="destructive" onClick={handleDelete}>
 								Delete
 							</Button>
 						</DialogFooter>
@@ -271,5 +305,5 @@ function WorkshopRow({ workshop, handleDelete, setSelectedWorkshopId, setDeleteD
 				</Dialog>
 			</TableCell>
 		</TableRow>
-	)
+	);
 }

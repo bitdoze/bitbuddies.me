@@ -7,7 +7,7 @@ export function useAuth() {
 	const { signOut } = useClerkAuth();
 	const convexUser = useQuery(
 		api.users.getCurrentUser,
-		user ? { clerkId: user.id } : "skip"
+		user ? { clerkId: user.id } : "skip",
 	);
 
 	const isAdmin = convexUser?.role === "admin";

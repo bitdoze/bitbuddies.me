@@ -276,9 +276,26 @@ export const list = query({
 
 		const workshops = await query.take(limit)
 
-		return workshops.filter(
+		const filtered = workshops.filter(
 			(w) => !publishedOnly || w.isPublished,
 		)
+
+		// Enrich with cover asset data to avoid N+1 queries
+		const enriched = await Promise.all(
+			filtered.map(async (workshop) => {
+				let coverAsset = null
+				if (workshop.coverAssetId) {
+					coverAsset = await ctx.db.get(workshop.coverAssetId)
+				}
+
+				return {
+					...workshop,
+					coverAsset,
+				}
+			}),
+		)
+
+		return enriched
 	},
 })
 
@@ -293,7 +310,20 @@ export const getBySlug = query({
 			.filter((q) => q.eq(q.field("isDeleted"), false))
 			.first()
 
-		return workshop
+		if (!workshop) {
+			return null
+		}
+
+		// Enrich with cover asset data
+		let coverAsset = null
+		if (workshop.coverAssetId) {
+			coverAsset = await ctx.db.get(workshop.coverAssetId)
+		}
+
+		return {
+			...workshop,
+			coverAsset,
+		}
 	},
 })
 
@@ -308,6 +338,15 @@ export const getById = query({
 			return null
 		}
 
-		return workshop
+		// Enrich with cover asset data
+		let coverAsset = null
+		if (workshop.coverAssetId) {
+			coverAsset = await ctx.db.get(workshop.coverAssetId)
+		}
+
+		return {
+			...workshop,
+			coverAsset,
+		}
 	},
 })

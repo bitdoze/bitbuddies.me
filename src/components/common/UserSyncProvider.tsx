@@ -12,7 +12,7 @@ export function UserSyncProvider({ children }: { children: React.ReactNode }) {
 	const getOrCreateUser = useMutation(api.users.getOrCreateUser);
 	const convexUser = useQuery(
 		api.users.getCurrentUser,
-		user ? { clerkId: user.id } : "skip"
+		user ? { clerkId: user.id } : "skip",
 	);
 	const hasSynced = useRef(false);
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { UserSyncDebug } from "../components/common/UserSyncDebug";
 import { SEO } from "../components/common/SEO";
+import { UserSyncDebug } from "../components/common/UserSyncDebug";
 
 export const Route = createFileRoute("/debug/user-sync")({
 	component: DebugUserSyncPage,

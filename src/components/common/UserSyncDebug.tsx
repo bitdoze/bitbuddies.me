@@ -1,15 +1,21 @@
-import { useMutation, useQuery } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Button } from "../ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "../ui/card";
 
 export function UserSyncDebug() {
 	const { user } = useUser();
 	const getOrCreateUser = useMutation(api.users.getOrCreateUser);
 	const convexUser = useQuery(
 		api.users.getCurrentUser,
-		user ? { clerkId: user.id } : "skip"
+		user ? { clerkId: user.id } : "skip",
 	);
 	const allUsers = useQuery(api.users.listAll);
 
@@ -62,7 +68,7 @@ export function UserSyncDebug() {
 									lastName: user.lastName,
 								},
 								null,
-								2
+								2,
 							)}
 						</pre>
 					) : (

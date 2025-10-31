@@ -35,7 +35,7 @@ const menuItems = [
 		title: "Workshops",
 		url: "/workshops",
 		icon: Calendar,
-		isRoute: false,
+		isRoute: true,
 	},
 	{
 		title: "Community",

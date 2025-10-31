@@ -133,18 +133,34 @@ export const updateRole = mutation({
 })
 
 /**
- * Set user role by Clerk ID (for initial admin setup)
- * In production, this should be protected or only callable via Convex dashboard
+ * Set user role by Clerk ID (admin only)
+ * Requires the caller to be an admin to change any user's role
  */
 export const setUserRole = mutation({
 	args: {
-		clerkId: v.string(),
+		callerClerkId: v.string(),
+		targetClerkId: v.string(),
 		role: v.union(v.literal("user"), v.literal("admin")),
 	},
 	handler: async (ctx, args) => {
+		// Verify caller is admin
+		const caller = await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.callerClerkId))
+			.first()
+
+		if (!caller) {
+			throw new Error("Caller not found")
+		}
+
+		if (caller.role !== "admin") {
+			throw new Error("Admin access required")
+		}
+
+		// Find target user
 		const user = await ctx.db
 			.query("users")
-			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.targetClerkId))
 			.first()
 
 		if (!user) {
