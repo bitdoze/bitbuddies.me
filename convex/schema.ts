@@ -218,10 +218,34 @@ export default defineSchema({
 		}),
 
 	/**
+	 * Chapters - groups of lessons within courses
+	 */
+	chapters: defineTable({
+		courseId: v.id("courses"),
+		// Basic info
+		title: v.string(),
+		description: v.optional(v.string()),
+		// Ordering
+		order: v.number(), // Position within course
+		// Status
+		isPublished: v.boolean(),
+		// Soft delete
+		isDeleted: v.boolean(),
+		deletedAt: v.optional(v.number()),
+		// Timestamps
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index("by_course_id", ["courseId"])
+		.index("by_course_and_order", ["courseId", "order"])
+		.index("by_is_deleted", ["isDeleted"]),
+
+	/**
 	 * Lessons - individual lessons within courses
 	 */
 	lessons: defineTable({
 		courseId: v.id("courses"),
+		chapterId: v.optional(v.id("chapters")),
 		// Basic info
 		title: v.string(),
 		slug: v.string(),
@@ -249,7 +273,9 @@ export default defineSchema({
 		updatedAt: v.number(),
 	})
 		.index("by_course_id", ["courseId"])
+		.index("by_chapter_id", ["chapterId"])
 		.index("by_course_and_order", ["courseId", "order"])
+		.index("by_chapter_and_order", ["chapterId", "order"])
 		.index("by_slug", ["slug"])
 		.index("by_published", ["isPublished"])
 		.index("by_is_deleted", ["isDeleted"]),

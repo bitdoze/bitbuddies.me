@@ -8,10 +8,13 @@
  * @module
  */
 
+import type * as chapters from "../chapters.js";
 import type * as contactMessages from "../contactMessages.js";
 import type * as contactMessagesActions from "../contactMessagesActions.js";
 import type * as courses from "../courses.js";
 import type * as enrollments from "../enrollments.js";
+import type * as lessonAttachments from "../lessonAttachments.js";
+import type * as lessons from "../lessons.js";
 import type * as mediaAssets from "../mediaAssets.js";
 import type * as posts from "../posts.js";
 import type * as subscriptions from "../subscriptions.js";
@@ -36,10 +39,13 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  chapters: typeof chapters;
   contactMessages: typeof contactMessages;
   contactMessagesActions: typeof contactMessagesActions;
   courses: typeof courses;
   enrollments: typeof enrollments;
+  lessonAttachments: typeof lessonAttachments;
+  lessons: typeof lessons;
   mediaAssets: typeof mediaAssets;
   posts: typeof posts;
   subscriptions: typeof subscriptions;

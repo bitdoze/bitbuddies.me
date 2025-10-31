@@ -15,14 +15,21 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
+import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
 import { Route as DebugWorkshopsVideoRouteImport } from './routes/debug.workshops-video'
 import { Route as DebugUserSyncRouteImport } from './routes/debug.user-sync'
 import { Route as DebugAdminSetupRouteImport } from './routes/debug.admin-setup'
+import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
+import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshops.index'
+import { Route as AdminCoursesIndexRouteImport } from './routes/admin.courses.index'
 import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin.workshops.create'
+import { Route as AdminCoursesCreateRouteImport } from './routes/admin.courses.create'
 import { Route as AdminWorkshopsIdEditRouteImport } from './routes/admin.workshops.$id.edit'
+import { Route as AdminCoursesIdLessonsRouteImport } from './routes/admin.courses.$id.lessons'
+import { Route as AdminCoursesIdEditRouteImport } from './routes/admin.courses.$id.edit'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -54,6 +61,11 @@ const WorkshopsIndexRoute = WorkshopsIndexRouteImport.update({
   path: '/workshops/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesIndexRoute = CoursesIndexRouteImport.update({
+  id: '/courses/',
+  path: '/courses/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
   id: '/workshops/$slug',
   path: '/workshops/$slug',
@@ -74,9 +86,19 @@ const DebugAdminSetupRoute = DebugAdminSetupRouteImport.update({
   path: '/debug/admin-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesSlugRoute = CoursesSlugRouteImport.update({
+  id: '/courses/$slug',
+  path: '/courses/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminWorkshopsRoute = AdminWorkshopsRouteImport.update({
   id: '/admin/workshops',
   path: '/admin/workshops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCoursesRoute = AdminCoursesRouteImport.update({
+  id: '/admin/courses',
+  path: '/admin/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWorkshopsIndexRoute = AdminWorkshopsIndexRouteImport.update({
@@ -84,15 +106,35 @@ const AdminWorkshopsIndexRoute = AdminWorkshopsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminWorkshopsRoute,
 } as any)
+const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminCoursesRoute,
+} as any)
 const AdminWorkshopsCreateRoute = AdminWorkshopsCreateRouteImport.update({
   id: '/create',
   path: '/create',
   getParentRoute: () => AdminWorkshopsRoute,
 } as any)
+const AdminCoursesCreateRoute = AdminCoursesCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminCoursesRoute,
+} as any)
 const AdminWorkshopsIdEditRoute = AdminWorkshopsIdEditRouteImport.update({
   id: '/$id/edit',
   path: '/$id/edit',
   getParentRoute: () => AdminWorkshopsRoute,
+} as any)
+const AdminCoursesIdLessonsRoute = AdminCoursesIdLessonsRouteImport.update({
+  id: '/$id/lessons',
+  path: '/$id/lessons',
+  getParentRoute: () => AdminCoursesRoute,
+} as any)
+const AdminCoursesIdEditRoute = AdminCoursesIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminCoursesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -101,14 +143,21 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/courses/$slug': typeof CoursesSlugRoute
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/courses': typeof CoursesIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
+  '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
+  '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -117,13 +166,19 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/courses/$slug': typeof CoursesSlugRoute
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/courses': typeof CoursesIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
+  '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/workshops': typeof AdminWorkshopsIndexRoute
+  '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
+  '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRoutesById {
@@ -133,14 +188,21 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/courses/$slug': typeof CoursesSlugRoute
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
+  '/courses/': typeof CoursesIndexRoute
   '/workshops/': typeof WorkshopsIndexRoute
+  '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
+  '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
 export interface FileRouteTypes {
@@ -151,14 +213,21 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/admin/courses'
     | '/admin/workshops'
+    | '/courses/$slug'
     | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
+    | '/courses'
     | '/workshops'
+    | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/admin/courses/'
     | '/admin/workshops/'
+    | '/admin/courses/$id/edit'
+    | '/admin/courses/$id/lessons'
     | '/admin/workshops/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -167,13 +236,19 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/courses/$slug'
     | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
+    | '/courses'
     | '/workshops'
+    | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/admin/courses'
     | '/admin/workshops'
+    | '/admin/courses/$id/edit'
+    | '/admin/courses/$id/lessons'
     | '/admin/workshops/$id/edit'
   id:
     | '__root__'
@@ -182,14 +257,21 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/admin/courses'
     | '/admin/workshops'
+    | '/courses/$slug'
     | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
+    | '/courses/'
     | '/workshops/'
+    | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/admin/courses/'
     | '/admin/workshops/'
+    | '/admin/courses/$id/edit'
+    | '/admin/courses/$id/lessons'
     | '/admin/workshops/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -199,11 +281,14 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  AdminCoursesRoute: typeof AdminCoursesRouteWithChildren
   AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
+  CoursesSlugRoute: typeof CoursesSlugRoute
   DebugAdminSetupRoute: typeof DebugAdminSetupRoute
   DebugUserSyncRoute: typeof DebugUserSyncRoute
   DebugWorkshopsVideoRoute: typeof DebugWorkshopsVideoRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
+  CoursesIndexRoute: typeof CoursesIndexRoute
   WorkshopsIndexRoute: typeof WorkshopsIndexRoute
 }
 
@@ -251,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkshopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/': {
+      id: '/courses/'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof CoursesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/workshops/$slug': {
       id: '/workshops/$slug'
       path: '/workshops/$slug'
@@ -279,11 +371,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DebugAdminSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/$slug': {
+      id: '/courses/$slug'
+      path: '/courses/$slug'
+      fullPath: '/courses/$slug'
+      preLoaderRoute: typeof CoursesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/workshops': {
       id: '/admin/workshops'
       path: '/admin/workshops'
       fullPath: '/admin/workshops'
       preLoaderRoute: typeof AdminWorkshopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/courses': {
+      id: '/admin/courses'
+      path: '/admin/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AdminCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/workshops/': {
@@ -293,12 +399,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorkshopsIndexRouteImport
       parentRoute: typeof AdminWorkshopsRoute
     }
+    '/admin/courses/': {
+      id: '/admin/courses/'
+      path: '/'
+      fullPath: '/admin/courses/'
+      preLoaderRoute: typeof AdminCoursesIndexRouteImport
+      parentRoute: typeof AdminCoursesRoute
+    }
     '/admin/workshops/create': {
       id: '/admin/workshops/create'
       path: '/create'
       fullPath: '/admin/workshops/create'
       preLoaderRoute: typeof AdminWorkshopsCreateRouteImport
       parentRoute: typeof AdminWorkshopsRoute
+    }
+    '/admin/courses/create': {
+      id: '/admin/courses/create'
+      path: '/create'
+      fullPath: '/admin/courses/create'
+      preLoaderRoute: typeof AdminCoursesCreateRouteImport
+      parentRoute: typeof AdminCoursesRoute
     }
     '/admin/workshops/$id/edit': {
       id: '/admin/workshops/$id/edit'
@@ -307,8 +427,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorkshopsIdEditRouteImport
       parentRoute: typeof AdminWorkshopsRoute
     }
+    '/admin/courses/$id/lessons': {
+      id: '/admin/courses/$id/lessons'
+      path: '/$id/lessons'
+      fullPath: '/admin/courses/$id/lessons'
+      preLoaderRoute: typeof AdminCoursesIdLessonsRouteImport
+      parentRoute: typeof AdminCoursesRoute
+    }
+    '/admin/courses/$id/edit': {
+      id: '/admin/courses/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/courses/$id/edit'
+      preLoaderRoute: typeof AdminCoursesIdEditRouteImport
+      parentRoute: typeof AdminCoursesRoute
+    }
   }
 }
+
+interface AdminCoursesRouteChildren {
+  AdminCoursesCreateRoute: typeof AdminCoursesCreateRoute
+  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
+  AdminCoursesIdEditRoute: typeof AdminCoursesIdEditRoute
+  AdminCoursesIdLessonsRoute: typeof AdminCoursesIdLessonsRoute
+}
+
+const AdminCoursesRouteChildren: AdminCoursesRouteChildren = {
+  AdminCoursesCreateRoute: AdminCoursesCreateRoute,
+  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
+  AdminCoursesIdEditRoute: AdminCoursesIdEditRoute,
+  AdminCoursesIdLessonsRoute: AdminCoursesIdLessonsRoute,
+}
+
+const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
+  AdminCoursesRouteChildren,
+)
 
 interface AdminWorkshopsRouteChildren {
   AdminWorkshopsCreateRoute: typeof AdminWorkshopsCreateRoute
@@ -332,11 +484,14 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  AdminCoursesRoute: AdminCoursesRouteWithChildren,
   AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
+  CoursesSlugRoute: CoursesSlugRoute,
   DebugAdminSetupRoute: DebugAdminSetupRoute,
   DebugUserSyncRoute: DebugUserSyncRoute,
   DebugWorkshopsVideoRoute: DebugWorkshopsVideoRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,
+  CoursesIndexRoute: CoursesIndexRoute,
   WorkshopsIndexRoute: WorkshopsIndexRoute,
 }
 export const routeTree = rootRouteImport

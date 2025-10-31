@@ -3,7 +3,7 @@ import type { Doc, Id, TableNames } from "./_generated/dataModel"
 
 type SluggedTables = Extract<
 	TableNames,
-	"courses" | "workshops" | "posts"
+	"courses" | "lessons" | "workshops" | "posts"
 >
 
 type Ctx = MutationCtx | QueryCtx
