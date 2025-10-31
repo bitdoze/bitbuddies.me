@@ -30,15 +30,54 @@ export const Route = createRootRoute({
 				name: "description",
 				content: "Empowering developers to build amazing things together",
 			},
+			{
+				name: "theme-color",
+				content: "#6366f1",
+			},
 		],
 		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
 			},
+			// Favicons - comprehensive setup for all devices
 			{
 				rel: "icon",
 				href: "/favicon.ico",
+				sizes: "32x32",
+			},
+			{
+				rel: "icon",
+				type: "image/svg+xml",
+				href: "/favicon.svg",
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "16x16",
+				href: "/favicon-16x16.png",
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "32x32",
+				href: "/favicon-32x32.png",
+			},
+			{
+				rel: "apple-touch-icon",
+				sizes: "180x180",
+				href: "/apple-touch-icon.png",
+			},
+			{
+				rel: "manifest",
+				href: "/site.webmanifest",
+			},
+		],
+		scripts: [
+			{
+				src: "https://an.bitdoze.com/js/script.js",
+				defer: true,
+				"data-domain": "bitbuddies.me",
 			},
 		],
 	}),

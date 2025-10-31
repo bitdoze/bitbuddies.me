@@ -1,0 +1,30 @@
+{
+  "name": "BitBuddies - Learn, Build, Connect",
+  "short_name": "BitBuddies",
+  "description": "Empowering developers to build amazing things together",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "https://bitbuddies.me/",
+  "display": "standalone",
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "https://bitbuddies.me/",
+  "categories": ["education", "productivity", "social"]
+}

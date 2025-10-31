@@ -139,7 +139,92 @@ The website needs to use the themes settings from styles.css, if I change them t
 4. Creates associated `profiles` record
 5. `useAuth()` hook provides both Clerk user and Convex user
 
-### TanStack Router Loaders (IMPLEMENTED)
+### Production URL Configuration (IMPLEMENTED)
+- **Site URL**: `https://bitbuddies.me` configured throughout the application
+- **Environment Variables** (`.env.example`):
+  ```bash
+  VITE_SITE_URL=https://bitbuddies.me
+  VITE_SITE_NAME=BitBuddies
+  VITE_SITE_DESCRIPTION=Empowering developers to build amazing things together
+  VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+  VITE_CONVEX_URL=https://your-project.convex.cloud
+  VITE_ENABLE_DEBUG_ROUTES=true  # false in production
+  NODE_ENV=development  # production in prod
+  ```
+- **Centralized Configuration** (`src/lib/config.ts`):
+  - `SITE_CONFIG` - Site metadata (name, description, URL, email)
+  - `SOCIAL_LINKS` - Social media URLs
+  - `ROUTES` - Route path constants
+  - `SEO_DEFAULTS` - Default SEO values
+  - Helper functions: `buildUrl()`, `getCanonicalUrl()`
+- **Configured in**:
+  - `site.webmanifest` - start_url and scope set to production URL
+  - `robots.txt` - Sitemap URL pointing to production
+  - `sitemap.xml` - All URLs use production domain
+  - `SEO.tsx` - Uses config for canonical URLs and OG images
+  - `__root.tsx` - Analytics script with correct domain
+- **Clerk Configuration**: Add `https://bitbuddies.me` to:
+  - Allowed redirect URLs
+  - Allowed origins (CORS)
+  - OAuth redirect URIs
+- **Convex Configuration**: Add production URL to allowed origins if needed
+
+### Analytics Setup (IMPLEMENTED)
+- **Plausible Analytics** - Privacy-friendly, GDPR-compliant analytics
+- **Implementation** in `__root.tsx`:
+  ```typescript
+  scripts: [
+    {
+      src: "https://an.bitdoze.com/js/script.js",
+      defer: true,
+      "data-domain": "bitbuddies.me",
+    },
+  ]
+  ```
+- **Benefits**:
+  - No cookies, no tracking, privacy-first
+  - Lightweight script (< 1KB)
+  - GDPR, CCPA, PECR compliant
+  - No consent banner needed
+  - Real-time analytics dashboard
+
+### Favicon Setup (IMPLEMENTED)
+- **Comprehensive favicon implementation** for all devices and platforms
+- **Files included**:
+  - `favicon.ico` - Classic 32x32 ICO format for older browsers
+  - `favicon.svg` - Modern SVG format with theme support
+  - `favicon-16x16.png` - Small PNG for browser tabs
+  - `favicon-32x32.png` - Standard PNG for browser tabs
+  - `apple-touch-icon.png` - 180x180 for iOS home screen
+  - `android-chrome-192x192.png` - Android home screen
+  - `android-chrome-512x512.png` - Android high-res
+  - `site.webmanifest` - PWA manifest with app metadata
+  - `browserconfig.xml` - Windows tile configuration
+- **Implementation** in `__root.tsx`:
+  ```typescript
+  links: [
+    { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+    { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+    { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
+    { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
+    { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+    { rel: "manifest", href: "/site.webmanifest" },
+  ]
+  ```
+- **Theme colors**: `#6366f1` (indigo) matching the brand gradient
+- **PWA support**: site.webmanifest enables "Add to Home Screen" on mobile
+- **Benefits**:
+  - Professional appearance across all platforms
+  - iOS home screen icon support
+  - Android adaptive icon support
+  - Windows tile support
+  - PWA installation capability
+  - Modern SVG with theme adaptation
+
+### Analytics (IMPLEMENTED)
+- **Privacy-Friendly Analytics**: Plausible Analytics via self-hosted instance
+- **Implementation**: Script added to `__root.tsx` head
+  ```ck Router Loaders (IMPLEMENTED)
 - **Server-Side Data Prefetching**: Routes prefetch data on the server for faster initial load
 - **Pattern**: Use ConvexHttpClient in loader, fallback to useQuery on client
 - **Implementation**:
@@ -440,3 +525,28 @@ The image library provides a centralized way to manage and reuse uploaded images
 - **Keyboard navigation**: Add onKeyDown handlers where onClick exists
 - **ARIA labels**: Provide labels for screen readers
 - **Alt text**: Describe images without redundant words (avoid "image of")
+
+## SEO & Production Checklist
+
+### Before Deployment
+- [ ] Set `VITE_SITE_URL=https://bitbuddies.me` in production env
+- [ ] Set `NODE_ENV=production`
+- [ ] Set `VITE_ENABLE_DEBUG_ROUTES=false`
+- [ ] Update Clerk with production URL in allowed origins
+- [ ] Update Convex with production URL if needed
+- [ ] Verify analytics script domain matches `data-domain="bitbuddies.me"`
+- [ ] Test all social sharing (OG tags, Twitter cards)
+- [ ] Verify canonical URLs point to production
+- [ ] Submit sitemap to Google Search Console: `https://bitbuddies.me/sitemap.xml`
+- [ ] Verify robots.txt is accessible: `https://bitbuddies.me/robots.txt`
+- [ ] Test PWA "Add to Home Screen" on mobile devices
+- [ ] Verify all favicons load correctly
+- [ ] Test all meta tags with social media preview tools
+- [ ] Ensure SSL certificate is valid and HTTPS redirects work
+
+### SEO Configuration Files
+- `public/sitemap.xml` - Search engine sitemap (update lastmod dates when content changes)
+- `public/robots.txt` - Search engine directives (admin/debug routes disallowed)
+- `src/lib/config.ts` - Centralized site configuration
+- `src/components/common/SEO.tsx` - SEO component using config
+- `.env.example` - Template for required environment variables

@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow admin and debug routes
+Disallow: /admin/
+Disallow: /debug/
+
+# Sitemap
+Sitemap: https://bitbuddies.me/sitemap.xml

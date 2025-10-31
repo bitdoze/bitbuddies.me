@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { SITE_CONFIG, buildUrl, getCanonicalUrl } from "../../lib/config";
 
 interface SEOProps {
 	title: string;
@@ -27,17 +28,12 @@ export function SEO({
 	modifiedTime,
 	noIndex = false,
 }: SEOProps) {
-	const siteName = "BitBuddies";
+	const siteName = SITE_CONFIG.name;
 	const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
-	const defaultImage = ogImage || "/og-default.png"; // Fallback image
-	const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+	const defaultImage = ogImage ? buildUrl(ogImage) : buildUrl("/og-image.png");
 	const fullCanonicalUrl = canonicalUrl
-		? canonicalUrl.startsWith("http")
-			? canonicalUrl
-			: `${baseUrl}${canonicalUrl}`
-		: typeof window !== "undefined"
-			? window.location.href
-			: "";
+		? buildUrl(canonicalUrl)
+		: getCanonicalUrl();
 
 	return (
 		<Helmet>
