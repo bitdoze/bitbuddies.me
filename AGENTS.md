@@ -13,6 +13,14 @@ Before implementing anything think that the structure and code is as simple as p
 2. **Eliminated N+1 Queries** - Workshop queries return enriched data with `coverAsset` included
 3. **SPA Navigation** - Replaced all internal `<a href>` with `<Link to>` in Header, Sidebar, Footer, and routes
 4. **Server-Side Data Prefetching** - Implemented TanStack Router loaders for workshops pages
+5. **UI Redesign (December 2024)** - Redesigned all workshop and admin pages with new open layout style
+   - `workshops.index.tsx` - Workshop list with hero section, decorative elements, and improved cards
+   - `workshops.$slug.tsx` - Workshop detail page with full-width hero, rounded containers, and section headers with icons
+   - `admin.workshops.index.tsx` - Admin dashboard with gradient hero, improved table styling, and better empty states
+   - `admin.workshops.create.tsx` - Create form with sectioned layout, icon headers, and improved visual hierarchy
+   - **Design Pattern**: Removed boxed Card components, replaced with `rounded-2xl` containers with `border`, `bg-card`, and `shadow-md/lg`
+   - **Visual Elements**: Added decorative blur circles, gradient backgrounds, icon badges, and improved spacing (py-16 sections)
+   - **Typography**: Larger headings (text-3xl/4xl/5xl), better hierarchy, improved line-height and spacing
 
 ### 🔄 Future Improvements (TODO)
 1. **Testing** - Establish baseline Vitest suite for mutations and utilities

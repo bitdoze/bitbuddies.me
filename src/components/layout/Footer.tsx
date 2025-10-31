@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { Github, Mail, Twitter, Youtube, Globe } from "lucide-react";
+import { SOCIAL_LINKS, SITE_CONFIG } from "@/lib/config";
 import { Logo } from "@/components/common/logo";
 
 export default function Footer() {
@@ -15,7 +16,7 @@ export default function Footer() {
 						</p>
 						<div className="flex gap-4">
 							<a
-								href="https://github.com"
+								href={SOCIAL_LINKS.github}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-muted-foreground hover:text-foreground transition-colors"
@@ -24,7 +25,7 @@ export default function Footer() {
 								<span className="sr-only">GitHub</span>
 							</a>
 							<a
-								href="https://twitter.com"
+								href={SOCIAL_LINKS.twitter}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-muted-foreground hover:text-foreground transition-colors"
@@ -33,16 +34,25 @@ export default function Footer() {
 								<span className="sr-only">Twitter</span>
 							</a>
 							<a
-								href="https://linkedin.com"
+								href={SOCIAL_LINKS.bluesky}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-muted-foreground hover:text-foreground transition-colors"
 							>
-								<Linkedin className="h-5 w-5" />
-								<span className="sr-only">LinkedIn</span>
+								<Globe className="h-5 w-5" />
+								<span className="sr-only">Bluesky</span>
 							</a>
 							<a
-								href="mailto:hello@bitbuddies.me"
+								href={SOCIAL_LINKS.youtube}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-muted-foreground hover:text-foreground transition-colors"
+							>
+								<Youtube className="h-5 w-5" />
+								<span className="sr-only">YouTube</span>
+							</a>
+							<a
+								href={`mailto:${SITE_CONFIG.email}`}
 								className="text-muted-foreground hover:text-foreground transition-colors"
 							>
 								<Mail className="h-5 w-5" />
@@ -96,35 +106,29 @@ export default function Footer() {
 						<ul className="space-y-3">
 							<li>
 								<a
-									href="/docs"
-									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-								>
-									Documentation
-								</a>
-							</li>
-							<li>
-								<a
-									href="/blog"
+									href={SOCIAL_LINKS.blog}
+									target="_blank"
+									rel="noopener noreferrer"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
 									Blog
 								</a>
 							</li>
 							<li>
-								<a
-									href="/tutorials"
+								<Link
+									to="/workshops"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
-									Tutorials
-								</a>
+									Workshops
+								</Link>
 							</li>
 							<li>
-								<a
-									href="/support"
+								<Link
+									to="/contact"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
-									Support
-								</a>
+									Contact
+								</Link>
 							</li>
 						</ul>
 					</div>
@@ -134,36 +138,28 @@ export default function Footer() {
 						<h3 className="text-sm font-semibold">Company</h3>
 						<ul className="space-y-3">
 							<li>
-								<a
-									href="/about"
+								<Link
+									to="/about"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
 									About
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a
-									href="/careers"
-									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-								>
-									Careers
-								</a>
-							</li>
-							<li>
-								<a
-									href="/privacy"
+								<Link
+									to="/privacy"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
 									Privacy
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a
-									href="/terms"
+								<Link
+									to="/terms"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors"
 								>
 									Terms
-								</a>
+								</Link>
 							</li>
 						</ul>
 					</div>

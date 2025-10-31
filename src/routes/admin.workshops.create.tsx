@@ -1,17 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus, AlertCircle, FileText, Settings, Video, Lock, Eye } from "lucide-react";
 import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ImageUpload } from "../components/common/ImageUpload";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import {
@@ -67,38 +60,53 @@ function CreateWorkshopPage() {
 
 	if (isLoading) {
 		return (
-			<div className="container mx-auto py-8">
-				<div className="text-center">Loading...</div>
+			<div className="w-full">
+				<div className="container mx-auto px-4 py-20">
+					<div className="text-center">
+						<div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
+						<p className="mt-4 text-muted-foreground">Loading...</p>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	if (!isAuthenticated || !user || !convexUser) {
 		return (
-			<div className="container mx-auto py-8">
-				<Card>
-					<CardHeader>
-						<CardTitle>Access Denied</CardTitle>
-						<CardDescription>
-							You must be logged in to access this page.
-						</CardDescription>
-					</CardHeader>
-				</Card>
+			<div className="w-full">
+				<div className="container mx-auto px-4 py-20">
+					<div className="mx-auto max-w-2xl">
+						<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
+							<div className="mb-4 inline-flex rounded-full bg-muted p-4">
+								<AlertCircle className="h-12 w-12 text-muted-foreground" />
+							</div>
+							<h1 className="mb-2 text-2xl font-bold">Access Denied</h1>
+							<p className="text-muted-foreground">
+								You must be logged in to access this page.
+							</p>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	if (!isAdmin) {
 		return (
-			<div className="container mx-auto py-8">
-				<Card>
-					<CardHeader>
-						<CardTitle>Admin Access Required</CardTitle>
-						<CardDescription>
-							You need admin privileges to access this page.
-						</CardDescription>
-					</CardHeader>
-				</Card>
+			<div className="w-full">
+				<div className="container mx-auto px-4 py-20">
+					<div className="mx-auto max-w-2xl">
+						<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
+							<div className="mb-4 inline-flex rounded-full bg-muted p-4">
+								<AlertCircle className="h-12 w-12 text-muted-foreground" />
+							</div>
+							<h1 className="mb-2 text-2xl font-bold">Admin Access Required</h1>
+							<p className="text-muted-foreground">
+								You need admin privileges to access this page.
+							</p>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -179,29 +187,50 @@ function CreateWorkshopPage() {
 				description="Create a new workshop with details, content, video, and scheduling options."
 				noIndex={true}
 			/>
-			<div className="container mx-auto py-8 max-w-4xl">
-				<div className="mb-6">
-					<Button
-						variant="ghost"
-						onClick={() => navigate({ to: "/admin/workshops" })}
-					>
-						<ArrowLeft className="mr-2 h-4 w-4" />
-						Back to Workshops
-					</Button>
-				</div>
+			<div className="w-full">
+				{/* Header Section */}
+				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-12">
+					<div className="container mx-auto px-4">
+						<Button
+							variant="ghost"
+							onClick={() => navigate({ to: "/admin/workshops" })}
+							className="mb-6"
+						>
+							<ArrowLeft className="mr-2 h-4 w-4" />
+							Back to Workshops
+						</Button>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Create New Workshop</CardTitle>
-						<CardDescription>
+						<div className="mb-4 flex items-center gap-3">
+							<div className="rounded-lg bg-primary/10 p-2 text-primary">
+								<Plus className="h-6 w-6" />
+							</div>
+							<h1 className="text-3xl md:text-4xl font-bold">Create New Workshop</h1>
+						</div>
+						<p className="text-lg text-muted-foreground">
 							Add a new workshop with all the details and content
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<form onSubmit={handleSubmit} className="space-y-6">
+						</p>
+					</div>
+
+					{/* Decorative elements */}
+					<div className="absolute left-0 top-0 -z-10 h-full w-full">
+						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
+					</div>
+				</section>
+
+				{/* Form Section */}
+				<section className="py-12">
+					<div className="container mx-auto px-4 max-w-4xl">
+						<form onSubmit={handleSubmit} className="space-y-8">
 							{/* Basic Information */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">Basic Information</h3>
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<FileText className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Basic Information</h2>
+								</div>
+								<div className="space-y-4">
 
 								<ImageUpload
 									value={coverAssetId}
@@ -283,10 +312,15 @@ function CreateWorkshopPage() {
 							</div>
 
 							{/* Workshop Details */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">Workshop Details</h3>
-
-								<div className="grid grid-cols-2 gap-4">
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<Settings className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Workshop Details</h2>
+								</div>
+								<div className="space-y-4">
+									<div className="grid grid-cols-2 gap-4">
 									<div className="space-y-2">
 										<Label htmlFor="level">Level *</Label>
 										<Select
@@ -320,38 +354,44 @@ function CreateWorkshopPage() {
 											placeholder="120"
 										/>
 									</div>
-								</div>
+									</div>
 
-								<div className="space-y-2">
-									<Label htmlFor="category">Category</Label>
-									<Input
-										id="category"
-										value={formData.category}
-										onChange={(e) =>
-											setFormData({ ...formData, category: e.target.value })
-										}
-										placeholder="Web Development, AI, etc."
-									/>
-								</div>
+									<div className="space-y-2">
+										<Label htmlFor="category">Category</Label>
+										<Input
+											id="category"
+											value={formData.category}
+											onChange={(e) =>
+												setFormData({ ...formData, category: e.target.value })
+											}
+											placeholder="Web Development, AI, etc."
+										/>
+									</div>
 
-								<div className="space-y-2">
-									<Label htmlFor="tags">Tags</Label>
-									<Input
-										id="tags"
-										value={formData.tags}
-										onChange={(e) =>
-											setFormData({ ...formData, tags: e.target.value })
-										}
-										placeholder="react, typescript, hooks (comma-separated)"
-									/>
+									<div className="space-y-2">
+										<Label htmlFor="tags">Tags</Label>
+										<Input
+											id="tags"
+											value={formData.tags}
+											onChange={(e) =>
+												setFormData({ ...formData, tags: e.target.value })
+											}
+											placeholder="react, typescript, hooks (comma-separated)"
+										/>
+									</div>
 								</div>
 							</div>
 
 							{/* Event Details */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">Event Details</h3>
-
-								<div className="flex items-center space-x-2">
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<Settings className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Event Details</h2>
+								</div>
+								<div className="space-y-4">
+									<div className="flex items-center space-x-2">
 									<Switch
 										id="isLive"
 										checked={formData.isLive}
@@ -359,11 +399,11 @@ function CreateWorkshopPage() {
 											setFormData({ ...formData, isLive: checked })
 										}
 									/>
-									<Label htmlFor="isLive">This is a live workshop</Label>
-								</div>
+										<Label htmlFor="isLive">This is a live workshop</Label>
+									</div>
 
-								{formData.isLive && (
-									<div className="grid grid-cols-2 gap-4">
+									{formData.isLive && (
+										<div className="grid grid-cols-2 gap-4">
 										<div className="space-y-2">
 											<Label htmlFor="startDate">Start Date</Label>
 											<Input
@@ -405,18 +445,22 @@ function CreateWorkshopPage() {
 												}
 												placeholder="50"
 											/>
+											</div>
 										</div>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
 
 							{/* Video Details */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">
-									Video Recording (Optional)
-								</h3>
-
-								<div className="grid grid-cols-2 gap-4">
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<Video className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Video Recording (Optional)</h2>
+								</div>
+								<div className="space-y-4">
+									<div className="grid grid-cols-2 gap-4">
 									<div className="space-y-2">
 										<Label htmlFor="videoProvider">Video Provider</Label>
 										<Select
@@ -460,18 +504,24 @@ function CreateWorkshopPage() {
 										}
 										placeholder="https://www.youtube.com/watch?v=... or https://www.youtube.com/embed/..."
 									/>
-									<p className="text-sm text-muted-foreground">
-										Paste any YouTube URL - it will be converted to embed format
-										automatically
-									</p>
+										<p className="text-sm text-muted-foreground">
+											Paste any YouTube URL - it will be converted to embed format
+											automatically
+										</p>
+									</div>
 								</div>
 							</div>
 
 							{/* Access Control */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">Access Control</h3>
-
-								<div className="space-y-2">
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<Lock className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Access Control</h2>
+								</div>
+								<div className="space-y-4">
+									<div className="space-y-2">
 									<Label htmlFor="accessLevel">Access Level *</Label>
 									<Select
 										value={formData.accessLevel}
@@ -492,10 +542,10 @@ function CreateWorkshopPage() {
 											</SelectItem>
 										</SelectContent>
 									</Select>
-								</div>
+									</div>
 
-								{formData.accessLevel === "subscription" && (
-									<div className="space-y-2">
+									{formData.accessLevel === "subscription" && (
+										<div className="space-y-2">
 										<Label htmlFor="requiredTier">Required Tier</Label>
 										<Select
 											value={formData.requiredTier}
@@ -510,16 +560,21 @@ function CreateWorkshopPage() {
 												<SelectItem value="basic">Basic</SelectItem>
 												<SelectItem value="premium">Premium</SelectItem>
 											</SelectContent>
-										</Select>
-									</div>
-								)}
+											</Select>
+										</div>
+									)}
+								</div>
 							</div>
 
 							{/* Publishing Options */}
-							<div className="space-y-4">
-								<h3 className="text-lg font-semibold">Publishing Options</h3>
-
-								<div className="space-y-3">
+							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+								<div className="mb-6 flex items-center gap-3">
+									<div className="rounded-lg bg-primary/10 p-2 text-primary">
+										<Eye className="h-5 w-5" />
+									</div>
+									<h2 className="text-2xl font-bold">Publishing Options</h2>
+								</div>
+								<div className="space-y-4">
 									<div className="flex items-center space-x-2">
 										<Switch
 											id="isPublished"
@@ -539,28 +594,32 @@ function CreateWorkshopPage() {
 												setFormData({ ...formData, isFeatured: checked })
 											}
 										/>
-										<Label htmlFor="isFeatured">Feature this workshop</Label>
+											<Label htmlFor="isFeatured">Feature this workshop</Label>
+										</div>
 									</div>
 								</div>
 							</div>
 
 							{/* Form Actions */}
-							<div className="flex justify-end space-x-4 pt-4 border-t">
-								<Button
-									type="button"
-									variant="outline"
-									onClick={() => navigate({ to: "/admin/workshops" })}
-									disabled={isSubmitting}
-								>
-									Cancel
-								</Button>
-								<Button type="submit" disabled={isSubmitting}>
-									{isSubmitting ? "Creating..." : "Create Workshop"}
-								</Button>
+							<div className="rounded-2xl border border-border bg-card p-6 shadow-md">
+								<div className="flex justify-end gap-4">
+									<Button
+										type="button"
+										variant="outline"
+										size="lg"
+										onClick={() => navigate({ to: "/admin/workshops" })}
+										disabled={isSubmitting}
+									>
+										Cancel
+									</Button>
+									<Button type="submit" size="lg" disabled={isSubmitting} className="shadow-md">
+										{isSubmitting ? "Creating..." : "Create Workshop"}
+									</Button>
+								</div>
 							</div>
 						</form>
-					</CardContent>
-				</Card>
+					</div>
+				</section>
 			</div>
 		</>
 	);

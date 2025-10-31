@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Calendar, Home, Settings, Users, X } from "lucide-react";
+import { BookOpen, Calendar, Home, Mail, Info, X } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,16 +38,16 @@ const menuItems = [
 		isRoute: true,
 	},
 	{
-		title: "Community",
-		url: "/community",
-		icon: Users,
-		isRoute: false,
+		title: "About",
+		url: "/about",
+		icon: Info,
+		isRoute: true,
 	},
 	{
-		title: "Settings",
-		url: "/settings",
-		icon: Settings,
-		isRoute: false,
+		title: "Contact",
+		url: "/contact",
+		icon: Mail,
+		isRoute: true,
 	},
 ];
 

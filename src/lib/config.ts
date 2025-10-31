@@ -33,9 +33,11 @@ export const SITE_CONFIG = {
 
 // Social Links
 export const SOCIAL_LINKS = {
-	github: "https://github.com/bitbuddies",
-	twitter: "https://twitter.com/bitbuddies",
-	linkedin: "https://linkedin.com/company/bitbuddies",
+	github: "https://github.com/bitdoze",
+	twitter: "https://twitter.com/bitdoze",
+	bluesky: "https://bsky.app/profile/bitdoze.com",
+	youtube: "https://www.youtube.com/channel/UCGsUtKhXsRrMvYAWm8q0bCg",
+	blog: "https://www.bitdoze.com",
 	email: `mailto:${SITE_CONFIG.email}`,
 } as const;
 
@@ -70,6 +72,8 @@ export const ROUTES = {
 	blog: "/blog",
 	about: "/about",
 	contact: "/contact",
+	privacy: "/privacy",
+	terms: "/terms",
 	admin: {
 		workshops: "/admin/workshops",
 		create: "/admin/workshops/create",

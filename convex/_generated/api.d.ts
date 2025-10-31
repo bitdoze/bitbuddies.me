@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as contactMessages from "../contactMessages.js";
+import type * as contactMessagesActions from "../contactMessagesActions.js";
 import type * as courses from "../courses.js";
 import type * as enrollments from "../enrollments.js";
 import type * as mediaAssets from "../mediaAssets.js";
@@ -34,6 +36,8 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  contactMessages: typeof contactMessages;
+  contactMessagesActions: typeof contactMessagesActions;
   courses: typeof courses;
   enrollments: typeof enrollments;
   mediaAssets: typeof mediaAssets;

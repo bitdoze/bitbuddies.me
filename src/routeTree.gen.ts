@@ -9,6 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
@@ -20,6 +24,26 @@ import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshop
 import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin.workshops.create'
 import { Route as AdminWorkshopsIdEditRouteImport } from './routes/admin.workshops.$id.edit'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,6 +97,10 @@ const AdminWorkshopsIdEditRoute = AdminWorkshopsIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
@@ -85,6 +113,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
@@ -97,6 +129,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
@@ -111,6 +147,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/terms'
     | '/admin/workshops'
     | '/debug/admin-setup'
     | '/debug/user-sync'
@@ -123,6 +163,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/terms'
     | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
@@ -134,6 +178,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/terms'
     | '/admin/workshops'
     | '/debug/admin-setup'
     | '/debug/user-sync'
@@ -147,6 +195,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
   DebugAdminSetupRoute: typeof DebugAdminSetupRoute
   DebugUserSyncRoute: typeof DebugUserSyncRoute
@@ -157,6 +209,34 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -248,6 +328,10 @@ const AdminWorkshopsRouteWithChildren = AdminWorkshopsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
   DebugAdminSetupRoute: DebugAdminSetupRoute,
   DebugUserSyncRoute: DebugUserSyncRoute,

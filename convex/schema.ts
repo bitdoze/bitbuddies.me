@@ -498,4 +498,42 @@ export default defineSchema({
 		completed: v.boolean(),
 		createdAt: v.number(),
 	}).index('by_created_at', ['createdAt']),
+
+	// ============================================================================
+	// CONTACT MESSAGES
+	// ============================================================================
+
+	/**
+	 * Contact messages - messages submitted through the contact form
+	 */
+	contactMessages: defineTable({
+		// Sender information
+		name: v.string(),
+		email: v.string(),
+		subject: v.string(),
+		message: v.string(),
+		// Status tracking
+		status: v.union(
+			v.literal('new'),
+			v.literal('read'),
+			v.literal('replied'),
+			v.literal('archived'),
+		),
+		// Email sending status
+		emailSent: v.boolean(),
+		emailError: v.optional(v.string()),
+		// Optional user reference (if logged in)
+		userId: v.optional(v.id('users')),
+		// Admin notes
+		adminNotes: v.optional(v.string()),
+		repliedAt: v.optional(v.number()),
+		repliedBy: v.optional(v.id('users')),
+		// Timestamps
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_status', ['status'])
+		.index('by_email', ['email'])
+		.index('by_user_id', ['userId'])
+		.index('by_created_at', ['createdAt']),
 })

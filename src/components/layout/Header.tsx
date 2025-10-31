@@ -43,12 +43,26 @@ export default function Header() {
 					>
 						Workshops
 					</Link>
-					<a
-						href="/community"
+					<Link
+						to="/about"
 						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+						activeProps={{
+							className:
+								"text-sm font-medium text-foreground transition-colors",
+						}}
 					>
-						Community
-					</a>
+						About
+					</Link>
+					<Link
+						to="/contact"
+						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+						activeProps={{
+							className:
+								"text-sm font-medium text-foreground transition-colors",
+						}}
+					>
+						Contact
+					</Link>
 				</nav>
 
 				<div className="flex items-center gap-2">
