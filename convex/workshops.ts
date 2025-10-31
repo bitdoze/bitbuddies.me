@@ -2,6 +2,26 @@ import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 import { ensureUniqueSlug } from "./utils"
 
+/**
+ * Helper to verify admin role
+ */
+async function requireAdmin(ctx: any, clerkId: string) {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
+		.first()
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Admin access required")
+	}
+
+	return user
+}
+
 const writeFields = {
 	title: v.string(),
 	slug: v.string(),
@@ -43,8 +63,13 @@ const writeFields = {
 }
 
 export const create = mutation({
-	args: writeFields,
+	args: {
+		...writeFields,
+		clerkId: v.string(),
+	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
 		await ensureUniqueSlug(ctx, "workshops", args.slug)
 
 		const now = Date.now()
@@ -106,6 +131,7 @@ export const create = mutation({
 
 export const update = mutation({
 	args: {
+		clerkId: v.string(),
 		workshopId: v.id("workshops"),
 		patch: v.object({
 			title: v.optional(v.string()),
@@ -153,6 +179,9 @@ export const update = mutation({
 		}),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const workshop = await ctx.db.get(args.workshopId)
 		if (!workshop) {
 			throw new Error("Workshop not found")
@@ -208,9 +237,12 @@ export const update = mutation({
 
 export const softDelete = mutation({
 	args: {
+		clerkId: v.string(),
 		workshopId: v.id("workshops"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
 		const workshop = await ctx.db.get(args.workshopId)
 		if (!workshop) {
 			throw new Error("Workshop not found")

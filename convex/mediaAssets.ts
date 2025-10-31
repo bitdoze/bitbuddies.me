@@ -1,0 +1,145 @@
+import { mutation, query } from "./_generated/server"
+import { v } from "convex/values"
+
+/**
+ * Generate an upload URL for image uploads
+ * This can be called by authenticated users
+ */
+export const generateUploadUrl = mutation({
+	args: {},
+	handler: async (ctx) => {
+		return await ctx.storage.generateUploadUrl()
+	},
+})
+
+/**
+ * Create a media asset record after file upload
+ */
+export const create = mutation({
+	args: {
+		storageId: v.id("_storage"),
+		mimeType: v.string(),
+		filesize: v.number(),
+		assetType: v.union(v.literal("image"), v.literal("attachment")),
+		altText: v.optional(v.string()),
+		caption: v.optional(v.string()),
+		createdBy: v.optional(v.id("users")),
+	},
+	handler: async (ctx, args) => {
+		const now = Date.now()
+
+		// Get the URL for the uploaded file
+		const url = await ctx.storage.getUrl(args.storageId)
+
+		return await ctx.db.insert("mediaAssets", {
+			storageId: args.storageId,
+			url: url ?? undefined,
+			mimeType: args.mimeType,
+			filesize: args.filesize,
+			assetType: args.assetType,
+			altText: args.altText,
+			caption: args.caption,
+			createdBy: args.createdBy,
+			createdAt: now,
+			updatedAt: now,
+		})
+	},
+})
+
+/**
+ * Get a media asset by ID
+ */
+export const getById = query({
+	args: {
+		assetId: v.id("mediaAssets"),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db.get(args.assetId)
+	},
+})
+
+/**
+ * Get URL for a media asset
+ */
+export const getUrl = query({
+	args: {
+		storageId: v.id("_storage"),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.storage.getUrl(args.storageId)
+	},
+})
+
+/**
+ * List all media assets
+ */
+export const list = query({
+	args: {
+		assetType: v.optional(v.union(v.literal("image"), v.literal("attachment"))),
+		limit: v.optional(v.number()),
+	},
+	handler: async (ctx, args) => {
+		const limit = args.limit ?? 100
+
+		if (args.assetType) {
+			const assetType = args.assetType // TypeScript narrowing
+			const assets = await ctx.db
+				.query("mediaAssets")
+				.withIndex("by_asset_type", (q) => q.eq("assetType", assetType))
+				.order("desc")
+				.take(limit)
+			return assets
+		}
+
+		const assets = await ctx.db
+			.query("mediaAssets")
+			.order("desc")
+			.take(limit)
+
+		return assets
+	},
+})
+
+/**
+ * Update media asset metadata
+ */
+export const update = mutation({
+	args: {
+		assetId: v.id("mediaAssets"),
+		altText: v.optional(v.string()),
+		caption: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const asset = await ctx.db.get(args.assetId)
+		if (!asset) {
+			throw new Error("Asset not found")
+		}
+
+		await ctx.db.patch(args.assetId, {
+			altText: args.altText,
+			caption: args.caption,
+			updatedAt: Date.now(),
+		})
+	},
+})
+
+/**
+ * Delete a media asset
+ */
+export const remove = mutation({
+	args: {
+		assetId: v.id("mediaAssets"),
+	},
+	handler: async (ctx, args) => {
+		const asset = await ctx.db.get(args.assetId)
+		if (!asset) {
+			throw new Error("Asset not found")
+		}
+
+		// Delete from storage
+		await ctx.storage.delete(asset.storageId)
+
+		// Delete from database
+		await ctx.db.delete(args.assetId)
+	},
+})

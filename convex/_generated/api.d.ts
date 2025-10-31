@@ -10,6 +10,7 @@
 
 import type * as courses from "../courses.js";
 import type * as enrollments from "../enrollments.js";
+import type * as mediaAssets from "../mediaAssets.js";
 import type * as posts from "../posts.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as todos from "../todos.js";
@@ -35,6 +36,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   courses: typeof courses;
   enrollments: typeof enrollments;
+  mediaAssets: typeof mediaAssets;
   posts: typeof posts;
   subscriptions: typeof subscriptions;
   todos: typeof todos;

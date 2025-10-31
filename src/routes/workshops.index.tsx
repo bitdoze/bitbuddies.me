@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, Users } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Users, ImageIcon } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "../components/ui/card";
 import { useAuth } from "../hooks/useAuth";
 import { useWorkshops } from "../hooks/useWorkshops";
+import { useMediaAsset } from "../hooks/useMediaAssets";
 
 export const Route = createFileRoute("/workshops/")({
 	component: WorkshopsPage,
@@ -142,6 +143,7 @@ function WorkshopsPage() {
 
 function WorkshopCard({ workshop }: { workshop: any }) {
 	const status = getWorkshopStatus(workshop);
+	const coverAsset = useMediaAsset(workshop.coverAssetId);
 
 	const formatDate = (timestamp?: number) => {
 		if (!timestamp) return null;
@@ -153,7 +155,23 @@ function WorkshopCard({ workshop }: { workshop: any }) {
 	};
 
 	return (
-		<Card className="flex flex-col hover:shadow-lg transition-shadow">
+		<Card className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+			{/* Cover Image with 16:9 aspect ratio */}
+			{coverAsset?.url ? (
+				<div className="w-full relative" style={{ paddingBottom: "56.25%" }}>
+					<img
+						src={coverAsset.url}
+						alt={workshop.title}
+						className="absolute inset-0 w-full h-full object-cover"
+					/>
+				</div>
+			) : (
+				<div className="w-full relative bg-muted" style={{ paddingBottom: "56.25%" }}>
+					<div className="absolute inset-0 flex items-center justify-center">
+						<ImageIcon className="h-12 w-12 text-muted-foreground" />
+					</div>
+				</div>
+			)}
 			<CardHeader>
 				<div className="flex items-start justify-between gap-2 mb-2">
 					<Badge variant="outline">{workshop.level}</Badge>

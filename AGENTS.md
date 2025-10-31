@@ -113,18 +113,62 @@ The website needs to use the themes settings from styles.css, if I change them t
 ### User Authentication Flow
 1. User signs in via Clerk
 2. `UserSyncProvider` (in `__root.tsx`) automatically syncs to Convex
-3. Creates record in `users` table with Clerk ID
+3. Creates record in `users` table with Clerk ID (default role: `user`)
 4. Creates associated `profiles` record
 5. `useAuth()` hook provides both Clerk user and Convex user
+
+### Admin Access Control (IMPLEMENTED)
+- **Backend Authorization**: All admin mutations (create/update/delete workshops) require `role=admin` in Convex users table
+- **Frontend Protection**: Admin routes (`/admin/*`) check `isAdmin` from `useAuth()` hook
+- **Setup**: Use `/debug/admin-setup` to grant admin privileges to users
+  - Click "Make Me Admin" to promote yourself
+  - View all users and manage their roles
+  - **WARNING**: Remove or protect this route in production!
+- **Hooks**:
+  - `useAuth()` returns `isAdmin` boolean (true if user role is "admin")
+  - `useRequireAdmin()` throws error if not admin (for route guards)
+- **Backend Functions**:
+  - `users.setUserRole()` - Set user role by Clerk ID
+  - All workshop mutations require `clerkId` parameter for authorization
+  - `requireAdmin()` helper validates admin role before mutations
 
 ### Workshop Features (IMPLEMENTED)
 - ✅ Create/Edit/Delete workshops (admin only)
 - ✅ List and view workshops (authenticated users only)
+- ✅ Cover image upload with Convex storage (IMPLEMENTED)
+- ✅ Image library for selecting previously uploaded images (IMPLEMENTED)
 - ✅ YouTube video embedding (auto-converts URLs to embed format)
 - ✅ Workshop attachments support
 - ✅ Rich content with HTML support
 - ✅ Live workshop scheduling with participant limits
 - ✅ Access level controls (public/authenticated/subscription)
+
+### Image Upload & Library (IMPLEMENTED)
+- **Storage**: Uses Convex storage (no external CDN needed)
+- **Three-step upload process**:
+  1. Generate upload URL via `mediaAssets.generateUploadUrl()`
+  2. POST file to upload URL → receives storage ID
+  3. Create `mediaAssets` record with storage ID
+- **ImageUpload component** with preview and library access:
+  - Upload new images with preview before saving
+  - Browse and select from previously uploaded images
+  - "Choose from Library" button opens image library dialog
+  - 16:9 aspect ratio maintained for all images
+  - Clear visual buttons: "Upload New" and "Choose from Library"
+- **ImageLibrary component** features:
+  - Grid view of all uploaded images (100 most recent)
+  - 16:9 aspect ratio thumbnails
+  - Hover to see file size and upload date
+  - Click to select, visual selection indicator
+  - Reusable across the application
+- **Image display** (all maintain 16:9 aspect ratio):
+  - Workshop cards (public list) - full-width hero with padding-bottom: 56.25%
+  - Admin table - 64x64 thumbnails
+  - Workshop detail page - full-width hero
+  - Upload preview - max-w-2xl with 16:9 ratio
+- **File validation**: max 10MB, images only
+- **Recommended dimensions**: 1200×675 pixels (16:9 ratio)
+- **Automatic URL generation** from storage ID
 
 ### Video Embedding Best Practices
 - Paste YouTube URL in Video URL field: `https://www.youtube.com/watch?v=VIDEO_ID`
@@ -135,3 +179,33 @@ The website needs to use the themes settings from styles.css, if I change them t
 ### Debug Tools
 - `/debug/user-sync` - Inspect and manually sync Clerk users to Convex
 - `/debug/workshops-video` - Fix video embed issues, extract IDs from iframe HTML
+- `/debug/admin-setup` - Grant admin privileges to users (⚠️ remove in production!)
+
+### Image Library System
+The image library provides a centralized way to manage and reuse uploaded images:
+
+**Components**:
+- `ImageUpload` - Upload UI with library access button
+- `ImageLibrary` - Modal dialog for browsing/selecting images
+
+**Usage**:
+```typescript
+<ImageUpload
+  value={coverAssetId}
+  imageUrl={coverAsset?.url}
+  onChange={setCoverAssetId}
+  label="Cover Image"
+/>
+```
+
+**Benefits**:
+- Reuse images across multiple workshops
+- No need to re-upload the same image
+- Central storage management
+- Browse all previously uploaded images
+- Reduces storage usage
+
+**Database**:
+- `mediaAssets` table stores all uploaded files
+- `workshops.coverAssetId` references the asset
+- Automatic cleanup when asset is deleted

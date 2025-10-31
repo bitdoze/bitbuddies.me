@@ -7,6 +7,7 @@ import {
 	Download,
 	Users,
 	Video,
+	ImageIcon,
 } from "lucide-react";
 import { useMemo } from "react";
 import { Badge } from "../components/ui/badge";
@@ -24,6 +25,7 @@ import {
 	useWorkshopAttachments,
 	useWorkshopBySlug,
 } from "../hooks/useWorkshops";
+import { useMediaAsset } from "../hooks/useMediaAssets";
 
 export const Route = createFileRoute("/workshops/$slug")({
 	component: WorkshopPage,
@@ -34,6 +36,7 @@ function WorkshopPage() {
 	const { isAuthenticated, isLoading: authLoading } = useAuth();
 	const workshop = useWorkshopBySlug(slug);
 	const attachments = useWorkshopAttachments(workshop?._id);
+	const coverAsset = useMediaAsset(workshop?.coverAssetId);
 
 	// Convert YouTube URL to embed URL
 	const embedUrl = useMemo(() => {
@@ -148,7 +151,8 @@ function WorkshopPage() {
 	const isPast = workshop.endDate && workshop.endDate < Date.now();
 
 	return (
-		<div className="container mx-auto py-8 max-w-5xl">
+		<div className="container mx-auto py-8 max-w-6xl">
+			{/* Back Button */}
 			<div className="mb-6">
 				<Button variant="ghost" asChild>
 					<Link to="/workshops">
@@ -158,8 +162,25 @@ function WorkshopPage() {
 				</Button>
 			</div>
 
+			{/* Cover Image with 16:9 aspect ratio */}
+			{coverAsset?.url ? (
+				<div className="w-full relative rounded-lg overflow-hidden mb-6" style={{ paddingBottom: "56.25%" }}>
+					<img
+						src={coverAsset.url}
+						alt={workshop.title}
+						className="absolute inset-0 w-full h-full object-cover"
+					/>
+				</div>
+			) : (
+				<div className="w-full relative bg-muted rounded-lg mb-6" style={{ paddingBottom: "56.25%" }}>
+					<div className="absolute inset-0 flex items-center justify-center">
+						<ImageIcon className="h-24 w-24 text-muted-foreground" />
+					</div>
+				</div>
+			)}
+
 			{/* Workshop Header */}
-			<div className="space-y-4 mb-8">
+			<div className="space-y-6">
 				<div className="flex items-start justify-between">
 					<div className="space-y-2">
 						<h1 className="text-4xl font-bold tracking-tight">

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ImageUpload } from "../components/common/ImageUpload";
 import { Button } from "../components/ui/button";
 import {
 	Card,
@@ -21,7 +22,9 @@ import {
 import { Switch } from "../components/ui/switch";
 import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
+import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useUpdateWorkshop, useWorkshop } from "../hooks/useWorkshops";
+import type { Id } from "../../convex/_generated/dataModel";
 
 export const Route = createFileRoute("/admin/workshops/$id/edit")({
 	component: EditWorkshopPage,
@@ -29,11 +32,14 @@ export const Route = createFileRoute("/admin/workshops/$id/edit")({
 
 function EditWorkshopPage() {
 	const { id } = Route.useParams();
-	const { isAuthenticated, isLoading: authLoading, convexUser } = useAuth();
+	const { isAuthenticated, isLoading: authLoading, isAdmin, user, convexUser } = useAuth();
 	const workshop = useWorkshop(id as any);
 	const updateWorkshop = useUpdateWorkshop();
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const [coverAssetId, setCoverAssetId] = useState<Id<"mediaAssets"> | undefined>();
+	const coverAsset = useMediaAsset(coverAssetId);
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -62,6 +68,7 @@ function EditWorkshopPage() {
 	// Load workshop data into form
 	useEffect(() => {
 		if (workshop) {
+			setCoverAssetId(workshop.coverAssetId);
 			setFormData({
 				title: workshop.title,
 				slug: workshop.slug,
@@ -96,6 +103,36 @@ function EditWorkshopPage() {
 		return (
 			<div className="container mx-auto py-8">
 				<div className="text-center">Loading...</div>
+			</div>
+		);
+	}
+
+	if (!isAuthenticated || !user) {
+		return (
+			<div className="container mx-auto py-8">
+				<Card>
+					<CardHeader>
+						<CardTitle>Access Denied</CardTitle>
+						<CardDescription>
+							You must be logged in to access this page.
+						</CardDescription>
+					</CardHeader>
+				</Card>
+			</div>
+		);
+	}
+
+	if (!isAdmin) {
+		return (
+			<div className="container mx-auto py-8">
+				<Card>
+					<CardHeader>
+						<CardTitle>Admin Access Required</CardTitle>
+						<CardDescription>
+							You need admin privileges to access this page.
+						</CardDescription>
+					</CardHeader>
+				</Card>
 			</div>
 		);
 	}
@@ -160,6 +197,7 @@ function EditWorkshopPage() {
 				slug: formData.slug,
 				description: formData.description,
 				shortDescription: formData.shortDescription || undefined,
+				coverAssetId: coverAssetId,
 				content: formData.content,
 				level: formData.level,
 				category: formData.category || undefined,
@@ -188,6 +226,7 @@ function EditWorkshopPage() {
 			};
 
 			await updateWorkshop({
+				clerkId: user.id,
 				workshopId: id as any,
 				patch,
 			});
@@ -225,6 +264,14 @@ function EditWorkshopPage() {
 						{/* Basic Information */}
 						<div className="space-y-4">
 							<h3 className="text-lg font-semibold">Basic Information</h3>
+
+							<ImageUpload
+								value={coverAssetId}
+								imageUrl={coverAsset?.url}
+								onChange={setCoverAssetId}
+								label="Cover Image"
+								disabled={isSubmitting}
+							/>
 
 							<div className="space-y-2">
 								<Label htmlFor="title">Title *</Label>

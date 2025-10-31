@@ -14,6 +14,7 @@ import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
 import { Route as DebugWorkshopsVideoRouteImport } from './routes/debug.workshops-video'
 import { Route as DebugUserSyncRouteImport } from './routes/debug.user-sync'
+import { Route as DebugAdminSetupRouteImport } from './routes/debug.admin-setup'
 import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
 import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshops.index'
 import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin.workshops.create'
@@ -44,6 +45,11 @@ const DebugUserSyncRoute = DebugUserSyncRouteImport.update({
   path: '/debug/user-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DebugAdminSetupRoute = DebugAdminSetupRouteImport.update({
+  id: '/debug/admin-setup',
+  path: '/debug/admin-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminWorkshopsRoute = AdminWorkshopsRouteImport.update({
   id: '/admin/workshops',
   path: '/admin/workshops',
@@ -68,6 +74,7 @@ const AdminWorkshopsIdEditRoute = AdminWorkshopsIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
+  '/debug/admin-setup': typeof DebugAdminSetupRoute
   '/debug/user-sync': typeof DebugUserSyncRoute
   '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin/workshops'
+    | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin/workshops'
+    | '/debug/admin-setup'
     | '/debug/user-sync'
     | '/debug/workshops-video'
     | '/workshops/$slug'
@@ -136,6 +148,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
+  DebugAdminSetupRoute: typeof DebugAdminSetupRoute
   DebugUserSyncRoute: typeof DebugUserSyncRoute
   DebugWorkshopsVideoRoute: typeof DebugWorkshopsVideoRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
@@ -177,6 +190,13 @@ declare module '@tanstack/react-router' {
       path: '/debug/user-sync'
       fullPath: '/debug/user-sync'
       preLoaderRoute: typeof DebugUserSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug/admin-setup': {
+      id: '/debug/admin-setup'
+      path: '/debug/admin-setup'
+      fullPath: '/debug/admin-setup'
+      preLoaderRoute: typeof DebugAdminSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/workshops': {
@@ -229,6 +249,7 @@ const AdminWorkshopsRouteWithChildren = AdminWorkshopsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
+  DebugAdminSetupRoute: DebugAdminSetupRoute,
   DebugUserSyncRoute: DebugUserSyncRoute,
   DebugWorkshopsVideoRoute: DebugWorkshopsVideoRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,

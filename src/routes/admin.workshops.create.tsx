@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { ImageUpload } from "../components/common/ImageUpload";
 import { Button } from "../components/ui/button";
 import {
 	Card,
@@ -21,17 +22,22 @@ import {
 import { Switch } from "../components/ui/switch";
 import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
+import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useCreateWorkshop } from "../hooks/useWorkshops";
+import type { Id } from "../../convex/_generated/dataModel";
 
 export const Route = createFileRoute("/admin/workshops/create")({
 	component: CreateWorkshopPage,
 });
 
 function CreateWorkshopPage() {
-	const { isAuthenticated, isLoading, user, convexUser } = useAuth();
+	const { isAuthenticated, isLoading, isAdmin, user, convexUser } = useAuth();
 	const createWorkshop = useCreateWorkshop();
 	const navigate = useNavigate();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const [coverAssetId, setCoverAssetId] = useState<Id<"mediaAssets"> | undefined>();
+	const coverAsset = useMediaAsset(coverAssetId);
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -79,6 +85,21 @@ function CreateWorkshopPage() {
 		)
 	}
 
+	if (!isAdmin) {
+		return (
+			<div className="container mx-auto py-8">
+				<Card>
+					<CardHeader>
+						<CardTitle>Admin Access Required</CardTitle>
+						<CardDescription>
+							You need admin privileges to access this page.
+						</CardDescription>
+					</CardHeader>
+				</Card>
+			</div>
+		)
+	}
+
 	const generateSlug = (title: string) => {
 		return title
 			.toLowerCase()
@@ -105,10 +126,12 @@ function CreateWorkshopPage() {
 				.filter((tag) => tag.length > 0);
 
 			await createWorkshop({
+				clerkId: user.id,
 				title: formData.title,
 				slug: formData.slug,
 				description: formData.description,
 				shortDescription: formData.shortDescription || undefined,
+				coverAssetId: coverAssetId,
 				content: formData.content,
 				level: formData.level,
 				category: formData.category || undefined,
@@ -168,6 +191,14 @@ function CreateWorkshopPage() {
 						{/* Basic Information */}
 						<div className="space-y-4">
 							<h3 className="text-lg font-semibold">Basic Information</h3>
+
+							<ImageUpload
+								value={coverAssetId}
+								imageUrl={coverAsset?.url}
+								onChange={setCoverAssetId}
+								label="Cover Image"
+								disabled={isSubmitting}
+							/>
 
 							<div className="space-y-2">
 								<Label htmlFor="title">Title *</Label>

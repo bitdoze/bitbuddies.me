@@ -133,6 +133,34 @@ export const updateRole = mutation({
 })
 
 /**
+ * Set user role by Clerk ID (for initial admin setup)
+ * In production, this should be protected or only callable via Convex dashboard
+ */
+export const setUserRole = mutation({
+	args: {
+		clerkId: v.string(),
+		role: v.union(v.literal("user"), v.literal("admin")),
+	},
+	handler: async (ctx, args) => {
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+			.first()
+
+		if (!user) {
+			throw new Error("User not found")
+		}
+
+		await ctx.db.patch(user._id, {
+			role: args.role,
+			updatedAt: Date.now(),
+		})
+
+		return user._id
+	},
+})
+
+/**
  * List all users (for debugging)
  */
 export const listAll = query({
