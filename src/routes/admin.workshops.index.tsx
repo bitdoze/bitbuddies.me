@@ -30,6 +30,7 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import { useDeleteWorkshop, useWorkshops } from "../hooks/useWorkshops";
 import { useMediaAsset } from "../hooks/useMediaAssets";
+import { SEO } from "../components/common/SEO";
 
 export const Route = createFileRoute("/admin/workshops/")({
 	component: AdminWorkshopsPage,
@@ -103,8 +104,14 @@ function AdminWorkshopsPage() {
 	}
 
 	return (
-		<div className="container mx-auto py-8 space-y-6">
-			<div className="flex items-center justify-between">
+		<>
+			<SEO
+				title="Manage Workshops"
+				description="Admin dashboard for managing workshops, creating new content, and editing existing workshops."
+				noIndex={true}
+			/>
+			<div className="container mx-auto py-8 space-y-6">
+				<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold">Manage Workshops</h1>
 					<p className="text-muted-foreground mt-2">
@@ -153,7 +160,8 @@ function AdminWorkshopsPage() {
 					)}
 				</CardContent>
 			</Card>
-		</div>
+			</div>
+		</>
 	)
 }
 

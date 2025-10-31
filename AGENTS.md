@@ -134,7 +134,10 @@ The website needs to use the themes settings from styles.css, if I change them t
 
 ### Workshop Features (IMPLEMENTED)
 - ✅ Create/Edit/Delete workshops (admin only)
-- ✅ List and view workshops (authenticated users only)
+- ✅ **Public workshop list** - visible to all visitors without authentication
+- ✅ **Workshop detail pages** - require authentication to view content
+- ✅ Visual indicators on cards for non-authenticated users ("Login Required" badge)
+- ✅ Preview mode for unauthenticated users showing workshop info and CTA
 - ✅ Cover image upload with Convex storage (IMPLEMENTED)
 - ✅ Image library for selecting previously uploaded images (IMPLEMENTED)
 - ✅ YouTube video embedding (auto-converts URLs to embed format)
@@ -209,3 +212,82 @@ The image library provides a centralized way to manage and reuse uploaded images
 - `mediaAssets` table stores all uploaded files
 - `workshops.coverAssetId` references the asset
 - Automatic cleanup when asset is deleted
+
+### SEO & Meta Tags (IMPLEMENTED)
+- **SEO component** with comprehensive meta tag support
+- **Open Graph** tags for social media sharing
+- **Twitter Card** support for enhanced Twitter previews
+- **JSON-LD structured data** for rich search results
+- **Canonical URLs** to prevent duplicate content
+- **Dynamic SEO** based on workshop content
+
+**Features**:
+- Page-specific titles and descriptions
+- Keywords for better search engine indexing
+- Open Graph images (uses workshop cover images)
+- Structured data for courses/workshops (Schema.org)
+- Breadcrumb navigation for search engines
+- noIndex flag for admin/debug pages
+- Author and publication date metadata
+
+**Components**:
+- `SEO` - Main SEO component with props for all meta tags
+- `StructuredData` - Helper for JSON-LD structured data
+- `generateStructuredData()` - Function to generate schema.org data
+- `SEO_CONFIGS` - Predefined configs for common pages
+
+**Usage**:
+```tsx
+<SEO
+  title="Workshop Title"
+  description="Workshop description"
+  keywords="react, typescript, workshop"
+  canonicalUrl="/workshops/my-workshop"
+  ogImage={coverAsset?.url}
+  ogType="article"
+/>
+```
+
+**Implemented on pages**:
+- `/` - Home page with WebSite and Organization schema
+- `/workshops` - Workshops list with BreadcrumbList schema
+- `/workshops/:slug` - Dynamic workshop pages with Course schema
+- `/admin/*` - Admin pages with noIndex flag
+- `/debug/*` - Debug pages with noIndex flag
+
+**Benefits**:
+- Better search engine rankings
+- Rich previews on social media
+- Improved click-through rates
+- Professional appearance in search results
+- Proper indexing by search engines
+- Enhanced discoverability
+
+### Public Access & Authentication Flow (IMPLEMENTED)
+- **Workshop List** (`/workshops`) - Publicly accessible
+  - All visitors can browse workshops
+  - Shows "Login Required" badge for non-authenticated users
+  - Preview images, titles, descriptions, and tags
+  - "Sign In to View" button on cards for non-authenticated users
+  - "View Workshop" button for authenticated users
+
+- **Workshop Detail Pages** (`/workshops/:slug`) - Authentication required
+  - Non-authenticated users see:
+    - Full workshop header with cover image
+    - Workshop title, description, and metadata
+    - Preview of content (limited)
+    - Call-to-action card explaining benefits of signing in
+    - List of features they'll get with an account
+    - "Sign In to Continue" button
+  - Authenticated users see:
+    - Full workshop content and video
+    - Downloadable attachments
+    - Enrollment options
+    - Complete materials
+
+**Benefits**:
+- Increased visibility and discoverability
+- Better conversion funnel for visitors
+- SEO-friendly public pages
+- Clear value proposition before sign-in
+- Professional user experience

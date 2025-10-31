@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { ImageUpload } from "../components/common/ImageUpload";
+import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
 import {
 	Card,
@@ -168,8 +169,14 @@ function CreateWorkshopPage() {
 	}
 
 	return (
-		<div className="container mx-auto py-8 max-w-4xl">
-			<div className="mb-6">
+		<>
+			<SEO
+				title="Create Workshop"
+				description="Create a new workshop with details, content, video, and scheduling options."
+				noIndex={true}
+			/>
+			<div className="container mx-auto py-8 max-w-4xl">
+				<div className="mb-6">
 				<Button
 					variant="ghost"
 					onClick={() => navigate({ to: "/admin/workshops" })}
@@ -542,6 +549,7 @@ function CreateWorkshopPage() {
 					</form>
 				</CardContent>
 			</Card>
-		</div>
+			</div>
+		</>
 	)
 }

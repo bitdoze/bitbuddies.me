@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calendar, Clock, Users, ImageIcon } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Users, ImageIcon, Lock } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
@@ -13,42 +13,19 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import { useWorkshops } from "../hooks/useWorkshops";
 import { useMediaAsset } from "../hooks/useMediaAssets";
+import { SEO, SEO_CONFIGS, generateStructuredData } from "../components/common/SEO";
 
 export const Route = createFileRoute("/workshops/")({
 	component: WorkshopsPage,
 });
 
 function WorkshopsPage() {
-	const { isAuthenticated, isLoading: authLoading } = useAuth();
 	const workshops = useWorkshops({ publishedOnly: true });
 
-	if (authLoading || workshops === undefined) {
+	if (workshops === undefined) {
 		return (
 			<div className="container mx-auto py-8">
 				<div className="text-center">Loading...</div>
-			</div>
-		);
-	}
-
-	if (!isAuthenticated) {
-		return (
-			<div className="container mx-auto py-8">
-				<Card>
-					<CardHeader>
-						<CardTitle>Authentication Required</CardTitle>
-						<CardDescription>
-							You must be logged in to view workshops.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<p className="text-muted-foreground mb-4">
-							Please sign in to access our workshop content and materials.
-						</p>
-						<Button asChild>
-							<Link to="/">Sign In</Link>
-						</Button>
-					</CardContent>
-				</Card>
 			</div>
 		);
 	}
@@ -80,14 +57,39 @@ function WorkshopsPage() {
 	const regularWorkshops = workshops?.filter((w) => !w.isFeatured) || [];
 
 	return (
-		<div className="container mx-auto py-8 space-y-8">
-			{/* Header */}
-			<div className="space-y-2">
-				<h1 className="text-4xl font-bold tracking-tight">Workshops</h1>
-				<p className="text-xl text-muted-foreground">
-					Learn from hands-on workshops and live sessions
-				</p>
-			</div>
+		<>
+			<SEO
+				title={SEO_CONFIGS.workshops.title}
+				description={SEO_CONFIGS.workshops.description}
+				keywords={SEO_CONFIGS.workshops.keywords}
+				canonicalUrl="/workshops"
+				ogType="website"
+			/>
+			{generateStructuredData({
+				type: "BreadcrumbList",
+				itemListElement: [
+					{
+						"@type": "ListItem",
+						position: 1,
+						name: "Home",
+						item: typeof window !== "undefined" ? window.location.origin : "",
+					},
+					{
+						"@type": "ListItem",
+						position: 2,
+						name: "Workshops",
+						item: typeof window !== "undefined" ? `${window.location.origin}/workshops` : "",
+					},
+				],
+			})}
+			<div className="container mx-auto py-8 space-y-8">
+				{/* Header */}
+				<div className="space-y-2">
+					<h1 className="text-4xl font-bold tracking-tight">Workshops</h1>
+					<p className="text-xl text-muted-foreground">
+						Learn from hands-on workshops and live sessions
+					</p>
+				</div>
 
 			{/* Featured Workshops */}
 			{featuredWorkshops.length > 0 && (
@@ -138,10 +140,12 @@ function WorkshopsPage() {
 				)}
 			</div>
 		</div>
+		</>
 	);
 }
 
 function WorkshopCard({ workshop }: { workshop: any }) {
+	const { isAuthenticated } = useAuth();
 	const status = getWorkshopStatus(workshop);
 	const coverAsset = useMediaAsset(workshop.coverAssetId);
 
@@ -174,12 +178,22 @@ function WorkshopCard({ workshop }: { workshop: any }) {
 			)}
 			<CardHeader>
 				<div className="flex items-start justify-between gap-2 mb-2">
-					<Badge variant="outline">{workshop.level}</Badge>
-					{status === "live" && <Badge variant="destructive">Live Now</Badge>}
-					{status === "upcoming" && <Badge variant="default">Upcoming</Badge>}
-					{status === "past" && workshop.videoUrl && (
-						<Badge variant="secondary">Recording Available</Badge>
-					)}
+					<div className="flex items-center gap-2">
+						<Badge variant="outline">{workshop.level}</Badge>
+						{!isAuthenticated && (
+							<Badge variant="secondary" className="gap-1">
+								<Lock className="h-3 w-3" />
+								Login Required
+							</Badge>
+						)}
+					</div>
+					<div className="flex items-center gap-2">
+						{status === "live" && <Badge variant="destructive">Live Now</Badge>}
+						{status === "upcoming" && <Badge variant="default">Upcoming</Badge>}
+						{status === "past" && workshop.videoUrl && (
+							<Badge variant="secondary">Recording Available</Badge>
+						)}
+					</div>
 				</div>
 				<CardTitle className="line-clamp-2">{workshop.title}</CardTitle>
 				{workshop.shortDescription && (
@@ -232,12 +246,21 @@ function WorkshopCard({ workshop }: { workshop: any }) {
 				)}
 			</CardContent>
 			<CardFooter>
-				<Button asChild className="w-full">
-					<a href={`/workshops/${workshop.slug}`}>
-						View Workshop
-						<ArrowRight className="ml-2 h-4 w-4" />
-					</a>
-				</Button>
+				{isAuthenticated ? (
+					<Button asChild className="w-full">
+						<a href={`/workshops/${workshop.slug}`}>
+							View Workshop
+							<ArrowRight className="ml-2 h-4 w-4" />
+						</a>
+					</Button>
+				) : (
+					<Button asChild className="w-full" variant="outline">
+						<a href={`/workshops/${workshop.slug}`}>
+							<Lock className="mr-2 h-4 w-4" />
+							Sign In to View
+						</a>
+					</Button>
+				)}
 			</CardFooter>
 		</Card>
 	);

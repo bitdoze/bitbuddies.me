@@ -26,6 +26,7 @@ import {
 	useWorkshopBySlug,
 } from "../hooks/useWorkshops";
 import { useMediaAsset } from "../hooks/useMediaAssets";
+import { SEO, generateStructuredData } from "../components/common/SEO";
 
 export const Route = createFileRoute("/workshops/$slug")({
 	component: WorkshopPage,
@@ -40,12 +41,6 @@ function WorkshopPage() {
 
 	// Convert YouTube URL to embed URL
 	const embedUrl = useMemo(() => {
-		console.log("Video data:", {
-			videoUrl: workshop?.videoUrl,
-			videoId: workshop?.videoId,
-			videoProvider: workshop?.videoProvider,
-		});
-
 		if (!workshop?.videoUrl && !workshop?.videoId) return null;
 
 		// If videoUrl is already provided, use it
@@ -74,35 +69,10 @@ function WorkshopPage() {
 		return null;
 	}, [workshop?.videoUrl, workshop?.videoId, workshop?.videoProvider]);
 
-	console.log("Generated embedUrl:", embedUrl);
-
 	if (authLoading || workshop === undefined) {
 		return (
 			<div className="container mx-auto py-8">
 				<div className="text-center">Loading...</div>
-			</div>
-		);
-	}
-
-	if (!isAuthenticated) {
-		return (
-			<div className="container mx-auto py-8">
-				<Card>
-					<CardHeader>
-						<CardTitle>Authentication Required</CardTitle>
-						<CardDescription>
-							You must be logged in to view this workshop.
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<p className="text-muted-foreground mb-4">
-							Please sign in to access workshop content and materials.
-						</p>
-						<Button asChild>
-							<Link to="/">Sign In</Link>
-						</Button>
-					</CardContent>
-				</Card>
 			</div>
 		);
 	}
@@ -130,6 +100,7 @@ function WorkshopPage() {
 		);
 	}
 
+	// Define variables needed for preview
 	const formatDate = (timestamp?: number) => {
 		if (!timestamp) return null;
 		return new Date(timestamp).toLocaleDateString("en-US", {
@@ -150,10 +121,252 @@ function WorkshopPage() {
 		workshop.endDate >= Date.now();
 	const isPast = workshop.endDate && workshop.endDate < Date.now();
 
+	if (!isAuthenticated) {
+		return (
+			<>
+				<SEO
+					title={workshop.title}
+					description={
+						workshop.shortDescription || workshop.description.substring(0, 160)
+					}
+					keywords={workshop.tags.join(", ")}
+					canonicalUrl={`/workshops/${workshop.slug}`}
+					ogImage={coverAsset?.url}
+					ogType="article"
+				/>
+				<div className="container mx-auto py-8 max-w-6xl">
+					{/* Back Button */}
+					<div className="mb-6">
+						<Button variant="ghost" asChild>
+							<Link to="/workshops">
+								<ArrowLeft className="mr-2 h-4 w-4" />
+								Back to Workshops
+							</Link>
+						</Button>
+					</div>
+
+					{/* Cover Image with 16:9 aspect ratio */}
+					{coverAsset?.url ? (
+						<div className="w-full relative rounded-lg overflow-hidden mb-6" style={{ paddingBottom: "56.25%" }}>
+							<img
+								src={coverAsset.url}
+								alt={workshop.title}
+								className="absolute inset-0 w-full h-full object-cover"
+							/>
+						</div>
+					) : (
+						<div className="w-full relative bg-muted rounded-lg mb-6" style={{ paddingBottom: "56.25%" }}>
+							<div className="absolute inset-0 flex items-center justify-center">
+								<ImageIcon className="h-24 w-24 text-muted-foreground" />
+							</div>
+						</div>
+					)}
+
+					{/* Workshop Preview Header */}
+					<div className="space-y-6 mb-8">
+						<div className="flex items-start justify-between">
+							<div className="space-y-2">
+								<h1 className="text-4xl font-bold tracking-tight">
+									{workshop.title}
+								</h1>
+								{workshop.shortDescription && (
+									<p className="text-xl text-muted-foreground">
+										{workshop.shortDescription}
+									</p>
+								)}
+								<div className="flex flex-wrap gap-2 mt-4">
+									<Badge variant="outline">{workshop.level}</Badge>
+									{workshop.isLive && workshop.startDate && (
+										<>
+											{isUpcoming && <Badge variant="default">Upcoming</Badge>}
+											{isOngoing && <Badge variant="destructive">Live Now</Badge>}
+											{isPast && workshop.videoUrl && (
+												<Badge variant="secondary">Recording Available</Badge>
+											)}
+										</>
+									)}
+									{workshop.isFeatured && (
+										<Badge variant="secondary">Featured</Badge>
+									)}
+								</div>
+							</div>
+						</div>
+
+						{/* Workshop Meta */}
+						<div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+							{workshop.instructorName && (
+								<div className="flex items-center gap-2">
+									<Users className="h-4 w-4" />
+									<span>By {workshop.instructorName}</span>
+								</div>
+							)}
+							{workshop.duration && (
+								<div className="flex items-center gap-2">
+									<Clock className="h-4 w-4" />
+									<span>{workshop.duration} minutes</span>
+								</div>
+							)}
+							{workshop.startDate && (
+								<div className="flex items-center gap-2">
+									<Calendar className="h-4 w-4" />
+									<span>{formatDate(workshop.startDate)}</span>
+								</div>
+							)}
+						</div>
+					</div>
+
+					{/* Authentication Required Card */}
+					<Card className="border-primary/50 bg-primary/5">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<CheckCircle2 className="h-5 w-5 text-primary" />
+								Sign In to Access This Workshop
+							</CardTitle>
+							<CardDescription>
+								Create a free account or sign in to access workshop content, materials, and community features.
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="space-y-4">
+							<div className="space-y-2">
+								<h4 className="font-medium">What you'll get with an account:</h4>
+								<ul className="space-y-2 text-sm text-muted-foreground">
+									<li className="flex items-start gap-2">
+										<CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+										<span>Full access to all workshop content and videos</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+										<span>Download workshop materials and resources</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+										<span>Track your progress across courses and workshops</span>
+									</li>
+									<li className="flex items-start gap-2">
+										<CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+										<span>Join live workshop sessions and Q&A</span>
+									</li>
+								</ul>
+							</div>
+							<Button size="lg" className="w-full sm:w-auto">
+								Sign In to Continue
+							</Button>
+						</CardContent>
+					</Card>
+
+					{/* Workshop Description Preview */}
+					<div className="mt-8 space-y-6">
+						<div>
+							<h2 className="text-2xl font-bold mb-4">About This Workshop</h2>
+							<div className="prose prose-gray dark:prose-invert max-w-none">
+								<p className="text-muted-foreground line-clamp-6">
+									{workshop.description}
+								</p>
+							</div>
+						</div>
+
+						{workshop.tags.length > 0 && (
+							<div>
+								<h3 className="text-lg font-semibold mb-3">Topics Covered</h3>
+								<div className="flex flex-wrap gap-2">
+									{workshop.tags.map((tag: string) => (
+										<Badge key={tag} variant="secondary">
+											{tag}
+										</Badge>
+									))}
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
+			</>
+		);
+	}
+
+	// Format dates for SEO
+	const publishedTime = workshop.publishedAt
+		? new Date(workshop.publishedAt).toISOString()
+		: new Date(workshop.createdAt).toISOString();
+	const modifiedTime = new Date(workshop.updatedAt).toISOString();
+
 	return (
-		<div className="container mx-auto py-8 max-w-6xl">
-			{/* Back Button */}
-			<div className="mb-6">
+		<>
+			<SEO
+				title={workshop.title}
+				description={
+					workshop.shortDescription || workshop.description.substring(0, 160)
+				}
+				keywords={workshop.tags.join(", ")}
+				canonicalUrl={`/workshops/${workshop.slug}`}
+				ogImage={coverAsset?.url}
+				ogType="article"
+				author={workshop.instructorName}
+				publishedTime={publishedTime}
+				modifiedTime={modifiedTime}
+			/>
+			{generateStructuredData({
+				type: "Course",
+				name: workshop.title,
+				description: workshop.description,
+				provider: {
+					"@type": "Organization",
+					name: "BitBuddies",
+				},
+				instructor: {
+					"@type": "Person",
+					name: workshop.instructorName || "BitBuddies Instructor",
+				},
+				...(workshop.duration && {
+					timeRequired: `PT${workshop.duration}M`,
+				}),
+				...(coverAsset?.url && {
+					image: coverAsset.url,
+				}),
+				...(workshop.isLive &&
+					workshop.startDate && {
+						courseMode: "online",
+						startDate: new Date(workshop.startDate).toISOString(),
+						...(workshop.endDate && {
+							endDate: new Date(workshop.endDate).toISOString(),
+						}),
+					}),
+				educationalLevel: workshop.level,
+				inLanguage: "en",
+				isAccessibleForFree: workshop.accessLevel === "public",
+			})}
+			{generateStructuredData({
+				type: "BreadcrumbList",
+				itemListElement: [
+					{
+						"@type": "ListItem",
+						position: 1,
+						name: "Home",
+						item:
+							typeof window !== "undefined" ? window.location.origin : "",
+					},
+					{
+						"@type": "ListItem",
+						position: 2,
+						name: "Workshops",
+						item:
+							typeof window !== "undefined"
+								? `${window.location.origin}/workshops`
+								: "",
+					},
+					{
+						"@type": "ListItem",
+						position: 3,
+						name: workshop.title,
+						item:
+							typeof window !== "undefined"
+								? `${window.location.origin}/workshops/${workshop.slug}`
+								: "",
+					},
+				],
+			})}
+			<div className="container mx-auto py-8 max-w-6xl">
+				{/* Back Button */}
+				<div className="mb-6">
 				<Button variant="ghost" asChild>
 					<Link to="/workshops">
 						<ArrowLeft className="mr-2 h-4 w-4" />
@@ -462,5 +675,6 @@ function WorkshopPage() {
 				</div>
 			</div>
 		</div>
+		</>
 	);
 }

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Award, BookOpen, Code, Rocket, Users, Zap } from "lucide-react";
 import { LogoIcon } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
+import { SEO, SEO_CONFIGS, generateStructuredData } from "@/components/common/SEO";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -46,8 +47,38 @@ function App() {
 	];
 
 	return (
-		<div className="flex flex-col w-full">
-			{/* Hero Section */}
+		<>
+			<SEO
+				title={SEO_CONFIGS.home.title}
+				description={SEO_CONFIGS.home.description}
+				keywords={SEO_CONFIGS.home.keywords}
+				canonicalUrl="/"
+				ogType="website"
+			/>
+			{generateStructuredData({
+				type: "WebSite",
+				name: "BitBuddies",
+				url: typeof window !== "undefined" ? window.location.origin : "",
+				description: SEO_CONFIGS.home.description,
+				potentialAction: {
+					"@type": "SearchAction",
+					target: {
+						"@type": "EntryPoint",
+						urlTemplate: typeof window !== "undefined" ? `${window.location.origin}/search?q={search_term_string}` : "",
+					},
+					"query-input": "required name=search_term_string",
+				},
+			})}
+			{generateStructuredData({
+				type: "Organization",
+				name: "BitBuddies",
+				url: typeof window !== "undefined" ? window.location.origin : "",
+				logo: typeof window !== "undefined" ? `${window.location.origin}/logo.png` : "",
+				description: "Empowering developers to build amazing things together",
+				sameAs: [],
+			})}
+			<div className="flex flex-col w-full">
+				{/* Hero Section */}
 			<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-20 md:py-32">
 				<div className="container mx-auto px-4">
 					<div className="mx-auto max-w-4xl text-center">
@@ -149,5 +180,6 @@ function App() {
 				</div>
 			</section>
 		</div>
+		</>
 	);
 }

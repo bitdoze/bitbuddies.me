@@ -14,6 +14,12 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  optimizeDeps: {
+    include: ['react-helmet-async'],
+  },
+  ssr: {
+    noExternal: ['react-helmet-async'],
+  },
 })
 
 export default config

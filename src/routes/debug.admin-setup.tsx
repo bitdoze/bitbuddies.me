@@ -23,6 +23,7 @@ import {
 } from "../components/ui/table";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../../convex/_generated/api";
+import { SEO } from "../components/common/SEO";
 
 export const Route = createFileRoute("/debug/admin-setup")({
 	component: AdminSetupPage,
@@ -85,7 +86,13 @@ function AdminSetupPage() {
 	};
 
 	return (
-		<div className="container mx-auto py-8 max-w-6xl space-y-6">
+		<>
+			<SEO
+				title="Admin Role Management"
+				description="Debug tool for setting up admin users and managing roles."
+				noIndex={true}
+			/>
+			<div className="container mx-auto py-8 max-w-6xl space-y-6">
 			<div className="flex items-center justify-between">
 				<div>
 					<h1 className="text-3xl font-bold flex items-center gap-2">
@@ -286,6 +293,7 @@ function AdminSetupPage() {
 					</ul>
 				</CardContent>
 			</Card>
-		</div>
+			</div>
+		</>
 	);
 }

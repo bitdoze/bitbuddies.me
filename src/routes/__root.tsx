@@ -1,6 +1,7 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "../components/common/theme-provider";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
@@ -64,33 +65,35 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body>
-				<ThemeProvider defaultTheme="system" storageKey="bitbuddies-ui-theme">
-					<ClerkProvider>
-						<ConvexProvider>
-							<UserSyncProvider>
-								<SidebarProvider>
-									<AppSidebar />
-									<SidebarInset className="flex flex-col min-h-screen">
-										<Header />
-										<main className="flex-1 w-full">{children}</main>
-										<Footer />
-									</SidebarInset>
-								</SidebarProvider>
-								<TanStackDevtools
-									config={{
-										position: "bottom-right",
-									}}
-									plugins={[
-										{
-											name: "Tanstack Router",
-											render: <TanStackRouterDevtoolsPanel />,
-										},
-									]}
-								/>
-							</UserSyncProvider>
-						</ConvexProvider>
-					</ClerkProvider>
-				</ThemeProvider>
+				<HelmetProvider>
+					<ThemeProvider defaultTheme="system" storageKey="bitbuddies-ui-theme">
+						<ClerkProvider>
+							<ConvexProvider>
+								<UserSyncProvider>
+									<SidebarProvider>
+										<AppSidebar />
+										<SidebarInset className="flex flex-col min-h-screen">
+											<Header />
+											<main className="flex-1 w-full">{children}</main>
+											<Footer />
+										</SidebarInset>
+									</SidebarProvider>
+									<TanStackDevtools
+										config={{
+											position: "bottom-right",
+										}}
+										plugins={[
+											{
+												name: "Tanstack Router",
+												render: <TanStackRouterDevtoolsPanel />,
+											},
+										]}
+									/>
+								</UserSyncProvider>
+							</ConvexProvider>
+						</ClerkProvider>
+					</ThemeProvider>
+				</HelmetProvider>
 				<Scripts />
 			</body>
 		</html>
