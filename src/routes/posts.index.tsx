@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConvexHttpClient } from "convex/browser";
-import { ArrowRight, Calendar, Clock, Eye, Lock } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Eye, FileText, Lock } from "lucide-react";
 import type { ReactNode } from "react";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import { ContentCard } from "@/components/content/ContentCard";
@@ -81,6 +81,7 @@ function PostsPage() {
 						title="Latest articles & tutorials"
 						description="Deep dives, playbooks, and community highlights to help you ship better products faster."
 						align="center"
+						icon={<FileText className="h-4 w-4" />}
 					/>
 					{!posts || posts.length === 0 ? (
 						<div className="surface-muted mx-auto max-w-xl p-10 text-center">

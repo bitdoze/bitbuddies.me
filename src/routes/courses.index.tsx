@@ -6,6 +6,7 @@ import {
 	Clock,
 	GraduationCap,
 	Sparkles,
+	Star,
 	Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -204,6 +205,7 @@ function CoursesPage() {
 							eyebrow="Guided learning paths"
 							title="Master new skills with project-based courses"
 							description="Follow structured, hands-on curriculums designed by mentors and industry experts. Build real-world projects while learning at your own pace."
+							icon={<GraduationCap className="h-4 w-4" />}
 						/>
 						<div className="flex flex-wrap items-center gap-3">
 							<Button asChild size="lg" className="gap-2">
@@ -249,6 +251,7 @@ function CoursesPage() {
 								eyebrow="Standout picks"
 								title="Featured courses"
 								description="Curated programs that learners love right now."
+								icon={<Star className="h-4 w-4" />}
 							/>
 							<div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 								{featuredCourses.map(renderCourseCard)}
@@ -262,6 +265,7 @@ function CoursesPage() {
 								featuredCourses.length ? "All courses" : "Available courses"
 							}
 							description="Choose the experience that matches your goals—every course blends guided lessons with community feedback."
+							icon={<BookOpen className="h-4 w-4" />}
 						/>
 						{regularCourses.length === 0 && featuredCourses.length === 0 ? (
 							<div className="surface-muted mx-auto max-w-2xl space-y-3 p-10 text-center">

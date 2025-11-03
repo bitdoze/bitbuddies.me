@@ -142,6 +142,8 @@ function HomePage() {
 				title: "Choose a guided learning path",
 				description:
 					"Structured learning modules with projects, assessments, and mentor feedback.",
+				viewAllLink: "/courses",
+				viewAllText: "View all courses",
 				items: courses.map((course) => {
 					const badges: Array<{
 						label: string;
@@ -194,6 +196,8 @@ function HomePage() {
 				title: "Join the next live build",
 				description:
 					"Interactive sessions with live Q&A, recordings, and actionable resources.",
+				viewAllLink: "/workshops",
+				viewAllText: "View all workshops",
 				items: workshops.map((workshop) => {
 					const badges: Array<{
 						label: string;
@@ -250,6 +254,8 @@ function HomePage() {
 				title: "Fresh ideas from the crew",
 				description:
 					"Guides, breakdowns, and playbooks to help you learn faster.",
+				viewAllLink: "/posts",
+				viewAllText: "View all posts",
 				items: posts.map((post) => {
 					const badges: Array<{
 						label: string;

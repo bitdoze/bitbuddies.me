@@ -35,25 +35,35 @@ export function ContentCard({
 	return (
 		<article
 			className={cn(
-				"card-surface flex h-full flex-col overflow-hidden transition-transform motion-safe:hover:-translate-y-1",
+				"group relative h-full overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/50 hover:-translate-y-1",
 				className,
 			)}
 		>
-			{cover ? <div className="relative overflow-hidden">{cover}</div> : null}
-			<div className="flex flex-1 flex-col gap-4 p-6">
+			{/* Cover image with overlay gradient */}
+			{cover ? (
+				<div className="relative overflow-hidden">
+					{cover}
+					{/* Subtle gradient overlay on hover */}
+					<div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+				</div>
+			) : null}
+
+			{/* Content */}
+			<div className="flex flex-1 flex-col gap-3 p-5">
+				{/* Badges */}
 				{badges && badges.length > 0 ? (
-					<div className="flex flex-wrap items-center gap-2 text-xs">
+					<div className="flex flex-wrap items-center gap-1.5">
 						{badges.map((badge, index) => (
 							<span
 								key={`${badge.label}-${index}`}
 								className={cn(
-									"inline-flex items-center rounded-full px-3 py-1 font-medium",
+									"inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
 									badge.variant === "secondary" &&
 										"bg-muted text-muted-foreground",
 									badge.variant === "outline" &&
-										"border border-border/70 bg-transparent",
+										"border border-border bg-transparent text-foreground",
 									badge.variant === "destructive" &&
-										"bg-destructive/10 text-destructive",
+										"bg-destructive/10 text-destructive font-semibold",
 									(!badge.variant || badge.variant === "default") &&
 										"bg-primary/10 text-primary",
 								)}
@@ -63,40 +73,49 @@ export function ContentCard({
 						))}
 					</div>
 				) : null}
-				<div className="space-y-2">
+
+				{/* Title and description */}
+				<div className="space-y-2 flex-1">
 					{typeof title === "string" ? (
-						<h3 className="line-clamp-2 text-xl font-semibold text-foreground">
+						<h3 className="line-clamp-2 text-lg font-bold text-foreground transition-colors group-hover:text-primary">
 							{title}
 						</h3>
 					) : (
 						title
 					)}
 					{subtitle ? (
-						<p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
 							{subtitle}
 						</p>
 					) : null}
 					{description ? (
-						<p className="line-clamp-3 text-sm text-muted-foreground">
+						<p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
 							{description}
 						</p>
 					) : null}
 				</div>
+
+				{/* Meta info */}
 				{meta && meta.length > 0 ? (
-					<ul className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+					<ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3">
 						{meta.map((item) => (
 							<li
 								key={item.label}
 								className="flex items-center gap-1.5 font-medium"
 							>
-								{item.icon}
+								<span className="text-primary/70">{item.icon}</span>
 								<span>{item.label}</span>
 							</li>
 						))}
 					</ul>
 				) : null}
 			</div>
-			{footer ? <div className="px-6 pb-6">{footer}</div> : null}
+
+			{/* Footer */}
+			{footer ? <div className="px-5 pb-5 pt-0">{footer}</div> : null}
+
+			{/* Decorative gradient on hover */}
+			<div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-sky-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 		</article>
 	);
 }

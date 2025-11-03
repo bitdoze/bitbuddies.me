@@ -5,6 +5,7 @@ import {
 	Calendar,
 	Clock,
 	Sparkles,
+	Star,
 	Users,
 	Zap,
 } from "lucide-react";
@@ -232,6 +233,7 @@ function WorkshopsPage() {
 							eyebrow="Live, collaborative sprints"
 							title="Workshops that help you ship faster"
 							description="Join focused sessions, meet peers tackling similar problems, and walk away with finished deliverables."
+							icon={<Calendar className="h-4 w-4" />}
 						/>
 						<div className="flex flex-wrap items-center gap-3">
 							<Button asChild size="lg" className="gap-2">
@@ -282,6 +284,7 @@ function WorkshopsPage() {
 								eyebrow="Community favorites"
 								title="Featured workshops"
 								description="Sessions that consistently deliver breakthroughs for teams and solo builders."
+								icon={<Star className="h-4 w-4" />}
 							/>
 							<div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 								{featuredWorkshops.map(renderWorkshopCard)}

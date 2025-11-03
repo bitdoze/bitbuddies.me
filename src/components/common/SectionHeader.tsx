@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 type SectionHeaderProps = {
 	eyebrow?: string;
@@ -6,6 +7,7 @@ type SectionHeaderProps = {
 	description?: string;
 	className?: string;
 	align?: "left" | "center";
+	icon?: React.ReactNode;
 };
 
 export function SectionHeader({
@@ -14,24 +16,46 @@ export function SectionHeader({
 	description,
 	className,
 	align = "left",
+	icon,
 }: SectionHeaderProps) {
 	return (
 		<header
 			className={cn(
-				"section-heading motion-safe:animate-fade-up",
+				"flex flex-col gap-4 motion-safe:animate-fade-up",
 				align === "center" && "items-center text-center",
+				align === "left" && "items-start",
 				className,
 			)}
 		>
+			{/* Eyebrow badge */}
 			{eyebrow ? (
-				<span className="section-heading__eyebrow">{eyebrow}</span>
+				<Badge
+					variant="outline"
+					className="inline-flex items-center gap-2 border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary"
+				>
+					{icon && <span className="shrink-0">{icon}</span>}
+					{eyebrow}
+				</Badge>
 			) : null}
-			<h2 className="section-heading__title">{title}</h2>
+
+			{/* Title */}
+			<h2
+				className={cn(
+					"text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl",
+					align === "center" && "max-w-3xl",
+					align === "left" && "max-w-2xl",
+				)}
+			>
+				{title}
+			</h2>
+
+			{/* Description */}
 			{description ? (
 				<p
 					className={cn(
-						"section-heading__description",
-						align === "center" && "md:text-center",
+						"text-base leading-relaxed text-muted-foreground sm:text-lg",
+						align === "center" && "max-w-2xl text-center",
+						align === "left" && "max-w-xl",
 					)}
 				>
 					{description}
