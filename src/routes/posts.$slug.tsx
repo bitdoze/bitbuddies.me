@@ -167,6 +167,7 @@ function PostPage() {
 			{postStructuredData}
 
 			<ContentDetailLayout
+				sidebarTitle="Post Info"
 				sidebar={
 					<>
 						{/* Post Views */}

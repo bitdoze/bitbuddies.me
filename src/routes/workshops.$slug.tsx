@@ -222,6 +222,7 @@ function WorkshopPage() {
 			{workshopStructuredData}
 
 			<ContentDetailLayout
+				sidebarTitle="Workshop Info"
 				sidebar={
 					<>
 						<MetaInfoCard title="Workshop Details" items={metaItems} />

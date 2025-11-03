@@ -269,6 +269,7 @@ function CoursePage() {
 			{courseStructuredData}
 
 			<ContentDetailLayout
+				sidebarTitle="Course Info"
 				sidebar={
 					<>
 						<MetaInfoCard title="Course Details" items={metaItems} />

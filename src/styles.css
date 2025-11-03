@@ -250,6 +250,18 @@ code {
     }
 }
 
+@keyframes pulse-scale {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
 @layer utilities {
     .animate-fade-up {
         animation: fade-up 0.4s ease-out both;
@@ -265,6 +277,10 @@ code {
 
     .animate-float {
         animation: float 3s ease-in-out infinite;
+    }
+
+    .animate-pulse-scale {
+        animation: pulse-scale 2s ease-in-out infinite;
     }
 
     .animate-stagger>*:nth-child(1) {

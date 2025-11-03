@@ -7,8 +7,10 @@ import {
 	Circle,
 	Clock,
 	FileText,
+	List,
 	Lock,
 	PlayCircle,
+	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Doc } from "../../convex/_generated/dataModel";
@@ -72,7 +74,7 @@ function LessonPage() {
 	const toggleCompletion = useToggleLessonCompletion();
 	const isCompleted = useLessonCompletion(progressRecords, currentLesson?._id);
 
-	const [isSidebarOpen] = useState(true);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	// Track video watch time for auto-completion (placeholder for future enhancement)
 	useEffect(() => {
@@ -164,41 +166,99 @@ function LessonPage() {
 			/>
 
 			<div className="flex h-screen overflow-hidden">
+				{/* Mobile sidebar toggle button - top */}
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+					className="fixed top-20 left-4 z-50 md:hidden shadow-lg"
+				>
+					{isSidebarOpen ? (
+						<>
+							<X className="h-4 w-4 mr-2" />
+							Close
+						</>
+					) : (
+						<>
+							<List className="h-4 w-4 mr-2" />
+							Lessons
+						</>
+					)}
+				</Button>
+
+				{/* Backdrop overlay for mobile */}
+				{isSidebarOpen && (
+					<div
+						className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+						onClick={() => setIsSidebarOpen(false)}
+					/>
+				)}
+
 				{/* Sidebar */}
 				<aside
 					className={cn(
-						"w-80 border-r border-border bg-card flex flex-col transition-all duration-300",
-						!isSidebarOpen && "-ml-80",
+						"w-80 border-r border-border bg-card flex flex-col transition-all duration-300 z-50",
+						"fixed md:static inset-y-0 left-0",
+						"md:translate-x-0",
+						isSidebarOpen ? "translate-x-0" : "-translate-x-full",
 					)}
 				>
-					<div className="p-4 border-b border-border">
+					{/* Sidebar Header */}
+					<div className="p-4 border-b border-border bg-muted/30">
+						<div className="flex items-center justify-between mb-4">
+							<h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+								Course Contents
+							</h3>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() => setIsSidebarOpen(false)}
+								className="md:hidden h-8 w-8 p-0"
+								aria-label="Close sidebar"
+							>
+								<X className="h-4 w-4" />
+							</Button>
+						</div>
+
+						<h2 className="font-bold text-base line-clamp-2 mb-3">
+							{course.title}
+						</h2>
+
+						<div className="space-y-3">
+							<div className="flex items-center justify-between text-sm">
+								<span className="text-muted-foreground">Progress</span>
+								<span className="font-semibold text-foreground">
+									{completedCount} / {totalLessons}
+								</span>
+							</div>
+
+							<div className="space-y-1.5">
+								<div className="h-2 bg-muted rounded-full overflow-hidden">
+									<div
+										className="h-full bg-gradient-to-r from-primary to-sky-500 transition-all duration-500"
+										style={{ width: `${progressPercentage}%` }}
+									/>
+								</div>
+								<div className="flex items-center justify-between text-xs text-muted-foreground">
+									<span>{progressPercentage}% complete</span>
+									{progressPercentage === 100 && (
+										<CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+									)}
+								</div>
+							</div>
+						</div>
+
 						<Button
-							variant="ghost"
+							variant="outline"
 							size="sm"
 							asChild
-							className="mb-3 w-full justify-start"
+							className="w-full mt-4"
 						>
 							<Link to="/courses/$slug" params={{ slug: course.slug }}>
 								<ArrowLeft className="mr-2 h-4 w-4" />
-								Back to Course
+								Back to Course Overview
 							</Link>
 						</Button>
-						<h2 className="font-semibold text-sm line-clamp-2 mb-2">
-							{course.title}
-						</h2>
-						<div className="flex items-center gap-2 text-xs text-muted-foreground">
-							<span>
-								{completedCount} / {totalLessons} lessons
-							</span>
-							<span>•</span>
-							<span>{progressPercentage}% complete</span>
-						</div>
-						<div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-							<div
-								className="h-full bg-primary transition-all duration-300"
-								style={{ width: `${progressPercentage}%` }}
-							/>
-						</div>
 					</div>
 
 					<ScrollArea className="flex-1">
@@ -279,8 +339,8 @@ function LessonPage() {
 				</aside>
 
 				{/* Main Content */}
-				<main className="flex-1 overflow-auto">
-					<div className="max-w-5xl mx-auto p-6">
+				<main className="flex-1 overflow-auto md:ml-0">
+					<div className="max-w-5xl mx-auto p-4 md:p-6 pt-20 md:pt-6">
 						{/* Lesson Header */}
 						<div className="mb-6">
 							<div className="flex items-start justify-between gap-4 mb-4">
@@ -400,6 +460,22 @@ function LessonPage() {
 						</div>
 					</div>
 				</main>
+
+				{/* Floating Action Button - Quick access to lesson list */}
+				<Button
+					onClick={() => setIsSidebarOpen(true)}
+					size="lg"
+					className={cn(
+						"fixed bottom-6 right-6 z-40 shadow-2xl transition-all duration-300 md:hidden",
+						"h-14 w-14 rounded-full p-0",
+						"bg-primary hover:bg-primary/90 text-primary-foreground",
+						"animate-pulse-scale",
+						!isSidebarOpen ? "translate-y-0 opacity-100 scale-100" : "translate-y-20 opacity-0 scale-0 pointer-events-none"
+					)}
+					aria-label="Open lesson list"
+				>
+					<List className="h-6 w-6" />
+				</Button>
 			</div>
 		</>
 	);
