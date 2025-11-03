@@ -1,7 +1,6 @@
-import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { HelmetProvider } from "react-helmet-async";
+import { lazy, Suspense } from "react";
 import { ThemeProvider } from "../components/common/theme-provider";
 import { UserSyncProvider } from "../components/common/UserSyncProvider";
 import Footer from "../components/layout/Footer";
@@ -12,6 +11,27 @@ import ClerkProvider from "../integrations/clerk/provider";
 import ConvexProvider from "../integrations/convex/provider";
 
 import appCss from "../styles.css?url";
+
+// Check if debug routes are enabled (default to true in dev, false in production)
+const isDebugEnabled = import.meta.env.VITE_ENABLE_DEBUG_ROUTES !== "false";
+const isDevelopment = import.meta.env.DEV && import.meta.env.MODE !== "production" && isDebugEnabled;
+
+// Lazy load dev tools only in development - completely excluded from production builds
+const TanStackDevtoolsLazy = isDevelopment
+	? lazy(() =>
+			import("@tanstack/react-devtools").then((mod) => ({
+				default: mod.TanStackDevtools,
+			})),
+	  )
+	: null;
+
+const TanStackRouterDevtoolsPanelLazy = isDevelopment
+	? lazy(() =>
+			import("@tanstack/react-router-devtools").then((mod) => ({
+				default: mod.TanStackRouterDevtoolsPanel,
+			})),
+	  )
+	: null;
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -116,17 +136,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 											<Footer />
 										</SidebarInset>
 									</SidebarProvider>
-									<TanStackDevtools
-										config={{
-											position: "bottom-right",
-										}}
-										plugins={[
-											{
-												name: "Tanstack Router",
-												render: <TanStackRouterDevtoolsPanel />,
-											},
-										]}
-									/>
+									{isDevelopment &&
+										TanStackDevtoolsLazy &&
+										TanStackRouterDevtoolsPanelLazy && (
+											<Suspense fallback={null}>
+												<TanStackDevtoolsLazy
+													config={{
+														position: "bottom-right",
+													}}
+													plugins={[
+														{
+															name: "Tanstack Router",
+															render: <TanStackRouterDevtoolsPanelLazy />,
+														},
+													]}
+												/>
+											</Suspense>
+										)}
 								</UserSyncProvider>
 							</ConvexProvider>
 						</ClerkProvider>

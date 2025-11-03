@@ -3,9 +3,21 @@ import { LogoHeader } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Shield, FileText, Calendar, BookOpen, LayoutDashboard } from "lucide-react";
 import HeaderUser from "@/integrations/clerk/header-user";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
+	const { isAdmin } = useAuth();
+
 	return (
 		<header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container flex h-16 items-center justify-between px-4">
@@ -77,6 +89,45 @@ export default function Header() {
 
 				<div className="flex items-center gap-2">
 					<ThemeToggle />
+					{isAdmin && (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
+									<Shield className="h-4 w-4" />
+									Admin
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-56">
+								<DropdownMenuLabel>Admin Panel</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem asChild>
+									<Link to="/admin" className="cursor-pointer" {...({} as any)}>
+										<LayoutDashboard className="mr-2 h-4 w-4" />
+										Dashboard
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem asChild>
+									<Link to="/admin/posts" className="cursor-pointer">
+										<FileText className="mr-2 h-4 w-4" />
+										Manage Posts
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link to="/admin/workshops" className="cursor-pointer">
+										<Calendar className="mr-2 h-4 w-4" />
+										Manage Workshops
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link to="/admin/courses" className="cursor-pointer">
+										<BookOpen className="mr-2 h-4 w-4" />
+										Manage Courses
+									</Link>
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
 					<HeaderUser />
 					<Button asChild size="sm" className="hidden md:inline-flex">
 						<a href="#get-started">Get Started</a>

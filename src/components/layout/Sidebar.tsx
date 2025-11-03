@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Calendar, Home, Mail, Info, X, FileText } from "lucide-react";
+import { BookOpen, Calendar, Home, Mail, Info, X, FileText, Shield, LayoutDashboard, Plus } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import {
 	Sidebar,
 	SidebarContent,
@@ -59,6 +60,7 @@ const menuItems = [
 
 export function AppSidebar() {
 	const { toggleSidebar } = useSidebar();
+	const { isAdmin } = useAuth();
 
 	return (
 		<Sidebar>
@@ -103,6 +105,51 @@ export function AppSidebar() {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
+
+				{isAdmin && (
+					<SidebarGroup>
+						<SidebarGroupLabel className="flex items-center gap-2">
+							<Shield className="h-4 w-4" />
+							Admin Panel
+						</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								<SidebarMenuItem>
+									<SidebarMenuButton asChild>
+										<Link to="/admin" {...({} as any)}>
+											<LayoutDashboard />
+											<span>Dashboard</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton asChild>
+										<Link to="/admin/posts">
+											<FileText />
+											<span>Manage Posts</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton asChild>
+										<Link to="/admin/workshops">
+											<Calendar />
+											<span>Manage Workshops</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton asChild>
+										<Link to="/admin/courses">
+											<BookOpen />
+											<span>Manage Courses</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				)}
 			</SidebarContent>
 			<SidebarFooter className="border-t border-sidebar-border p-4">
 				<div className="flex flex-col gap-2">
