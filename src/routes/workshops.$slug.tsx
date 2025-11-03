@@ -11,8 +11,9 @@ import {
 	FileText,
 	Play,
 } from "lucide-react";
-import { useMemo } from "react";
+
 import { generateStructuredData, SEO } from "../components/common/SEO";
+import { WorkshopVideoPlayer } from "../components/common/VideoPlayer";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
@@ -59,38 +60,6 @@ function WorkshopPage() {
 	const workshop = loaderData?.workshop ?? clientWorkshop;
 
 	const attachments = useWorkshopAttachments(workshop?._id);
-
-	// Convert YouTube URL to embed URL
-	const embedUrl = useMemo(() => {
-		if (!workshop?.videoUrl && !workshop?.videoId) return null;
-
-		// If videoUrl is already provided, use it
-		if (workshop.videoUrl) {
-			// Check if it's already an embed URL
-			if (workshop.videoUrl.includes("/embed/")) {
-				return workshop.videoUrl;
-			}
-			// Try to extract video ID from various YouTube URL formats
-			const videoIdMatch = workshop.videoUrl.match(
-				/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
-			);
-			if (videoIdMatch) {
-				return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
-			}
-			return workshop.videoUrl;
-		}
-
-		// Use videoId if provided
-		if (workshop.videoId) {
-			if (workshop.videoProvider === "bunny") {
-				return workshop.videoId; // Bunny stream URLs are used as-is
-			}
-			// Default to YouTube if no provider specified or if provider is youtube
-			return `https://www.youtube.com/embed/${workshop.videoId}`;
-		}
-
-		return null;
-	}, [workshop?.videoUrl, workshop?.videoId, workshop?.videoProvider]);
 
 	if (authLoading || workshop === undefined) {
 		return (
@@ -481,7 +450,7 @@ function WorkshopPage() {
 				</section>
 
 				{/* Video Player Section */}
-				{(embedUrl || workshop.videoId || workshop.videoUrl) && (
+				{(workshop.videoId || workshop.videoUrl) && (
 					<section className="py-16 bg-muted/30">
 						<div className="container mx-auto px-4">
 							<div className="max-w-5xl mx-auto">
@@ -492,38 +461,7 @@ function WorkshopPage() {
 									<h2 className="text-3xl font-bold">Workshop Recording</h2>
 								</div>
 								<div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
-									{embedUrl ? (
-										<div className="aspect-video w-full rounded-xl overflow-hidden shadow-md">
-											<iframe
-												src={embedUrl}
-												className="w-full h-full"
-												allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-												allowFullScreen
-												title={workshop.title}
-											/>
-										</div>
-									) : (
-										<div className="bg-muted p-6 rounded-xl">
-											<p className="text-sm font-medium mb-3 text-muted-foreground">
-												Video configuration issue
-											</p>
-											<pre className="text-xs bg-background p-4 rounded-lg overflow-auto">
-												{JSON.stringify(
-													{
-														videoUrl: workshop.videoUrl,
-														videoId: workshop.videoId,
-														videoProvider: workshop.videoProvider,
-														generatedEmbedUrl: embedUrl,
-													},
-													null,
-													2,
-												)}
-											</pre>
-											<p className="text-xs text-muted-foreground mt-3">
-												Please contact the workshop administrator to fix the video settings.
-											</p>
-										</div>
-									)}
+									<WorkshopVideoPlayer workshop={workshop} />
 								</div>
 							</div>
 						</div>

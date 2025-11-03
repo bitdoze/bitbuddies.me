@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
 	BookOpen,
@@ -9,9 +9,13 @@ import {
 	ImageIcon,
 	Lock,
 	Users,
+	PlayCircle,
+	Award,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { SignInButton } from "@clerk/clerk-react";
 import { SEO, generateStructuredData } from "../components/common/SEO";
+import { LessonVideoPlayer } from "../components/common/VideoPlayer";
 import {
 	Accordion,
 	AccordionContent,
@@ -24,6 +28,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useCourseBySlug } from "../hooks/useCourses";
 import { useLessonsByCourse } from "../hooks/useLessons";
 import { useChaptersByCourse } from "../hooks/useChapters";
+import { useUserCourseProgress, useEnrollment } from "../hooks/useProgress";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
@@ -74,7 +79,7 @@ export const Route = createFileRoute("/courses/$slug" as any)({
 function CoursePage() {
 	const params = Route.useParams();
 	const slug = (params as any).slug as string;
-	const { isAuthenticated, isLoading: authLoading } = useAuth();
+	const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
 	// Use prefetched data from loader, fallback to client-side fetch
 	const loaderData = Route.useLoaderData();
@@ -90,6 +95,10 @@ function CoursePage() {
 		publishedOnly: true,
 	});
 	const chapters = ((loaderData as any)?.chapters ?? clientChapters) as ChapterDoc[] | null | undefined;
+
+	// Progress tracking
+	const progressRecords = useUserCourseProgress(user?.id, course?._id);
+	const enrollment = useEnrollment(user?.id, course?._id);
 
 	if (authLoading || course === undefined) {
 		return (
@@ -255,9 +264,11 @@ function CoursePage() {
 											<span>Download resources and materials</span>
 										</div>
 									</div>
-									<Button size="lg" asChild className="shadow-md">
-										<a href="/sign-in">Sign In to Continue</a>
-									</Button>
+									<SignInButton mode="modal">
+										<Button size="lg" className="shadow-md">
+											Sign In to Continue
+										</Button>
+									</SignInButton>
 								</div>
 							</div>
 						</div>
@@ -381,6 +392,75 @@ function CoursePage() {
 								)}
 							</div>
 
+							{/* Progress Banner for enrolled users */}
+							{enrollment && (
+								<div className="mt-8 max-w-2xl mx-auto">
+									<div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
+										<div className="flex items-center justify-between mb-4">
+											<div className="flex items-center gap-3">
+												{enrollment.progressPercentage === 100 ? (
+													<Award className="h-6 w-6 text-primary" />
+												) : (
+													<PlayCircle className="h-6 w-6 text-primary" />
+												)}
+												<div className="text-left">
+													<h3 className="font-semibold">
+														{enrollment.progressPercentage === 100
+															? "Course Completed!"
+															: "Your Progress"}
+													</h3>
+													<p className="text-sm text-muted-foreground">
+														{enrollment.completedLessons} of {enrollment.totalLessons} lessons
+													</p>
+												</div>
+											</div>
+											<span className="text-2xl font-bold text-primary">
+												{enrollment.progressPercentage}%
+											</span>
+										</div>
+										<div className="h-2 bg-muted rounded-full overflow-hidden mb-4">
+											<div
+												className="h-full bg-primary transition-all duration-300"
+												style={{ width: `${enrollment.progressPercentage}%` }}
+											/>
+										</div>
+										<Button asChild size="lg" className="w-full">
+											<Link
+												to="/courses/$courseSlug/$lessonSlug"
+												params={{
+													courseSlug: course.slug,
+													lessonSlug: lessons?.sort((a, b) => a.order - b.order)[0]?.slug || "",
+												}}
+											>
+												{enrollment.progressPercentage === 0
+													? "Start Course"
+													: enrollment.progressPercentage === 100
+														? "Review Course"
+														: "Continue Learning"}
+											</Link>
+										</Button>
+									</div>
+								</div>
+							)}
+
+							{/* Start Course button for non-enrolled users */}
+							{!enrollment && lessons && lessons.length > 0 && (
+								<div className="mt-8">
+									<Button asChild size="lg">
+										<Link
+											to="/courses/$courseSlug/$lessonSlug"
+											params={{
+												courseSlug: course.slug,
+												lessonSlug: lessons?.sort((a, b) => a.order - b.order)[0]?.slug || "",
+											}}
+										>
+											<PlayCircle className="mr-2 h-5 w-5" />
+											Start Course
+										</Link>
+									</Button>
+								</div>
+							)}
+
 							{/* Tags */}
 							{course.tags.length > 0 && (
 								<div className="flex flex-wrap items-center justify-center gap-2 mt-6">
@@ -432,14 +512,14 @@ function CoursePage() {
 											Course Playlist
 										</h2>
 									</div>
-									<Button variant="ghost" size="sm">
-										Expand All
-									</Button>
+
 								</div>
 								<ChaptersAndLessonsAccordion
 									chapters={chapters || []}
 									lessons={lessons || []}
+									courseSlug={course.slug}
 									isAuthenticated={Boolean(isAuthenticated)}
+									progressRecords={progressRecords}
 								/>
 							</div>
 						</div>
@@ -453,13 +533,31 @@ function CoursePage() {
 function ChaptersAndLessonsAccordion({
 	chapters,
 	lessons,
+	courseSlug,
 	isAuthenticated,
+	progressRecords,
 }: {
 	chapters: ChapterDoc[];
 	lessons: LessonDoc[];
+	courseSlug: string;
 	isAuthenticated: boolean;
+	progressRecords: Array<{ lessonId: Doc<"lessons">["_id"]; isCompleted: boolean }> | undefined;
 }) {
 	const [expandedItems, setExpandedItems] = useState<string[]>([]);
+	const [isAllExpanded, setIsAllExpanded] = useState(false);
+
+	// Get all chapter IDs for expand/collapse all
+	const allChapterIds = chapters.map((c) => c._id);
+
+	const handleToggleAll = () => {
+		if (isAllExpanded) {
+			setExpandedItems([]);
+			setIsAllExpanded(false);
+		} else {
+			setExpandedItems(allChapterIds);
+			setIsAllExpanded(true);
+		}
+	};
 
 	// Group lessons by chapter
 	const lessonsWithoutChapter = lessons.filter(l => !l.chapterId);
@@ -480,6 +578,14 @@ function ChaptersAndLessonsAccordion({
 
 	return (
 		<div className="space-y-4">
+			{/* Expand/Collapse All Button */}
+			{chapters.length > 0 && (
+				<div className="flex justify-end mb-4">
+					<Button variant="ghost" size="sm" onClick={handleToggleAll}>
+						{isAllExpanded ? "Collapse All" : "Expand All"}
+					</Button>
+				</div>
+			)}
 			{/* Chapters with lessons */}
 			{chapters.map((chapter, chapterIndex) => {
 				const chapterLessons = lessonsByChapter[chapter._id] || [];
@@ -511,8 +617,10 @@ function ChaptersAndLessonsAccordion({
 											<LessonItem
 												key={lesson._id}
 												lesson={lesson}
+												courseSlug={courseSlug}
 												lessonNumber={lessonIndex + 1}
 												isAuthenticated={isAuthenticated}
+												isCompleted={progressRecords?.find((p) => p.lessonId === lesson._id)?.isCompleted ?? false}
 											/>
 										))}
 									</div>
@@ -538,10 +646,16 @@ function ChaptersAndLessonsAccordion({
 							className="rounded-2xl border border-border bg-card shadow-md overflow-hidden"
 						>
 							<AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors">
-								<LessonHeader lesson={lesson} lessonNumber={index + 1} isAuthenticated={isAuthenticated} />
+								<LessonHeader
+									lesson={lesson}
+									courseSlug={courseSlug}
+									lessonNumber={index + 1}
+									isAuthenticated={isAuthenticated}
+									isCompleted={progressRecords?.find((p) => p.lessonId === lesson._id)?.isCompleted ?? false}
+								/>
 							</AccordionTrigger>
 							<AccordionContent className="px-6 py-6 bg-muted/20">
-								<LessonContentWrapper lesson={lesson} isAuthenticated={isAuthenticated} />
+								<LessonContentWrapper lesson={lesson} courseSlug={courseSlug} isAuthenticated={isAuthenticated} />
 							</AccordionContent>
 						</AccordionItem>
 					))}
@@ -553,49 +667,53 @@ function ChaptersAndLessonsAccordion({
 
 function LessonItem({
 	lesson,
+	courseSlug,
 	lessonNumber,
 	isAuthenticated,
+	isCompleted,
 }: {
 	lesson: LessonDoc;
+	courseSlug: string;
 	lessonNumber: number;
 	isAuthenticated: boolean;
+	isCompleted: boolean;
 }) {
-	const [isOpen, setIsOpen] = useState(false);
-
 	return (
-		<Accordion
-			type="single"
-			collapsible
-			value={isOpen ? lesson._id : undefined}
-			onValueChange={(value) => setIsOpen(value === lesson._id)}
+		<Link
+			to="/courses/$courseSlug/$lessonSlug"
+			params={{ courseSlug, lessonSlug: lesson.slug }}
+			className="block px-6 py-4 hover:bg-muted/30 transition-colors border-b border-border last:border-0"
 		>
-			<AccordionItem value={lesson._id} className="border-0">
-				<AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/30 transition-colors border-b border-border last:border-0">
-					<LessonHeader lesson={lesson} lessonNumber={lessonNumber} isAuthenticated={isAuthenticated} />
-				</AccordionTrigger>
-				<AccordionContent className="px-6 py-6 bg-muted/10">
-					<LessonContentWrapper lesson={lesson} isAuthenticated={isAuthenticated} />
-				</AccordionContent>
-			</AccordionItem>
-		</Accordion>
+			<LessonHeader
+				lesson={lesson}
+				courseSlug={courseSlug}
+				lessonNumber={lessonNumber}
+				isAuthenticated={isAuthenticated}
+				isCompleted={isCompleted}
+			/>
+		</Link>
 	);
 }
 
 function LessonHeader({
 	lesson,
+	courseSlug,
 	lessonNumber,
 	isAuthenticated,
+	isCompleted,
 }: {
 	lesson: LessonDoc;
+	courseSlug: string;
 	lessonNumber: number;
 	isAuthenticated: boolean;
+	isCompleted: boolean;
 }) {
 	const canAccessLesson = Boolean(lesson.isFree) || isAuthenticated;
 
 	return (
 		<div className="flex items-center gap-4 w-full text-left">
 			<div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-				{lessonNumber}
+				{isCompleted ? <CheckCircle2 className="h-5 w-5 text-primary" /> : lessonNumber}
 			</div>
 			<div className="flex-1 min-w-0">
 				<div className="flex items-center gap-2 mb-1">
@@ -629,9 +747,11 @@ function LessonHeader({
 
 function LessonContentWrapper({
 	lesson,
+	courseSlug,
 	isAuthenticated,
 }: {
 	lesson: LessonDoc;
+	courseSlug: string;
 	isAuthenticated: boolean;
 }) {
 	const canAccessLesson = Boolean(lesson.isFree) || isAuthenticated;
@@ -648,59 +768,20 @@ function LessonContentWrapper({
 			<p className="text-muted-foreground mb-4">
 				Sign in to access this lesson
 			</p>
-			<Button asChild size="sm">
-				<a href="/sign-in">Sign In</a>
-			</Button>
+			<SignInButton mode="modal">
+				<Button size="sm">Sign In</Button>
+			</SignInButton>
 		</div>
 	);
 }
 
 function LessonContent({ lesson }: { lesson: LessonDoc }) {
-	const embedUrl = useMemo(() => {
-		if (!lesson.videoUrl && !lesson.videoId) return null;
-
-		// If videoUrl is already provided, use it
-		if (lesson.videoUrl) {
-			// Check if it's already an embed URL
-			if (lesson.videoUrl.includes("/embed/")) {
-				return lesson.videoUrl;
-			}
-			// Try to extract video ID from various YouTube URL formats
-			const videoIdMatch = lesson.videoUrl.match(
-				/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
-			);
-			if (videoIdMatch) {
-				return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
-			}
-			return lesson.videoUrl;
-		}
-
-		// Use videoId if provided
-		if (lesson.videoId) {
-			if (lesson.videoProvider === "bunny") {
-				return lesson.videoId; // Bunny stream URLs are used as-is
-			}
-			// Default to YouTube
-			return `https://www.youtube.com/embed/${lesson.videoId}`;
-		}
-
-		return null;
-	}, [lesson.videoUrl, lesson.videoId, lesson.videoProvider]);
-
 	return (
 		<div className="space-y-6">
 			{/* Video Player */}
-			{embedUrl && (
+			{(lesson.videoUrl || lesson.videoId) && (
 				<div className="rounded-xl overflow-hidden shadow-lg">
-					<div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-						<iframe
-							src={embedUrl}
-							title={lesson.title}
-							className="absolute inset-0 w-full h-full"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowFullScreen
-						/>
-					</div>
+					<LessonVideoPlayer lesson={lesson} />
 				</div>
 			)}
 

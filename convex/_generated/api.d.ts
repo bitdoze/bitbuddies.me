@@ -17,6 +17,7 @@ import type * as lessonAttachments from "../lessonAttachments.js";
 import type * as lessons from "../lessons.js";
 import type * as mediaAssets from "../mediaAssets.js";
 import type * as posts from "../posts.js";
+import type * as progress from "../progress.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as todos from "../todos.js";
 import type * as users from "../users.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   lessons: typeof lessons;
   mediaAssets: typeof mediaAssets;
   posts: typeof posts;
+  progress: typeof progress;
   subscriptions: typeof subscriptions;
   todos: typeof todos;
   users: typeof users;

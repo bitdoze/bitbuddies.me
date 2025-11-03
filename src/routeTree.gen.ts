@@ -25,6 +25,7 @@ import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshops.index'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin.courses.index'
+import { Route as CoursesCourseSlugLessonSlugRouteImport } from './routes/courses.$courseSlug.$lessonSlug'
 import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin.workshops.create'
 import { Route as AdminCoursesCreateRouteImport } from './routes/admin.courses.create'
 import { Route as AdminWorkshopsIdEditRouteImport } from './routes/admin.workshops.$id.edit'
@@ -111,6 +112,12 @@ const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminCoursesRoute,
 } as any)
+const CoursesCourseSlugLessonSlugRoute =
+  CoursesCourseSlugLessonSlugRouteImport.update({
+    id: '/courses/$courseSlug/$lessonSlug',
+    path: '/courses/$courseSlug/$lessonSlug',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminWorkshopsCreateRoute = AdminWorkshopsCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/workshops': typeof WorkshopsIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/workshops': typeof WorkshopsIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/workshops': typeof AdminWorkshopsIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
@@ -199,6 +208,7 @@ export interface FileRoutesById {
   '/workshops/': typeof WorkshopsIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
+  '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/workshops'
     | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/courses/$courseSlug/$lessonSlug'
     | '/admin/courses/'
     | '/admin/workshops/'
     | '/admin/courses/$id/edit'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/workshops'
     | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/courses/$courseSlug/$lessonSlug'
     | '/admin/courses'
     | '/admin/workshops'
     | '/admin/courses/$id/edit'
@@ -268,6 +280,7 @@ export interface FileRouteTypes {
     | '/workshops/'
     | '/admin/courses/create'
     | '/admin/workshops/create'
+    | '/courses/$courseSlug/$lessonSlug'
     | '/admin/courses/'
     | '/admin/workshops/'
     | '/admin/courses/$id/edit'
@@ -290,6 +303,7 @@ export interface RootRouteChildren {
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   WorkshopsIndexRoute: typeof WorkshopsIndexRoute
+  CoursesCourseSlugLessonSlugRoute: typeof CoursesCourseSlugLessonSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -406,6 +420,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesIndexRouteImport
       parentRoute: typeof AdminCoursesRoute
     }
+    '/courses/$courseSlug/$lessonSlug': {
+      id: '/courses/$courseSlug/$lessonSlug'
+      path: '/courses/$courseSlug/$lessonSlug'
+      fullPath: '/courses/$courseSlug/$lessonSlug'
+      preLoaderRoute: typeof CoursesCourseSlugLessonSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/workshops/create': {
       id: '/admin/workshops/create'
       path: '/create'
@@ -493,6 +514,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorkshopsSlugRoute: WorkshopsSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   WorkshopsIndexRoute: WorkshopsIndexRoute,
+  CoursesCourseSlugLessonSlugRoute: CoursesCourseSlugLessonSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

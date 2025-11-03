@@ -1082,8 +1082,17 @@ function LessonFormDialog({
 								onChange={(e) =>
 									setFormData({ ...formData, videoUrl: e.target.value })
 								}
-								placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+								placeholder={
+									formData.videoProvider === "bunny"
+										? "e.g., https://iframe.mediadelivery.net/play/149616/8adcaaab..."
+										: "e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+								}
 							/>
+							{formData.videoProvider === "bunny" && (
+								<p className="text-xs text-muted-foreground mt-1">
+									💡 Tip: Use the Bunny play URL (e.g., /play/...) - it will be automatically converted to embed format
+								</p>
+							)}
 						</div>
 
 						<div>
