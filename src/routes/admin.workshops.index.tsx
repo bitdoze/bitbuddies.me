@@ -267,6 +267,7 @@ function AdminWorkshopsPage() {
 											<TableHead className="w-20">Cover</TableHead>
 											<TableHead>Workshop</TableHead>
 											<TableHead>Level</TableHead>
+											<TableHead>Access</TableHead>
 											<TableHead>Status</TableHead>
 											<TableHead>Start</TableHead>
 											<TableHead>Participants</TableHead>
@@ -338,6 +339,23 @@ function WorkshopRow({
 			</TableCell>
 			<TableCell>
 				<Badge variant="outline">{workshop.level}</Badge>
+			</TableCell>
+			<TableCell>
+				<Badge
+					variant={
+						workshop.accessLevel === "public"
+							? "secondary"
+							: workshop.accessLevel === "authenticated"
+								? "default"
+								: "destructive"
+					}
+				>
+					{workshop.accessLevel === "public"
+						? "Free"
+						: workshop.accessLevel === "authenticated"
+							? "Login"
+							: "Subscription"}
+				</Badge>
 			</TableCell>
 			<TableCell>
 				<div className="flex flex-wrap items-center gap-2">

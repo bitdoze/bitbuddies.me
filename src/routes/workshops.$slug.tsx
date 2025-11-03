@@ -1,29 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConvexHttpClient } from "convex/browser";
-import {
-	ArrowLeft,
-	Calendar,
-	Clock,
-	FileText,
-	Users,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Clock, FileText, Users } from "lucide-react";
 
 import { api } from "../../convex/_generated/api";
 import { generateStructuredData, SEO } from "../components/common/SEO";
 import { SectionHeader } from "../components/common/SectionHeader";
 import { WorkshopVideoPlayer } from "../components/common/VideoPlayer";
+import type { MetaItem, Resource } from "../components/content";
 import {
-	ContentDetailLayout,
-	ContentDetailHeader,
-	ContentDetailCover,
-	MetaInfoCard,
 	AuthRequiredCard,
+	ContentDetailCover,
+	ContentDetailHeader,
+	ContentDetailLayout,
+	MetaInfoCard,
 	ResourcesList,
+	TiptapRenderer,
 	TopicsTags,
 	WorkshopStatus,
-	TiptapRenderer,
 } from "../components/content";
-import type { MetaItem, Resource } from "../components/content";
 import { Button } from "../components/ui/button";
 import { useAuth } from "../hooks/useAuth";
 import {
@@ -37,7 +31,9 @@ export const Route = createFileRoute("/workshops/$slug")({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { workshop: null };
 			}
 
@@ -157,12 +153,11 @@ function WorkshopPage() {
 		});
 	}
 
-
-
 	// Prepare badges
-	const badges: Array<{ label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = [
-		{ label: workshop.level, variant: "secondary" },
-	];
+	const badges: Array<{
+		label: string;
+		variant: "default" | "secondary" | "outline" | "destructive";
+	}> = [{ label: workshop.level, variant: "secondary" }];
 
 	if (isOngoing && workshop.isLive) {
 		badges.push({ label: "Live Now", variant: "destructive" });
@@ -182,7 +177,9 @@ function WorkshopPage() {
 			id: attachment._id,
 			name: attachment.displayName || "Attachment",
 			type: attachment.asset?.mimeType || "file",
-			size: attachment.asset?.filesize ? `${(attachment.asset.filesize / 1024 / 1024).toFixed(2)} MB` : "Unknown",
+			size: attachment.asset?.filesize
+				? `${(attachment.asset.filesize / 1024 / 1024).toFixed(2)} MB`
+				: "Unknown",
 			url: attachment.asset?.url || "",
 		})) || [];
 
@@ -237,11 +234,7 @@ function WorkshopPage() {
 						)}
 
 						{workshop.tags && workshop.tags.length > 0 && (
-							<TopicsTags
-								tags={workshop.tags}
-								title="Topics"
-								variant="card"
-							/>
+							<TopicsTags tags={workshop.tags} title="Topics" variant="card" />
 						)}
 					</>
 				}
@@ -258,18 +251,9 @@ function WorkshopPage() {
 					alt={workshop.title}
 				/>
 
-				{!isAuthenticated ? (
-					<AuthRequiredCard
-						title="Sign In to Access This Workshop"
-						description="Create a free account or sign in to access workshop content, materials, and community features."
-						features={[
-							"Full access to all workshop content and videos",
-							"Download workshop materials and resources",
-							"Track your progress across courses and workshops",
-							"Join the community and participate in discussions",
-						]}
-					/>
-				) : (
+				{/* Access Control Logic */}
+				{workshop.accessLevel === "public" ? (
+					// Public workshops - accessible to everyone
 					<>
 						{/* About Section */}
 						<section>
@@ -286,9 +270,7 @@ function WorkshopPage() {
 							<section>
 								<SectionHeader
 									eyebrow="Video"
-									title={
-										isPast ? "Workshop Recording" : "Watch Workshop"
-									}
+									title={isPast ? "Workshop Recording" : "Watch Workshop"}
 								/>
 								<div className="mt-6">
 									<WorkshopVideoPlayer workshop={workshop} />
@@ -314,8 +296,121 @@ function WorkshopPage() {
 								eyebrow="Downloads"
 							/>
 						)}
+					</>
+				) : workshop.accessLevel === "authenticated" && !isAuthenticated ? (
+					// Authenticated only - require login
+					<AuthRequiredCard
+						title="Sign In to Access This Workshop"
+						description="Create a free account or sign in to access workshop content, materials, and community features."
+						features={[
+							"Full access to all workshop content and videos",
+							"Download workshop materials and resources",
+							"Track your progress across courses and workshops",
+							"Join the community and participate in discussions",
+						]}
+					/>
+				) : workshop.accessLevel === "subscription" && !isAuthenticated ? (
+					// Subscription required but not logged in
+					<AuthRequiredCard
+						title="Subscription Required"
+						description="This workshop is available exclusively to our subscribers. Sign in or upgrade your account to access premium content."
+						features={[
+							"Access to all premium workshops and courses",
+							"Download exclusive materials and resources",
+							"Priority support and community access",
+							"Advanced tutorials and live sessions",
+						]}
+					/>
+				) : workshop.accessLevel === "subscription" && isAuthenticated ? (
+					// Subscription required and logged in - TODO: check actual subscription status
+					// For now, show the content (later add subscription check)
+					<>
+						{/* About Section */}
+						<section>
+							<SectionHeader eyebrow="Overview" title="About This Workshop" />
+							<div className="prose prose-slate dark:prose-invert max-w-none mt-6">
+								<p className="text-lg text-foreground leading-relaxed">
+									{workshop.description}
+								</p>
+							</div>
+						</section>
 
+						{/* Video Section */}
+						{(workshop.videoUrl || workshop.videoId) && (
+							<section>
+								<SectionHeader
+									eyebrow="Video"
+									title={isPast ? "Workshop Recording" : "Watch Workshop"}
+								/>
+								<div className="mt-6">
+									<WorkshopVideoPlayer workshop={workshop} />
+								</div>
+							</section>
+						)}
 
+						{/* Content Section */}
+						{workshop.content && (
+							<section>
+								<SectionHeader eyebrow="Content" title="Workshop Materials" />
+								<div className="mt-6">
+									<TiptapRenderer content={workshop.content} />
+								</div>
+							</section>
+						)}
+
+						{/* Resources Section */}
+						{resources.length > 0 && (
+							<ResourcesList
+								resources={resources}
+								title="Workshop Materials"
+								eyebrow="Downloads"
+							/>
+						)}
+					</>
+				) : (
+					// Authenticated level and user is logged in - show content
+					<>
+						{/* About Section */}
+						<section>
+							<SectionHeader eyebrow="Overview" title="About This Workshop" />
+							<div className="prose prose-slate dark:prose-invert max-w-none mt-6">
+								<p className="text-lg text-foreground leading-relaxed">
+									{workshop.description}
+								</p>
+							</div>
+						</section>
+
+						{/* Video Section */}
+						{(workshop.videoUrl || workshop.videoId) && (
+							<section>
+								<SectionHeader
+									eyebrow="Video"
+									title={isPast ? "Workshop Recording" : "Watch Workshop"}
+								/>
+								<div className="mt-6">
+									<WorkshopVideoPlayer workshop={workshop} />
+								</div>
+							</section>
+						)}
+
+						{/* Content Section */}
+						{workshop.content && (
+							<section>
+								<SectionHeader eyebrow="Content" title="Workshop Materials" />
+								<div className="mt-6">
+									<TiptapRenderer content={workshop.content} />
+								</div>
+							</section>
+						)}
+
+						{/* Resources Section */}
+						{resources.length > 0 && (
+							<ResourcesList
+								resources={resources}
+								title="Workshop Materials"
+								eyebrow="Downloads"
+							/>
+						)}
 					</>
 				)}
 			</ContentDetailLayout>
