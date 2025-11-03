@@ -3,6 +3,7 @@ import { Check, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
+import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../ui/button";
 import {
 	Dialog,
@@ -29,14 +30,21 @@ export function ImageLibrary({
 	disabled = false,
 	triggerButton,
 }: ImageLibraryProps) {
+	const { user } = useAuth();
 	const [open, setOpen] = useState(false);
 	const [selectedAssetId, setSelectedAssetId] = useState<
 		Id<"mediaAssets"> | undefined
 	>(value);
-	const images = useQuery(api.mediaAssets.list, {
-		assetType: "image",
-		limit: 100,
-	});
+	const images = useQuery(
+		api.mediaAssets.list,
+		user?.id
+			? {
+					clerkId: user.id,
+					assetType: "image",
+					limit: 100,
+			  }
+			: "skip",
+	);
 
 	const handleSelect = (assetId: Id<"mediaAssets">) => {
 		setSelectedAssetId(assetId);

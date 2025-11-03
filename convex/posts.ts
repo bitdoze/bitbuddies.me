@@ -1,22 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { ensureUniqueSlug } from "./utils";
-
-/**
- * Helper to verify admin role
- */
-async function requireAdmin(ctx: any, clerkId: string) {
-	const user = await ctx.db
-		.query("users")
-		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
-		.unique();
-
-	if (!user || user.role !== "admin") {
-		throw new Error("Admin access required");
-	}
-
-	return user;
-}
+import { ensureUniqueSlug, requireAdmin } from "./utils";
 
 const writeFields = {
 	clerkId: v.string(), // For authorization
@@ -135,7 +119,8 @@ export const update = mutation({
 		for (const [key, value] of Object.entries(args.patch) as Array<
 			[keyof typeof args.patch, unknown]
 		>) {
-			if (value !== undefined) {
+			// Skip undefined values and empty strings
+			if (value !== undefined && value !== "") {
 				(next as Record<string, unknown>)[key as string] = value;
 			}
 		}
@@ -180,6 +165,7 @@ export const softDelete = mutation({
 
 /**
  * List all posts with optional filtering
+ * Optimized to push filtering into Convex and limit before enrichment
  */
 export const list = query({
 	args: {
@@ -189,42 +175,42 @@ export const list = query({
 		limit: v.optional(v.number()),
 	},
 	handler: async (ctx, args) => {
+		const limit = args.limit ?? 100;
+
+		// Start with base query - not deleted posts
 		let query = ctx.db
 			.query("posts")
 			.withIndex("by_is_deleted", (q) => q.eq("isDeleted", false));
 
-		const posts = await query.collect();
-
-		// Apply filters
-		let filtered = posts;
-
+		// Apply indexed filters where possible
 		if (args.publishedOnly) {
-			filtered = filtered.filter((p) => p.isPublished);
+			query = query.filter((q) => q.eq(q.field("isPublished"), true));
 		}
 
 		if (args.featuredOnly) {
-			filtered = filtered.filter((p) => p.isFeatured);
+			query = query.filter((q) => q.eq(q.field("isFeatured"), true));
 		}
 
 		if (args.category) {
-			filtered = filtered.filter((p) => p.category === args.category);
+			query = query.filter((q) => q.eq(q.field("category"), args.category));
 		}
 
+		// Collect and sort
+		let posts = await query.collect();
+
 		// Sort by published date (newest first) or creation date
-		filtered.sort((a, b) => {
+		posts.sort((a, b) => {
 			const aDate = a.publishedAt || a.createdAt;
 			const bDate = b.publishedAt || b.createdAt;
 			return bDate - aDate;
 		});
 
-		// Apply limit
-		if (args.limit) {
-			filtered = filtered.slice(0, args.limit);
-		}
+		// Apply limit before enrichment
+		const limited = posts.slice(0, limit);
 
-		// Enrich with cover asset
+		// Enrich only the limited set with cover assets
 		const enriched = await Promise.all(
-			filtered.map(async (post) => {
+			limited.map(async (post) => {
 				let coverAsset = null;
 				if (post.coverAssetId) {
 					coverAsset = await ctx.db.get(post.coverAssetId);

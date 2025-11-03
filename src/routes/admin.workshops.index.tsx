@@ -288,7 +288,7 @@ function WorkshopRow({
 			<TableCell>{formatDate(workshop.startDate)}</TableCell>
 			<TableCell>
 				{workshop.currentParticipants}
-				{workshop.maxParticipants && " / ${workshop.maxParticipants}"}
+				{workshop.maxParticipants && ` / ${workshop.maxParticipants}`}
 			</TableCell>
 			<TableCell className="text-right">
 				<div className="flex items-center justify-end gap-2">

@@ -21,10 +21,6 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
 import { Route as PostsSlugRouteImport } from './routes/posts.$slug'
-import { Route as DebugWorkshopsVideoRouteImport } from './routes/debug.workshops-video'
-import { Route as DebugUserSyncRouteImport } from './routes/debug.user-sync'
-import { Route as DebugEditorRouteImport } from './routes/debug.editor'
-import { Route as DebugAdminSetupRouteImport } from './routes/debug.admin-setup'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
@@ -99,26 +95,6 @@ const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
 const PostsSlugRoute = PostsSlugRouteImport.update({
   id: '/posts/$slug',
   path: '/posts/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DebugWorkshopsVideoRoute = DebugWorkshopsVideoRouteImport.update({
-  id: '/debug/workshops-video',
-  path: '/debug/workshops-video',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DebugUserSyncRoute = DebugUserSyncRouteImport.update({
-  id: '/debug/user-sync',
-  path: '/debug/user-sync',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DebugEditorRoute = DebugEditorRouteImport.update({
-  id: '/debug/editor',
-  path: '/debug/editor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DebugAdminSetupRoute = DebugAdminSetupRouteImport.update({
-  id: '/debug/admin-setup',
-  path: '/debug/admin-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesSlugRoute = CoursesSlugRouteImport.update({
@@ -209,10 +185,6 @@ export interface FileRoutesByFullPath {
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
-  '/debug/admin-setup': typeof DebugAdminSetupRoute
-  '/debug/editor': typeof DebugEditorRoute
-  '/debug/user-sync': typeof DebugUserSyncRoute
-  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -238,10 +210,6 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/courses/$slug': typeof CoursesSlugRoute
-  '/debug/admin-setup': typeof DebugAdminSetupRoute
-  '/debug/editor': typeof DebugEditorRoute
-  '/debug/user-sync': typeof DebugUserSyncRoute
-  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -272,10 +240,6 @@ export interface FileRoutesById {
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
-  '/debug/admin-setup': typeof DebugAdminSetupRoute
-  '/debug/editor': typeof DebugEditorRoute
-  '/debug/user-sync': typeof DebugUserSyncRoute
-  '/debug/workshops-video': typeof DebugWorkshopsVideoRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -307,10 +271,6 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/workshops'
     | '/courses/$slug'
-    | '/debug/admin-setup'
-    | '/debug/editor'
-    | '/debug/user-sync'
-    | '/debug/workshops-video'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin/'
@@ -336,10 +296,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/courses/$slug'
-    | '/debug/admin-setup'
-    | '/debug/editor'
-    | '/debug/user-sync'
-    | '/debug/workshops-video'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin'
@@ -369,10 +325,6 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/workshops'
     | '/courses/$slug'
-    | '/debug/admin-setup'
-    | '/debug/editor'
-    | '/debug/user-sync'
-    | '/debug/workshops-video'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin/'
@@ -400,10 +352,6 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
-  DebugAdminSetupRoute: typeof DebugAdminSetupRoute
-  DebugEditorRoute: typeof DebugEditorRoute
-  DebugUserSyncRoute: typeof DebugUserSyncRoute
-  DebugWorkshopsVideoRoute: typeof DebugWorkshopsVideoRoute
   PostsSlugRoute: typeof PostsSlugRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
@@ -496,34 +444,6 @@ declare module '@tanstack/react-router' {
       path: '/posts/$slug'
       fullPath: '/posts/$slug'
       preLoaderRoute: typeof PostsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/debug/workshops-video': {
-      id: '/debug/workshops-video'
-      path: '/debug/workshops-video'
-      fullPath: '/debug/workshops-video'
-      preLoaderRoute: typeof DebugWorkshopsVideoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/debug/user-sync': {
-      id: '/debug/user-sync'
-      path: '/debug/user-sync'
-      fullPath: '/debug/user-sync'
-      preLoaderRoute: typeof DebugUserSyncRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/debug/editor': {
-      id: '/debug/editor'
-      path: '/debug/editor'
-      fullPath: '/debug/editor'
-      preLoaderRoute: typeof DebugEditorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/debug/admin-setup': {
-      id: '/debug/admin-setup'
-      path: '/debug/admin-setup'
-      fullPath: '/debug/admin-setup'
-      preLoaderRoute: typeof DebugAdminSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/$slug': {
@@ -708,10 +628,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   CoursesSlugRoute: CoursesSlugRoute,
-  DebugAdminSetupRoute: DebugAdminSetupRoute,
-  DebugEditorRoute: DebugEditorRoute,
-  DebugUserSyncRoute: DebugUserSyncRoute,
-  DebugWorkshopsVideoRoute: DebugWorkshopsVideoRoute,
   PostsSlugRoute: PostsSlugRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,

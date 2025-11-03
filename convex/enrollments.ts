@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server"
 import { v } from "convex/values"
+import { requireAdmin } from "./utils"
 
 const contentTypeEnum = v.union(
 	v.literal("course"),
@@ -35,13 +36,23 @@ const resolveContent = (args: {
 
 export const create = mutation({
 	args: {
-		userId: v.id("users"),
+		clerkId: v.string(),
 		contentType: contentTypeEnum,
 		courseId: v.optional(v.id("courses")),
 		workshopId: v.optional(v.id("workshops")),
 		status: v.optional(statusEnum),
 	},
 	handler: async (ctx, args) => {
+		// Get user from clerkId
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+			.first()
+
+		if (!user) {
+			throw new Error("User not found")
+		}
+
 		resolveContent(args)
 
 		const now = Date.now()
@@ -90,7 +101,7 @@ export const create = mutation({
 		}
 
 		return ctx.db.insert("enrollments", {
-			userId: args.userId,
+			userId: user._id,
 			contentType: args.contentType,
 			courseId,
 			workshopId,
@@ -109,6 +120,7 @@ export const create = mutation({
 
 export const updateProgress = mutation({
 	args: {
+		clerkId: v.string(),
 		enrollmentId: v.id("enrollments"),
 		completedLessons: v.number(),
 		progressPercentage: v.number(),
@@ -116,9 +128,24 @@ export const updateProgress = mutation({
 		markCompleted: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
+		// Get user from clerkId
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+			.first()
+
+		if (!user) {
+			throw new Error("User not found")
+		}
+
 		const enrollment = await ctx.db.get(args.enrollmentId)
 		if (!enrollment) {
 			throw new Error("Enrollment not found")
+		}
+
+		// Verify ownership
+		if (enrollment.userId !== user._id) {
+			throw new Error("You can only update your own enrollments")
 		}
 
 		if (args.completedLessons < 0) {
@@ -173,13 +200,29 @@ export const updateProgress = mutation({
 
 export const setStatus = mutation({
 	args: {
+		clerkId: v.string(),
 		enrollmentId: v.id("enrollments"),
 		status: statusEnum,
 	},
 	handler: async (ctx, args) => {
+		// Get user from clerkId
+		const user = await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+			.first()
+
+		if (!user) {
+			throw new Error("User not found")
+		}
+
 		const enrollment = await ctx.db.get(args.enrollmentId)
 		if (!enrollment) {
 			throw new Error("Enrollment not found")
+		}
+
+		// Verify ownership
+		if (enrollment.userId !== user._id) {
+			throw new Error("You can only update your own enrollments")
 		}
 
 		const now = Date.now()

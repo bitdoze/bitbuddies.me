@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
+import { requireAdmin } from "./utils"
 
 /**
  * Get or create a user by Clerk ID
@@ -118,13 +119,18 @@ export const getById = query({
 
 /**
  * Update user role (admin only)
+ * Requires caller to be an admin
  */
 export const updateRole = mutation({
 	args: {
+		callerClerkId: v.string(),
 		userId: v.id("users"),
 		role: v.union(v.literal("user"), v.literal("admin")),
 	},
 	handler: async (ctx, args) => {
+		// Verify caller is admin
+		await requireAdmin(ctx, args.callerClerkId)
+
 		await ctx.db.patch(args.userId, {
 			role: args.role,
 			updatedAt: Date.now(),
@@ -143,19 +149,8 @@ export const setUserRole = mutation({
 		role: v.union(v.literal("user"), v.literal("admin")),
 	},
 	handler: async (ctx, args) => {
-		// Verify caller is admin
-		const caller = await ctx.db
-			.query("users")
-			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.callerClerkId))
-			.first()
-
-		if (!caller) {
-			throw new Error("Caller not found")
-		}
-
-		if (caller.role !== "admin") {
-			throw new Error("Admin access required")
-		}
+		// Verify caller is admin using centralized helper
+		await requireAdmin(ctx, args.callerClerkId)
 
 		// Find target user
 		const user = await ctx.db
@@ -177,11 +172,22 @@ export const setUserRole = mutation({
 })
 
 /**
- * List all users (for debugging)
+ * List all users (admin only, for debugging)
+ * Protected endpoint - should only be used in development
  */
 export const listAll = query({
-	args: {},
-	handler: async (ctx) => {
+	args: {
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
+		// Additional check: only allow in development
+		if (process.env.NODE_ENV === "production") {
+			throw new Error("This endpoint is disabled in production")
+		}
+
 		return await ctx.db.query("users").collect()
 	},
 })

@@ -50,9 +50,10 @@ function EditWorkshopPage() {
 	const [coverAssetId, setCoverAssetId] = useState<
 		Id<"mediaAssets"> | undefined
 	>();
-	const coverAsset = useMediaAsset(coverAssetId);
+	const coverAsset = useMediaAsset(user?.id, coverAssetId);
 
 	const [content, setContent] = useState<JSONContent>(createEmptyContent());
+	const [contentLoaded, setContentLoaded] = useState(false);
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -80,15 +81,31 @@ function EditWorkshopPage() {
 	// Load workshop data into form
 	useEffect(() => {
 		if (workshop) {
+			setContentLoaded(false);
 			setCoverAssetId(workshop.coverAssetId);
 
 			// Parse content from JSON string
 			try {
-				const parsedContent = JSON.parse(workshop.content);
-				setContent(parsedContent);
-			} catch {
+				console.log("Loading workshop content:", workshop.content);
+				if (workshop.content && typeof workshop.content === "string") {
+					const parsedContent = JSON.parse(workshop.content);
+					console.log("Parsed content:", parsedContent);
+					setContent(parsedContent);
+				} else if (workshop.content && typeof workshop.content === "object") {
+					// Content is already an object
+					console.log("Content is already an object:", workshop.content);
+					setContent(workshop.content as JSONContent);
+				} else {
+					console.warn("No content found, using empty content");
+					setContent(createEmptyContent());
+				}
+			} catch (error) {
+				console.error("Failed to parse content:", error);
+				console.log("Raw content that failed:", workshop.content);
 				setContent(createEmptyContent());
 			}
+
+			setContentLoaded(true);
 
 			setFormData({
 				title: workshop.title,
@@ -360,12 +377,22 @@ function EditWorkshopPage() {
 								<div className="space-y-2">
 									<Label htmlFor="content">Content *</Label>
 									<div className="min-h-[500px]">
-										<RichTextEditor
-											content={content}
-											onChange={setContent}
-											placeholder="Write the full workshop content with rich formatting..."
-											className="min-h-[500px]"
-										/>
+										{contentLoaded ? (
+											<RichTextEditor
+												key={workshop?._id}
+												content={content}
+												onChange={setContent}
+												placeholder="Write the full workshop content with rich formatting..."
+												className="min-h-[500px]"
+											/>
+										) : (
+											<div className="flex items-center justify-center min-h-[500px] border rounded-lg bg-muted/20">
+												<div className="text-center">
+													<div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2" />
+													<p className="text-sm text-muted-foreground">Loading editor...</p>
+												</div>
+											</div>
+										)}
 									</div>
 									<p className="text-sm text-muted-foreground">
 										Use the editor toolbar for rich text formatting

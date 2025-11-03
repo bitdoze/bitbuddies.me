@@ -17,7 +17,10 @@ export function UserSyncDebug() {
 		api.users.getCurrentUser,
 		user ? { clerkId: user.id } : "skip",
 	);
-	const allUsers = useQuery(api.users.listAll);
+	const allUsers = useQuery(
+		api.users.listAll,
+		user ? { clerkId: user.id } : "skip",
+	);
 
 	const handleSync = async () => {
 		if (!user) {

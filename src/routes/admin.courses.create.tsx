@@ -33,7 +33,7 @@ function CreateCoursePage() {
 	const [coverAssetId, setCoverAssetId] = useState<
 		Id<"mediaAssets"> | undefined
 	>();
-	const coverAsset = useMediaAsset(coverAssetId);
+	const coverAsset = useMediaAsset(user?.id, coverAssetId);
 
 	const [formData, setFormData] = useState({
 		title: "",

@@ -59,15 +59,10 @@ export function RichTextEditor({
 	className = "",
 }: RichTextEditorProps) {
 	const [isClient, setIsClient] = useState(false);
-	const [editorContent, setEditorContent] = useState<JSONContent>(content);
 
 	useEffect(() => {
 		setIsClient(true);
 	}, []);
-
-	useEffect(() => {
-		setEditorContent(content);
-	}, [content]);
 
 	const handleUpdate = ({ editor }: { editor: Editor }) => {
 		try {
@@ -89,7 +84,7 @@ export function RichTextEditor({
 	return (
 		<EditorProvider
 			className={`h-full w-full overflow-y-auto rounded-lg border bg-background p-4 ${className}`}
-			content={editorContent}
+			content={content}
 			onUpdate={handleUpdate}
 			placeholder={placeholder}
 		>

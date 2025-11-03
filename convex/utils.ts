@@ -26,3 +26,27 @@ export const ensureUniqueSlug = async <TableName extends SluggedTables>(
 		throw new Error(`Slug "${slug}" already exists in ${table}`)
 	}
 }
+
+/**
+ * Centralized admin authorization check
+ * Returns the admin user if authorized, throws error otherwise
+ */
+export const requireAdmin = async (
+	ctx: MutationCtx | QueryCtx,
+	clerkId: string,
+): Promise<Doc<"users">> => {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
+		.first()
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Admin access required")
+	}
+
+	return user
+}

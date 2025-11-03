@@ -74,7 +74,7 @@ export function ImageUpload({
 			console.log("Starting upload...");
 
 			// Step 1: Get upload URL
-			const uploadUrl = await generateUploadUrl();
+			const uploadUrl = await generateUploadUrl({ clerkId: user.id });
 			console.log("Got upload URL");
 
 			// Step 2: Upload file to Convex storage

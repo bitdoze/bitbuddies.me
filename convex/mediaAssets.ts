@@ -1,33 +1,19 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
-
-/**
- * Helper to verify admin role
- */
-async function requireAdmin(ctx: any, clerkId: string) {
-	const user = await ctx.db
-		.query("users")
-		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
-		.first()
-
-	if (!user) {
-		throw new Error("User not found")
-	}
-
-	if (user.role !== "admin") {
-		throw new Error("Admin access required")
-	}
-
-	return user
-}
+import { requireAdmin } from "./utils"
 
 /**
  * Generate an upload URL for image uploads
- * This can be called by authenticated users
+ * Requires admin authentication
  */
 export const generateUploadUrl = mutation({
-	args: {},
-	handler: async (ctx) => {
+	args: {
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		return await ctx.storage.generateUploadUrl()
 	},
 })
@@ -72,12 +58,17 @@ export const create = mutation({
 
 /**
  * Get a media asset by ID with URL
+ * Requires admin authentication
  */
 export const getById = query({
 	args: {
+		clerkId: v.string(),
 		assetId: v.id("mediaAssets"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const asset = await ctx.db.get(args.assetId)
 		if (!asset) {
 			return null
@@ -107,13 +98,18 @@ export const getUrl = query({
 
 /**
  * List all media assets
+ * Requires admin authentication
  */
 export const list = query({
 	args: {
+		clerkId: v.string(),
 		assetType: v.optional(v.union(v.literal("image"), v.literal("attachment"))),
 		limit: v.optional(v.number()),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId)
+
 		const limit = args.limit ?? 100
 
 		let assets: any[] = []

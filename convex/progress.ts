@@ -7,13 +7,13 @@ import type { Id } from "./_generated/dataModel";
  */
 export const getCourseProgress = query({
 	args: {
-		userId: v.id("users"),
+		clerkId: v.string(),
 		courseId: v.id("courses"),
 	},
 	handler: async (ctx, args) => {
 		const user = await ctx.db
 			.query("users")
-			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.userId))
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
 			.first();
 
 		if (!user) {
@@ -50,13 +50,13 @@ export const getCourseProgress = query({
  */
 export const getLessonProgress = query({
 	args: {
-		userId: v.id("users"),
+		clerkId: v.string(),
 		lessonId: v.id("lessons"),
 	},
 	handler: async (ctx, args) => {
 		const user = await ctx.db
 			.query("users")
-			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.userId))
+			.withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
 			.first();
 
 		if (!user) {

@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { requireAdmin } from "./utils";
 
 /**
  * Submit a contact message
@@ -55,6 +56,7 @@ export const create = mutation({
  */
 export const list = query({
 	args: {
+		clerkId: v.string(),
 		status: v.optional(
 			v.union(
 				v.literal("new"),
@@ -66,6 +68,8 @@ export const list = query({
 		limit: v.optional(v.number()),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId);
 		let messages;
 
 		if (args.status !== undefined) {
@@ -91,9 +95,12 @@ export const list = query({
  */
 export const getById = query({
 	args: {
+		clerkId: v.string(),
 		id: v.id("contactMessages"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId);
 		const message = await ctx.db.get(args.id);
 		return message;
 	},
@@ -104,6 +111,7 @@ export const getById = query({
  */
 export const updateStatus = mutation({
 	args: {
+		clerkId: v.string(),
 		id: v.id("contactMessages"),
 		status: v.union(
 			v.literal("new"),
@@ -114,6 +122,8 @@ export const updateStatus = mutation({
 		adminNotes: v.optional(v.string()),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId);
 		const message = await ctx.db.get(args.id);
 		if (!message) {
 			throw new Error("Message not found");
@@ -141,9 +151,12 @@ export const updateStatus = mutation({
  */
 export const remove = mutation({
 	args: {
+		clerkId: v.string(),
 		id: v.id("contactMessages"),
 	},
 	handler: async (ctx, args) => {
+		// Verify admin access
+		await requireAdmin(ctx, args.clerkId);
 		await ctx.db.delete(args.id);
 	},
 });

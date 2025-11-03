@@ -37,9 +37,10 @@ function EditPostPage() {
 	const [coverAssetId, setCoverAssetId] = useState<
 		Id<"mediaAssets"> | undefined
 	>();
-	const coverAsset = useMediaAsset(coverAssetId);
+	const coverAsset = useMediaAsset(user?.id, coverAssetId);
 
 	const [content, setContent] = useState<JSONContent>(createEmptyContent());
+	const [contentLoaded, setContentLoaded] = useState(false);
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -59,6 +60,7 @@ function EditPostPage() {
 	// Load post data when available
 	useEffect(() => {
 		if (post) {
+			setContentLoaded(false);
 			setFormData({
 				title: post.title,
 				slug: post.slug,
@@ -77,11 +79,26 @@ function EditPostPage() {
 
 			// Parse content from JSON string
 			try {
-				const parsedContent = JSON.parse(post.content);
-				setContent(parsedContent);
-			} catch {
+				console.log("Loading post content:", post.content);
+				if (post.content && typeof post.content === "string") {
+					const parsedContent = JSON.parse(post.content);
+					console.log("Parsed content:", parsedContent);
+					setContent(parsedContent);
+				} else if (post.content && typeof post.content === "object") {
+					// Content is already an object
+					console.log("Content is already an object:", post.content);
+					setContent(post.content as JSONContent);
+				} else {
+					console.warn("No content found, using empty content");
+					setContent(createEmptyContent());
+				}
+			} catch (error) {
+				console.error("Failed to parse content:", error);
+				console.log("Raw content that failed:", post.content);
 				setContent(createEmptyContent());
 			}
+
+			setContentLoaded(true);
 		}
 	}, [post]);
 
@@ -311,12 +328,22 @@ function EditPostPage() {
 								</div>
 
 								<div className="min-h-[500px]">
-									<RichTextEditor
-										content={content}
-										onChange={setContent}
-										placeholder="Start writing your post..."
-										className="min-h-[500px]"
-									/>
+									{contentLoaded ? (
+										<RichTextEditor
+											key={post?._id}
+											content={content}
+											onChange={setContent}
+											placeholder="Start writing your post..."
+											className="min-h-[500px]"
+										/>
+									) : (
+										<div className="flex items-center justify-center min-h-[500px] border rounded-lg bg-muted/20">
+											<div className="text-center">
+												<div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2" />
+												<p className="text-sm text-muted-foreground">Loading editor...</p>
+											</div>
+										</div>
+									)}
 								</div>
 							</div>
 

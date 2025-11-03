@@ -35,7 +35,7 @@ function CreateWorkshopPage() {
 	const [coverAssetId, setCoverAssetId] = useState<
 		Id<"mediaAssets"> | undefined
 	>();
-	const coverAsset = useMediaAsset(coverAssetId);
+	const coverAsset = useMediaAsset(user?.id, coverAssetId);
 
 	const [content, setContent] = useState<JSONContent>(createEmptyContent());
 

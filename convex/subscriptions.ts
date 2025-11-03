@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server"
+import { mutation, internalMutation } from "./_generated/server"
 import type { MutationCtx } from "./_generated/server"
 import type { Id } from "./_generated/dataModel"
 import { v } from "convex/values"
@@ -42,7 +42,12 @@ const logHistory = async (
 	})
 }
 
-export const upsert = mutation({
+/**
+ * Upsert subscription - INTERNAL ONLY
+ * Should only be called by Stripe webhooks or server-side actions
+ * NOT exposed to client
+ */
+export const upsert = internalMutation({
 	args: {
 		subscriptionId: v.optional(v.id("subscriptions")),
 		userId: v.id("users"),
@@ -145,7 +150,12 @@ export const upsert = mutation({
 	},
 })
 
-export const cancel = mutation({
+/**
+ * Cancel subscription - INTERNAL ONLY
+ * Should only be called by Stripe webhooks or server-side actions
+ * NOT exposed to client
+ */
+export const cancel = internalMutation({
 	args: {
 		subscriptionId: v.id("subscriptions"),
 		cancelledAt: v.optional(v.number()),

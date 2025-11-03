@@ -202,7 +202,8 @@ export const update = mutation({
 		for (const [key, value] of Object.entries(args.patch) as Array<
 			[keyof typeof args.patch, unknown]
 		>) {
-			if (value !== undefined) {
+			// Skip undefined values and empty strings
+			if (value !== undefined && value !== "") {
 				;(next as Record<string, unknown>)[key as string] = value
 			}
 		}
