@@ -14,7 +14,9 @@ const getEnvVar = (key: string, fallback: string = ""): string => {
 // Site URLs
 export const SITE_URL =
 	getEnvVar("VITE_SITE_URL") ||
-	(typeof window !== "undefined" ? window.location.origin : "https://bitbuddies.me");
+	(typeof window !== "undefined"
+		? window.location.origin
+		: "https://bitbuddies.me");
 
 // Site Metadata
 export const SITE_CONFIG = {

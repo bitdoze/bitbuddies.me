@@ -1,9 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Edit, Eye, ImageIcon, Plus, Trash2, FileText, AlertCircle } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConvexHttpClient } from "convex/browser";
+import {
+	AlertCircle,
+	Edit,
+	Eye,
+	FileText,
+	ImageIcon,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { useState } from "react";
-import { SEO } from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { SEO } from "@/components/common/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -12,7 +25,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
 	Table,
 	TableBody,
@@ -20,12 +33,10 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { useAuth } from "../hooks/useAuth";
-import { useDeletePost, usePosts } from "../hooks/usePosts";
-import { ConvexHttpClient } from "convex/browser";
+} from "@/components/ui/table";
+import { useAuth } from "@/hooks/useAuth";
+import { useDeletePost, usePosts } from "@/hooks/usePosts";
 import { api } from "../../convex/_generated/api";
-import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/posts/")({
 	component: AdminPostsPage,
@@ -34,7 +45,9 @@ export const Route = createFileRoute("/admin/posts/")({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { posts: null };
 			}
 
@@ -66,10 +79,10 @@ function AdminPostsPage() {
 	if (isLoading) {
 		return (
 			<div className="w-full">
-				<div className="container mx-auto px-4 py-20">
+				<div className="container flex h-[60vh] items-center justify-center">
 					<div className="text-center">
-						<div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-						<p className="mt-4 text-muted-foreground">Loading posts...</p>
+						<div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+						<p className="mt-4 text-sm text-muted-foreground">Loading posts…</p>
 					</div>
 				</div>
 			</div>
@@ -141,6 +154,26 @@ function AdminPostsPage() {
 		return `${minutes} min read`;
 	};
 
+	const totalPosts = posts?.length ?? 0;
+	const publishedPosts = posts?.filter((post) => post.isPublished).length ?? 0;
+	const draftPosts = posts?.filter((post) => !post.isPublished).length ?? 0;
+	const featuredPosts = posts?.filter((post) => post.isFeatured).length ?? 0;
+	const totalViews =
+		posts?.reduce((sum, post) => sum + (post.viewCount ?? 0), 0) ?? 0;
+	const readDurations = (posts ?? [])
+		.map((post) => post.readTime)
+		.filter((value): value is number => typeof value === "number" && value > 0);
+	const averageReadTime = readDurations.length
+		? `${Math.round(readDurations.reduce((sum, value) => sum + value, 0) / readDurations.length)} min`
+		: "—";
+	const accessCounts = (posts ?? []).reduce(
+		(acc, post) => {
+			acc[post.accessLevel as keyof typeof acc] += 1;
+			return acc;
+		},
+		{ public: 0, authenticated: 0, subscription: 0 },
+	);
+
 	return (
 		<>
 			<SEO
@@ -148,81 +181,85 @@ function AdminPostsPage() {
 				description="Admin dashboard for managing blog posts, creating new content, and editing existing posts."
 				noIndex={true}
 			/>
-			<div className="w-full">
-				{/* Header Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-12">
-					<div className="container mx-auto px-4">
-						<div className="relative z-10 flex items-center justify-between">
-							<div>
-								<div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5">
-									<FileText className="h-4 w-4 text-primary" />
-									<span className="text-sm font-medium text-primary">
-										Admin Dashboard
-									</span>
-								</div>
-								<h1 className="mb-3 text-4xl font-bold tracking-tight">
-									Manage Posts
-								</h1>
-								<p className="text-lg text-muted-foreground">
-									Create and manage blog posts for your community
-								</p>
-							</div>
-							<Link to="/admin/posts/create">
-								<Button size="lg" className="gap-2">
+			<div className="container space-y-12 py-12">
+				<AdminShell>
+					<AdminHeader
+						eyebrow="Content management"
+						title="Manage posts"
+						description="Review performance, adjust visibility, and publish updates to keep the community in the loop."
+						actions={
+							<Button asChild size="lg" className="gap-2">
+								<Link to="/admin/posts/create">
 									<Plus className="h-5 w-5" />
-									Create Post
-								</Button>
-							</Link>
-						</div>
+									New post
+								</Link>
+							</Button>
+						}
+						stats={[
+							{ label: "Published", value: publishedPosts },
+							{ label: "Drafts", value: draftPosts },
+							{ label: "Featured", value: featuredPosts },
+							{ label: "Total views", value: totalViews.toLocaleString() },
+						]}
+					/>
+					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+						<AdminStatCard
+							label="Average read time"
+							value={averageReadTime}
+							description="Across posts with read-time estimates"
+						/>
+						<AdminStatCard
+							label="Public access"
+							value={accessCounts.public}
+							description="Visible without signing in"
+						/>
+						<AdminStatCard
+							label="Members"
+							value={accessCounts.authenticated}
+							description="Requires authenticated users"
+						/>
+						<AdminStatCard
+							label="Premium"
+							value={accessCounts.subscription}
+							description="Subscription-only articles"
+						/>
 					</div>
-					{/* Decorative blur circles */}
-					<div className="pointer-events-none absolute -right-32 top-0 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-					<div className="pointer-events-none absolute -left-32 bottom-0 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
-				</section>
-
-				{/* Posts Table Section */}
-				<section className="py-16">
-					<div className="container mx-auto px-4">
+					<AdminTable
+						title="All posts"
+						description="Synchronised with the public blog in real time."
+						badge={<Badge variant="secondary">{totalPosts}</Badge>}
+					>
 						{!posts || posts.length === 0 ? (
-							<div className="mx-auto max-w-2xl">
-								<div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center shadow-md">
-									<div className="mb-4 inline-flex rounded-full bg-muted p-6">
-										<FileText className="h-12 w-12 text-muted-foreground" />
-									</div>
-									<h2 className="mb-2 text-2xl font-bold">No posts yet</h2>
-									<p className="mb-6 text-muted-foreground">
-										Get started by creating your first blog post.
-									</p>
-									<Link to="/admin/posts/create">
-										<Button size="lg" className="gap-2">
-											<Plus className="h-5 w-5" />
-											Create Your First Post
-										</Button>
-									</Link>
+							<div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
+								<div className="rounded-full bg-muted p-5 text-muted-foreground">
+									<FileText className="h-10 w-10" />
 								</div>
+								<div className="space-y-2">
+									<h3 className="text-lg font-semibold text-foreground">
+										No posts yet
+									</h3>
+									<p className="text-sm text-muted-foreground">
+										Launch the blog with your first announcement.
+									</p>
+								</div>
+								<Button asChild size="sm" className="gap-2">
+									<Link to="/admin/posts/create">
+										<Plus className="h-4 w-4" />
+										Create post
+									</Link>
+								</Button>
 							</div>
 						) : (
-							<div className="rounded-2xl border border-border bg-card shadow-lg">
-								<div className="border-b border-border bg-card/50 px-6 py-4">
-									<div className="flex items-center justify-between">
-										<div>
-											<h2 className="text-lg font-semibold">All Posts</h2>
-											<p className="text-sm text-muted-foreground">
-												{posts.length} {posts.length === 1 ? "post" : "posts"}{" "}
-												total
-											</p>
-										</div>
-									</div>
-								</div>
+							<div className="overflow-x-auto">
 								<Table>
 									<TableHeader>
 										<TableRow>
-											<TableHead className="w-16"></TableHead>
+											<TableHead className="w-16" />
 											<TableHead>Title</TableHead>
 											<TableHead>Category</TableHead>
 											<TableHead>Status</TableHead>
 											<TableHead>Access</TableHead>
-											<TableHead>Read Time</TableHead>
+											<TableHead>Read time</TableHead>
 											<TableHead>Views</TableHead>
 											<TableHead>Published</TableHead>
 											<TableHead className="text-right">Actions</TableHead>
@@ -233,7 +270,7 @@ function AdminPostsPage() {
 											<TableRow key={post._id}>
 												<TableCell>
 													{post.coverAsset?.url ? (
-														<div className="relative h-16 w-16 overflow-hidden rounded-lg border border-border bg-muted">
+														<div className="relative h-16 w-16 overflow-hidden rounded-xl border border-border bg-muted">
 															<img
 																src={post.coverAsset.url}
 																alt={post.title}
@@ -241,24 +278,26 @@ function AdminPostsPage() {
 															/>
 														</div>
 													) : (
-														<div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-border bg-muted">
+														<div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-border bg-muted">
 															<ImageIcon className="h-6 w-6 text-muted-foreground" />
 														</div>
 													)}
 												</TableCell>
 												<TableCell>
-													<div>
-														<div className="font-medium">{post.title}</div>
-														{post.excerpt && (
-															<div className="line-clamp-1 text-sm text-muted-foreground">
+													<div className="space-y-1">
+														<div className="font-medium text-foreground">
+															{post.title}
+														</div>
+														{post.excerpt ? (
+															<p className="line-clamp-1 text-xs text-muted-foreground">
 																{post.excerpt}
-															</div>
-														)}
-														{post.isFeatured && (
-															<Badge variant="secondary" className="mt-1">
+															</p>
+														) : null}
+														{post.isFeatured ? (
+															<Badge variant="secondary" className="text-xs">
 																Featured
 															</Badge>
-														)}
+														) : null}
 													</div>
 												</TableCell>
 												<TableCell>
@@ -270,9 +309,7 @@ function AdminPostsPage() {
 												</TableCell>
 												<TableCell>
 													<Badge
-														variant={
-															post.isPublished ? "default" : "secondary"
-														}
+														variant={post.isPublished ? "default" : "secondary"}
 													>
 														{post.isPublished ? "Published" : "Draft"}
 													</Badge>
@@ -292,13 +329,9 @@ function AdminPostsPage() {
 																: "Subscription"}
 													</Badge>
 												</TableCell>
-												<TableCell>
-													{formatReadTime(post.readTime)}
-												</TableCell>
-												<TableCell>{post.viewCount}</TableCell>
-												<TableCell>
-													{formatDate(post.publishedAt)}
-												</TableCell>
+												<TableCell>{formatReadTime(post.readTime)}</TableCell>
+												<TableCell>{post.viewCount ?? 0}</TableCell>
+												<TableCell>{formatDate(post.publishedAt)}</TableCell>
 												<TableCell>
 													<div className="flex justify-end gap-2">
 														<Link
@@ -320,8 +353,7 @@ function AdminPostsPage() {
 														</Link>
 														<Dialog
 															open={
-																deleteDialogOpen &&
-																selectedPostId === post._id
+																deleteDialogOpen && selectedPostId === post._id
 															}
 															onOpenChange={(open) => {
 																setDeleteDialogOpen(open);
@@ -339,10 +371,10 @@ function AdminPostsPage() {
 															</DialogTrigger>
 															<DialogContent>
 																<DialogHeader>
-																	<DialogTitle>Delete Post</DialogTitle>
+																	<DialogTitle>Delete post</DialogTitle>
 																	<DialogDescription>
-																		Are you sure you want to delete "{post.title}
-																		"? This action cannot be undone.
+																		Are you sure you want to delete "
+																		{post.title}"? This action cannot be undone.
 																	</DialogDescription>
 																</DialogHeader>
 																<DialogFooter>
@@ -372,8 +404,8 @@ function AdminPostsPage() {
 								</Table>
 							</div>
 						)}
-					</div>
-				</section>
+					</AdminTable>
+				</AdminShell>
 			</div>
 		</>
 	);

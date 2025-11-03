@@ -1,9 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Edit, Eye, ImageIcon, Plus, Trash2, LayoutGrid, AlertCircle } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConvexHttpClient } from "convex/browser";
+import {
+	AlertCircle,
+	Edit,
+	Eye,
+	ImageIcon,
+	LayoutGrid,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { useState } from "react";
-import { SEO } from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { SEO } from "@/components/common/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -12,7 +25,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
 	Table,
 	TableBody,
@@ -20,10 +33,9 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { useAuth } from "../hooks/useAuth";
-import { useDeleteWorkshop, useWorkshops } from "../hooks/useWorkshops";
-import { ConvexHttpClient } from "convex/browser";
+} from "@/components/ui/table";
+import { useAuth } from "@/hooks/useAuth";
+import { useDeleteWorkshop, useWorkshops } from "@/hooks/useWorkshops";
 import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/admin/workshops/")({
@@ -33,7 +45,9 @@ export const Route = createFileRoute("/admin/workshops/")({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { workshops: null };
 			}
 
@@ -137,6 +151,39 @@ function AdminWorkshopsPage() {
 		return new Date(timestamp).toLocaleDateString();
 	};
 
+	const totalWorkshops = workshops?.length ?? 0;
+	const publishedWorkshops =
+		workshops?.filter((workshop) => workshop.isPublished).length ?? 0;
+	const draftWorkshops = totalWorkshops - publishedWorkshops;
+	const liveWorkshops =
+		workshops?.filter((workshop) => workshop.isLive).length ?? 0;
+	const upcomingWorkshops =
+		workshops?.filter(
+			(workshop) => workshop.startDate && workshop.startDate > Date.now(),
+		).length ?? 0;
+	const featuredWorkshopsCount =
+		workshops?.filter((workshop) => workshop.isFeatured).length ?? 0;
+	const recordingCount =
+		workshops?.filter((workshop) => Boolean(workshop.videoUrl)).length ?? 0;
+	const durations = (workshops ?? [])
+		.map((workshop) => workshop.duration)
+		.filter((value): value is number => typeof value === "number" && value > 0);
+	const averageDuration = durations.length
+		? `${Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)} mins`
+		: "—";
+	const seats = (workshops ?? []).reduce(
+		(acc, workshop) => {
+			acc.registered += workshop.currentParticipants ?? 0;
+			acc.capacity += workshop.maxParticipants ?? 0;
+			return acc;
+		},
+		{ registered: 0, capacity: 0 },
+	);
+	const capacityFill =
+		seats.capacity > 0
+			? `${Math.min(100, Math.round((seats.registered / seats.capacity) * 100))}%`
+			: "—";
+
 	return (
 		<>
 			<SEO
@@ -144,95 +191,107 @@ function AdminWorkshopsPage() {
 				description="Admin dashboard for managing workshops, creating new content, and editing existing workshops."
 				noIndex={true}
 			/>
-			<div className="w-full">
-				{/* Header Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-12">
-					<div className="container mx-auto px-4">
-						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-							<div>
-								<div className="mb-4 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<LayoutGrid className="h-6 w-6" />
-									</div>
-									<h1 className="text-3xl md:text-4xl font-bold">Manage Workshops</h1>
-								</div>
-								<p className="text-lg text-muted-foreground">
-									Create and manage workshop content
-								</p>
-								<p className="text-sm text-muted-foreground mt-1">
-									{workshops?.length ?? 0} workshop(s) total
-								</p>
-							</div>
-							<Button asChild size="lg" className="shadow-md">
-								<a href="/admin/workshops/create">
-									<Plus className="mr-2 h-5 w-5" />
-									New Workshop
-								</a>
+			<div className="container space-y-12 py-12">
+				<AdminShell>
+					<AdminHeader
+						eyebrow="Content management"
+						title="Manage workshops"
+						description="Track live sessions, recordings, and upcoming programming to keep momentum in the community."
+						actions={
+							<Button asChild size="lg" className="gap-2">
+								<Link to="/admin/workshops/create">
+									<Plus className="h-5 w-5" />
+									New workshop
+								</Link>
 							</Button>
-						</div>
+						}
+						stats={[
+							{ label: "Published", value: publishedWorkshops },
+							{ label: "Drafts", value: draftWorkshops },
+							{ label: "Live now", value: liveWorkshops },
+							{ label: "Upcoming", value: upcomingWorkshops },
+						]}
+					/>
+					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+						<AdminStatCard
+							label="Average duration"
+							value={averageDuration}
+							description="Across scheduled workshops"
+						/>
+						<AdminStatCard
+							label="Recordings available"
+							value={recordingCount}
+							description="Sessions with video archives"
+						/>
+						<AdminStatCard
+							label="Featured sessions"
+							value={featuredWorkshopsCount}
+							description="Highlighted for visibility"
+						/>
+						<AdminStatCard
+							label="Seats filled"
+							value={capacityFill}
+							description={`${seats.registered} of ${seats.capacity || "—"} reserved`}
+						/>
 					</div>
-
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-					</div>
-				</section>
-
-				{/* Workshops Table Section */}
-				<section className="py-12">
-					<div className="container mx-auto px-4">
-						<div className="rounded-2xl border border-border bg-card shadow-lg overflow-hidden">
-							{!workshops || workshops.length === 0 ? (
-								<div className="p-12 text-center">
-									<div className="mb-4 inline-flex rounded-full bg-muted p-4">
-										<LayoutGrid className="h-12 w-12 text-muted-foreground" />
-									</div>
-									<h3 className="text-xl font-semibold mb-2">No Workshops Yet</h3>
-									<p className="text-muted-foreground mb-6">
-										Create your first workshop to get started.
+					<AdminTable
+						title="All workshops"
+						description="Manage live, upcoming, and recorded sessions from a single place."
+						badge={<Badge variant="secondary">{totalWorkshops}</Badge>}
+					>
+						{!workshops || workshops.length === 0 ? (
+							<div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
+								<div className="rounded-full bg-muted p-5 text-muted-foreground">
+									<LayoutGrid className="h-10 w-10" />
+								</div>
+								<div className="space-y-2">
+									<h3 className="text-lg font-semibold text-foreground">
+										No workshops yet
+									</h3>
+									<p className="text-sm text-muted-foreground">
+										Set up your first live session to kickstart engagement.
 									</p>
-									<Button asChild size="lg">
-										<a href="/admin/workshops/create">
-											<Plus className="mr-2 h-5 w-5" />
-											Create Workshop
-										</a>
-									</Button>
 								</div>
-							) : (
-								<div className="overflow-x-auto">
-									<Table>
-										<TableHeader>
-											<TableRow className="bg-muted/50">
-												<TableHead>Image</TableHead>
-												<TableHead>Title</TableHead>
-												<TableHead>Level</TableHead>
-												<TableHead>Status</TableHead>
-												<TableHead>Start Date</TableHead>
-												<TableHead>Participants</TableHead>
-												<TableHead className="text-right">Actions</TableHead>
-											</TableRow>
-										</TableHeader>
-										<TableBody>
-											{workshops.map((workshop) => (
-												<WorkshopRow
-													key={workshop._id}
-													workshop={workshop}
-													handleDelete={handleDelete}
-													setSelectedWorkshopId={setSelectedWorkshopId}
-													setDeleteDialogOpen={setDeleteDialogOpen}
-													deleteDialogOpen={deleteDialogOpen}
-													selectedWorkshopId={selectedWorkshopId}
-													formatDate={formatDate}
-												/>
-											))}
-										</TableBody>
-									</Table>
-								</div>
-							)}
-						</div>
-					</div>
-				</section>
+								<Button asChild size="sm" className="gap-2">
+									<Link to="/admin/workshops/create">
+										<Plus className="h-4 w-4" />
+										Create workshop
+									</Link>
+								</Button>
+							</div>
+						) : (
+							<div className="overflow-x-auto">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead className="w-20">Cover</TableHead>
+											<TableHead>Workshop</TableHead>
+											<TableHead>Level</TableHead>
+											<TableHead>Status</TableHead>
+											<TableHead>Start</TableHead>
+											<TableHead>Participants</TableHead>
+											<TableHead className="text-right">Actions</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{workshops.map((workshop) => (
+											<WorkshopRow
+												key={workshop._id}
+												workshop={workshop}
+												handleDelete={handleDelete}
+												setSelectedWorkshopId={setSelectedWorkshopId}
+												setDeleteDialogOpen={setDeleteDialogOpen}
+												deleteDialogOpen={deleteDialogOpen}
+												selectedWorkshopId={selectedWorkshopId}
+												formatDate={formatDate}
+											/>
+										))}
+									</TableBody>
+								</Table>
+							</div>
+						)}
+					</AdminTable>
+				</AdminShell>
 			</div>
 		</>
 	);
@@ -251,56 +310,63 @@ function WorkshopRow({
 		<TableRow>
 			<TableCell>
 				{workshop.coverAsset?.url ? (
-					<img
-						src={workshop.coverAsset.url}
-						alt={workshop.title}
-						className="w-16 h-16 object-cover rounded-lg shadow-sm"
-					/>
+					<div className="relative h-16 w-16 overflow-hidden rounded-xl border border-border bg-muted">
+						<img
+							src={workshop.coverAsset.url}
+							alt={workshop.title}
+							className="h-full w-full object-cover"
+						/>
+					</div>
 				) : (
-					<div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+					<div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-border bg-muted">
 						<ImageIcon className="h-6 w-6 text-muted-foreground" />
 					</div>
 				)}
 			</TableCell>
-			<TableCell className="font-medium">
-				{workshop.title}
-				{workshop.isFeatured && (
-					<Badge variant="secondary" className="ml-2">
-						Featured
-					</Badge>
-				)}
+			<TableCell>
+				<div className="space-y-1">
+					<p className="font-medium text-foreground">{workshop.title}</p>
+					<p className="line-clamp-1 text-xs text-muted-foreground">
+						{workshop.shortDescription}
+					</p>
+					<div className="flex flex-wrap items-center gap-2">
+						{workshop.isFeatured ? (
+							<Badge variant="secondary">Featured</Badge>
+						) : null}
+					</div>
+				</div>
 			</TableCell>
 			<TableCell>
 				<Badge variant="outline">{workshop.level}</Badge>
 			</TableCell>
 			<TableCell>
-				{workshop.isPublished ? (
-					<Badge variant="default">Published</Badge>
-				) : (
-					<Badge variant="secondary">Draft</Badge>
-				)}
-				{workshop.isLive && (
-					<Badge variant="destructive" className="ml-2">
-						Live
+				<div className="flex flex-wrap items-center gap-2">
+					<Badge variant={workshop.isPublished ? "default" : "secondary"}>
+						{workshop.isPublished ? "Published" : "Draft"}
 					</Badge>
-				)}
+					{workshop.isLive ? <Badge variant="destructive">Live</Badge> : null}
+				</div>
 			</TableCell>
 			<TableCell>{formatDate(workshop.startDate)}</TableCell>
 			<TableCell>
-				{workshop.currentParticipants}
-				{workshop.maxParticipants && ` / ${workshop.maxParticipants}`}
+				{workshop.currentParticipants ?? 0}
+				{workshop.maxParticipants ? ` / ${workshop.maxParticipants}` : null}
 			</TableCell>
-			<TableCell className="text-right">
-				<div className="flex items-center justify-end gap-2">
-					<Button variant="ghost" size="icon" asChild className="hover:bg-muted">
-						<a href={`/workshops/${workshop.slug}`} title="View Workshop">
+			<TableCell>
+				<div className="flex justify-end gap-2">
+					<Button variant="ghost" size="icon" asChild>
+						<Link
+							to="/workshops/$slug"
+							params={{ slug: workshop.slug }}
+							target="_blank"
+						>
 							<Eye className="h-4 w-4" />
-						</a>
+						</Link>
 					</Button>
-					<Button variant="ghost" size="icon" asChild className="hover:bg-muted">
-						<a href={`/admin/workshops/${workshop._id}/edit`} title="Edit Workshop">
+					<Button variant="ghost" size="icon" asChild>
+						<Link to="/admin/workshops/$id/edit" params={{ id: workshop._id }}>
 							<Edit className="h-4 w-4" />
-						</a>
+						</Link>
 					</Button>
 					<Dialog
 						open={deleteDialogOpen && selectedWorkshopId === workshop._id}
@@ -314,17 +380,16 @@ function WorkshopRow({
 								variant="ghost"
 								size="icon"
 								onClick={() => setSelectedWorkshopId(workshop._id)}
-								className="hover:bg-destructive/10"
-								title="Delete Workshop"
 							>
 								<Trash2 className="h-4 w-4 text-destructive" />
 							</Button>
 						</DialogTrigger>
-						<DialogContent className="sm:max-w-md">
+						<DialogContent>
 							<DialogHeader>
-								<DialogTitle>Delete Workshop</DialogTitle>
+								<DialogTitle>Delete workshop</DialogTitle>
 								<DialogDescription>
-									Are you sure you want to delete "{workshop.title}"? This action cannot be undone.
+									Are you sure you want to delete "{workshop.title}"? This
+									action cannot be undone.
 								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>
@@ -338,7 +403,6 @@ function WorkshopRow({
 									Cancel
 								</Button>
 								<Button variant="destructive" onClick={handleDelete}>
-									<Trash2 className="mr-2 h-4 w-4" />
 									Delete
 								</Button>
 							</DialogFooter>

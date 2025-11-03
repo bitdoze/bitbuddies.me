@@ -1,20 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SEO } from "../components/common/SEO";
-import { Button } from "../components/ui/button";
-import { Badge } from "../components/ui/badge";
-import { SOCIAL_LINKS, SITE_CONFIG } from "../lib/config";
 import {
-	Github,
-	Twitter,
-	Youtube,
-	Globe,
-	Mail,
-	Laptop,
 	BookOpen,
-	Users,
 	Code,
+	Github,
+	Globe,
+	Laptop,
+	Mail,
 	Sparkles,
+	Twitter,
+	Users,
+	Youtube,
 } from "lucide-react";
+import { SEO } from "../components/common/SEO";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { SITE_CONFIG, SOCIAL_LINKS } from "../lib/config";
 
 export const Route = createFileRoute("/about")({
 	component: AboutPage,
@@ -108,10 +108,10 @@ function AboutPage() {
 								<p>
 									BitBuddies is a community-driven website built to empower
 									developers and tech enthusiasts with practical knowledge.
-									Through comprehensive courses, hands-on workshops, and detailed
-									tutorials, we help you navigate the online space, from VPS
-									configurations and blog setups to working with AI and modern
-									development tools.
+									Through comprehensive courses, hands-on workshops, and
+									detailed tutorials, we help you navigate the online space,
+									from VPS configurations and blog setups to working with AI and
+									modern development tools.
 								</p>
 								<p className="text-foreground font-medium">
 									Our goal is to make quality tech education accessible,
@@ -245,7 +245,9 @@ function AboutPage() {
 									<h3 className="mb-3 text-xl font-semibold">
 										{offering.title}
 									</h3>
-									<p className="text-muted-foreground">{offering.description}</p>
+									<p className="text-muted-foreground">
+										{offering.description}
+									</p>
 								</div>
 							))}
 						</div>

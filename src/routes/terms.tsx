@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SEO } from "../components/common/SEO";
-import { SITE_CONFIG } from "../lib/config";
 import {
-	FileText,
-	Scale,
-	CreditCard,
-	Shield,
 	AlertTriangle,
-	Users,
+	CreditCard,
+	FileText,
 	Gavel,
 	Mail,
+	Scale,
+	Shield,
+	Users,
 } from "lucide-react";
+import { SEO } from "../components/common/SEO";
+import { SITE_CONFIG } from "../lib/config";
 
 export const Route = createFileRoute("/terms")({
 	component: TermsPage,
@@ -32,13 +32,13 @@ function TermsPage() {
 							{SITE_CONFIG.url}
 						</a>{" "}
 						("Service"), you agree to be bound by these Terms of Service
-						("Terms"). If you disagree with any part of these terms, you may
-						not access the Service.
+						("Terms"). If you disagree with any part of these terms, you may not
+						access the Service.
 					</p>
 					<p className="mt-4">
 						These Terms apply to all visitors, users, and others who access or
-						use the Service. By using the Service, you represent that you are
-						at least 13 years of age.
+						use the Service. By using the Service, you represent that you are at
+						least 13 years of age.
 					</p>
 				</>
 			),
@@ -77,8 +77,8 @@ function TermsPage() {
 						</li>
 					</ul>
 					<p className="mt-4">
-						We reserve the right to modify, suspend, or discontinue any part
-						of the Service at any time without notice.
+						We reserve the right to modify, suspend, or discontinue any part of
+						the Service at any time without notice.
 					</p>
 				</>
 			),
@@ -221,7 +221,9 @@ function TermsPage() {
 								limited, non-exclusive, non-transferable license to:
 							</p>
 							<ul className="list-disc pl-6 space-y-1 text-muted-foreground">
-								<li>Access and view content for personal, non-commercial use</li>
+								<li>
+									Access and view content for personal, non-commercial use
+								</li>
 								<li>Download materials explicitly marked as downloadable</li>
 								<li>
 									Use code examples and snippets from courses in your own
@@ -243,7 +245,9 @@ function TermsPage() {
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-destructive mt-1">✕</span>
-									<span>Share your account credentials or access with others</span>
+									<span>
+										Share your account credentials or access with others
+									</span>
 								</li>
 								<li className="flex items-start gap-2">
 									<span className="text-destructive mt-1">✕</span>
@@ -319,7 +323,9 @@ function TermsPage() {
 				<>
 					<div className="space-y-6">
 						<div className="rounded-lg bg-muted/50 p-4 border border-border">
-							<h3 className="font-semibold text-lg mb-2">7.1 "As Is" Service</h3>
+							<h3 className="font-semibold text-lg mb-2">
+								7.1 "As Is" Service
+							</h3>
 							<p className="text-sm text-muted-foreground uppercase font-medium">
 								THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT
 								WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT
@@ -360,7 +366,9 @@ function TermsPage() {
 				<>
 					<div className="space-y-6">
 						<div>
-							<h3 className="font-semibold text-lg mb-2">8.1 Indemnification</h3>
+							<h3 className="font-semibold text-lg mb-2">
+								8.1 Indemnification
+							</h3>
 							<p className="text-muted-foreground">
 								You agree to indemnify, defend, and hold harmless BitBuddies,
 								its officers, directors, employees, and agents from any claims,
@@ -386,7 +394,8 @@ function TermsPage() {
 							<p className="text-muted-foreground">
 								These Terms shall be governed and construed in accordance with
 								applicable laws. Any disputes arising from these Terms or your
-								use of the Service shall be resolved through binding arbitration.
+								use of the Service shall be resolved through binding
+								arbitration.
 							</p>
 						</div>
 
@@ -397,9 +406,9 @@ function TermsPage() {
 							<p className="text-muted-foreground">
 								We reserve the right to modify or replace these Terms at any
 								time. If a revision is material, we will provide at least 30
-								days' notice prior to any new terms taking effect. Your continued
-								use of the Service after any changes indicates your acceptance of
-								the new Terms.
+								days' notice prior to any new terms taking effect. Your
+								continued use of the Service after any changes indicates your
+								acceptance of the new Terms.
 							</p>
 						</div>
 

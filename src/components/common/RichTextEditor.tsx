@@ -75,7 +75,9 @@ export function RichTextEditor({
 
 	if (!isClient) {
 		return (
-			<div className={`h-full w-full overflow-y-auto rounded-lg border bg-muted p-4 ${className}`}>
+			<div
+				className={`h-full w-full overflow-y-auto rounded-lg border bg-muted p-4 ${className}`}
+			>
 				<p className="text-sm text-muted-foreground">Loading editor...</p>
 			</div>
 		);

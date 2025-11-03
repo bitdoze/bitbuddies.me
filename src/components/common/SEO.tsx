@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { SITE_CONFIG, buildUrl, getCanonicalUrl } from "../../lib/config";
+import { buildUrl, getCanonicalUrl, SITE_CONFIG } from "../../lib/config";
 
 interface SEOProps {
 	title: string;

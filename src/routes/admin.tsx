@@ -1,8 +1,7 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/admin" as any)({
 	component: AdminLayout,
@@ -38,9 +37,7 @@ function AdminLayout() {
 								You don't have permission to access the admin area.
 							</p>
 							<Button asChild variant="outline" size="lg">
-								<Link to="/">
-									Back to Home
-								</Link>
+								<Link to="/">Back to Home</Link>
 							</Button>
 						</div>
 					</div>

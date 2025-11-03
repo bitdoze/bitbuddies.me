@@ -1,18 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-	ArrowLeft,
-	Plus,
-	Edit,
-	Trash2,
 	AlertCircle,
+	ArrowLeft,
 	BookOpen,
+	Edit,
+	Eye,
+	Folder,
 	GripVertical,
 	Lock,
-	Eye,
 	PlayCircle,
-	Folder,
+	Plus,
+	Trash2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 import { SEO } from "../components/common/SEO";
 import { Badge } from "../components/ui/badge";
@@ -36,22 +36,27 @@ import {
 	SelectValue,
 } from "../components/ui/select";
 import { Switch } from "../components/ui/switch";
-import { Textarea } from "../components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { useAuth } from "../hooks/useAuth";
-import { useCourse } from "../hooks/useCourses";
 import {
-	useLessonsByCourse,
-	useCreateLesson,
-	useUpdateLesson,
-	useDeleteLesson,
-} from "../hooks/useLessons";
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "../components/ui/tabs";
+import { Textarea } from "../components/ui/textarea";
+import { useAuth } from "../hooks/useAuth";
 import {
 	useChaptersByCourse,
 	useCreateChapter,
-	useUpdateChapter,
 	useDeleteChapter,
+	useUpdateChapter,
 } from "../hooks/useChapters";
+import { useCourse } from "../hooks/useCourses";
+import {
+	useCreateLesson,
+	useDeleteLesson,
+	useLessonsByCourse,
+	useUpdateLesson,
+} from "../hooks/useLessons";
 
 export const Route = createFileRoute("/admin/courses/$id/lessons" as any)({
 	component: ManageLessonsPage,
@@ -63,7 +68,9 @@ function ManageLessonsPage() {
 	const { isAuthenticated, isLoading, isAdmin, user } = useAuth();
 	const course = useCourse(courseId as any);
 	const lessons = useLessonsByCourse(courseId as any, { publishedOnly: false });
-	const chapters = useChaptersByCourse(courseId as any, { publishedOnly: false });
+	const chapters = useChaptersByCourse(courseId as any, {
+		publishedOnly: false,
+	});
 
 	const [createLessonDialogOpen, setCreateLessonDialogOpen] = useState(false);
 	const [editLessonDialogOpen, setEditLessonDialogOpen] = useState(false);
@@ -75,7 +82,12 @@ function ManageLessonsPage() {
 	const [deleteChapterDialogOpen, setDeleteChapterDialogOpen] = useState(false);
 	const [selectedChapter, setSelectedChapter] = useState<any>(null);
 
-	if (isLoading || course === undefined || lessons === undefined || chapters === undefined) {
+	if (
+		isLoading ||
+		course === undefined ||
+		lessons === undefined ||
+		chapters === undefined
+	) {
 		return (
 			<div className="w-full">
 				<div className="container mx-auto px-4 py-20">
@@ -242,7 +254,9 @@ function ManageLessonsPage() {
 											<div className="mb-4 inline-flex rounded-full bg-muted p-4">
 												<Folder className="h-12 w-12 text-muted-foreground" />
 											</div>
-											<h3 className="text-xl font-semibold mb-2">No Chapters Yet</h3>
+											<h3 className="text-xl font-semibold mb-2">
+												No Chapters Yet
+											</h3>
 											<p className="text-muted-foreground mb-6">
 												Add chapters to organize your lessons.
 											</p>
@@ -283,7 +297,9 @@ function ManageLessonsPage() {
 											<div className="mb-4 inline-flex rounded-full bg-muted p-4">
 												<BookOpen className="h-12 w-12 text-muted-foreground" />
 											</div>
-											<h3 className="text-xl font-semibold mb-2">No Lessons Yet</h3>
+											<h3 className="text-xl font-semibold mb-2">
+												No Lessons Yet
+											</h3>
 											<p className="text-muted-foreground mb-6">
 												Add your first lesson to get started.
 											</p>
@@ -404,7 +420,7 @@ function ChapterCard({
 	onEdit: (chapter: any) => void;
 	onDelete: (chapter: any) => void;
 }) {
-	const lessonsInChapter = lessons.filter(l => l.chapterId === chapter._id);
+	const lessonsInChapter = lessons.filter((l) => l.chapterId === chapter._id);
 
 	return (
 		<div className="rounded-2xl border border-border bg-card p-6 shadow-md hover:shadow-lg transition-shadow">
@@ -477,7 +493,7 @@ function LessonCard({
 	onEdit: (lesson: any) => void;
 	onDelete: (lesson: any) => void;
 }) {
-	const chapter = chapters.find(c => c._id === lesson.chapterId);
+	const chapter = chapters.find((c) => c._id === lesson.chapterId);
 	return (
 		<div className="rounded-2xl border border-border bg-card p-6 shadow-md hover:shadow-lg transition-shadow">
 			<div className="flex items-start gap-4">
@@ -591,7 +607,6 @@ function ChapterFormDialog({
 		}
 	}, [open, chapter, nextOrder]);
 
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
@@ -639,7 +654,9 @@ function ChapterFormDialog({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-2xl">
 				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit Chapter" : "Add New Chapter"}</DialogTitle>
+					<DialogTitle>
+						{isEdit ? "Edit Chapter" : "Add New Chapter"}
+					</DialogTitle>
 					<DialogDescription>
 						{isEdit
 							? "Update chapter details below."
@@ -653,7 +670,9 @@ function ChapterFormDialog({
 							<Input
 								id="chapter-title"
 								value={formData.title}
-								onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+								onChange={(e) =>
+									setFormData({ ...formData, title: e.target.value })
+								}
 								placeholder="e.g., Introduction to React"
 								required
 							/>
@@ -772,8 +791,8 @@ function DeleteChapterDialog({
 				<DialogHeader>
 					<DialogTitle>Delete Chapter</DialogTitle>
 					<DialogDescription>
-						Are you sure you want to delete "{chapter?.title}"? This action cannot
-						be undone.
+						Are you sure you want to delete "{chapter?.title}"? This action
+						cannot be undone.
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
@@ -850,7 +869,9 @@ function LessonFormDialog({
 				description: lesson?.description || "",
 				content: lesson?.content || "",
 				chapterId: lesson?.chapterId || undefined,
-				videoProvider: (lesson?.videoProvider || "youtube") as "youtube" | "bunny",
+				videoProvider: (lesson?.videoProvider || "youtube") as
+					| "youtube"
+					| "bunny",
 				videoId: lesson?.videoId || "",
 				videoUrl: lesson?.videoUrl || "",
 				videoDuration: lesson?.videoDuration?.toString() || "",
@@ -976,7 +997,9 @@ function LessonFormDialog({
 							<Input
 								id="lesson-slug"
 								value={formData.slug}
-								onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+								onChange={(e) =>
+									setFormData({ ...formData, slug: e.target.value })
+								}
 								placeholder="e.g., introduction-to-react-hooks"
 								required
 							/>
@@ -1012,7 +1035,10 @@ function LessonFormDialog({
 							<Select
 								value={formData.chapterId || "none"}
 								onValueChange={(value) =>
-									setFormData({ ...formData, chapterId: value === "none" ? undefined : value })
+									setFormData({
+										...formData,
+										chapterId: value === "none" ? undefined : value,
+									})
 								}
 							>
 								<SelectTrigger id="chapter-id">
@@ -1090,7 +1116,8 @@ function LessonFormDialog({
 							/>
 							{formData.videoProvider === "bunny" && (
 								<p className="text-xs text-muted-foreground mt-1">
-									💡 Tip: Use the Bunny play URL (e.g., /play/...) - it will be automatically converted to embed format
+									💡 Tip: Use the Bunny play URL (e.g., /play/...) - it will be
+									automatically converted to embed format
 								</p>
 							)}
 						</div>
@@ -1215,8 +1242,8 @@ function DeleteLessonDialog({
 				<DialogHeader>
 					<DialogTitle>Delete Lesson</DialogTitle>
 					<DialogDescription>
-						Are you sure you want to delete "{lesson?.title}"? This action cannot
-						be undone.
+						Are you sure you want to delete "{lesson?.title}"? This action
+						cannot be undone.
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>

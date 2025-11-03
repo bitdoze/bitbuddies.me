@@ -42,7 +42,7 @@ export function ImageLibrary({
 					clerkId: user.id,
 					assetType: "image",
 					limit: 100,
-			  }
+				}
 			: "skip",
 	);
 
@@ -159,19 +159,27 @@ function ImageCard({ asset, isSelected, onSelect }: ImageCardProps) {
 
 	return (
 		<div
+			role="button"
+			tabIndex={0}
+			onClick={onSelect}
+			onKeyDown={(event) => {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					onSelect();
+				}
+			}}
 			className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
 				isSelected
 					? "border-primary ring-2 ring-primary ring-offset-2"
 					: "border-transparent hover:border-muted-foreground/25"
 			}`}
-			onClick={onSelect}
 		>
 			{/* 16:9 aspect ratio container */}
 			<div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
 				{asset.url ? (
 					<img
 						src={asset.url}
-						alt="Library image"
+						alt="Asset preview"
 						className="absolute inset-0 w-full h-full object-cover"
 					/>
 				) : (

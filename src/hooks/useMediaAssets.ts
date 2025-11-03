@@ -38,7 +38,7 @@ export function useListMediaAssets(
 					clerkId,
 					assetType: options?.assetType,
 					limit: options?.limit,
-			  }
+				}
 			: "skip",
 	);
 }

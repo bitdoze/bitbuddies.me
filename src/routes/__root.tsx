@@ -1,6 +1,6 @@
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "../components/common/theme-provider";
 import { UserSyncProvider } from "../components/common/UserSyncProvider";
 import Footer from "../components/layout/Footer";
@@ -14,7 +14,10 @@ import appCss from "../styles.css?url";
 
 // Check if debug routes are enabled (default to true in dev, false in production)
 const isDebugEnabled = import.meta.env.VITE_ENABLE_DEBUG_ROUTES !== "false";
-const isDevelopment = import.meta.env.DEV && import.meta.env.MODE !== "production" && isDebugEnabled;
+const isDevelopment =
+	import.meta.env.DEV &&
+	import.meta.env.MODE !== "production" &&
+	isDebugEnabled;
 
 // Lazy load dev tools only in development - completely excluded from production builds
 const TanStackDevtoolsLazy = isDevelopment
@@ -22,7 +25,7 @@ const TanStackDevtoolsLazy = isDevelopment
 			import("@tanstack/react-devtools").then((mod) => ({
 				default: mod.TanStackDevtools,
 			})),
-	  )
+		)
 	: null;
 
 const TanStackRouterDevtoolsPanelLazy = isDevelopment
@@ -30,7 +33,7 @@ const TanStackRouterDevtoolsPanelLazy = isDevelopment
 			import("@tanstack/react-router-devtools").then((mod) => ({
 				default: mod.TanStackRouterDevtoolsPanel,
 			})),
-	  )
+		)
 	: null;
 
 export const Route = createRootRoute({

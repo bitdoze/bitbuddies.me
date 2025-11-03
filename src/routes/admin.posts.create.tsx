@@ -1,11 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, AlertCircle, FileText, Save } from "lucide-react";
+import { AlertCircle, ArrowLeft, FileText, Save } from "lucide-react";
 import { useState } from "react";
+import type { JSONContent } from "@/components/kibo-ui/editor";
+import type { Id } from "../../convex/_generated/dataModel";
+import { ImageUpload } from "../components/common/ImageUpload";
+import {
+	createEmptyContent,
+	RichTextEditor,
+} from "../components/common/RichTextEditor";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
+import { Checkbox } from "../components/ui/checkbox";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
 import {
 	Select,
 	SelectContent,
@@ -13,14 +20,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../components/ui/select";
-import { Checkbox } from "../components/ui/checkbox";
+import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
-import { useCreatePost } from "../hooks/usePosts";
-import type { Id } from "../../convex/_generated/dataModel";
-import { ImageUpload } from "../components/common/ImageUpload";
 import { useMediaAsset } from "../hooks/useMediaAssets";
-import { RichTextEditor, createEmptyContent } from "../components/common/RichTextEditor";
-import type { JSONContent } from "@/components/kibo-ui/editor";
+import { useCreatePost } from "../hooks/usePosts";
 
 export const Route = createFileRoute("/admin/posts/create")({
 	component: CreatePostPage,

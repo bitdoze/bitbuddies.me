@@ -1,9 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Edit, Eye, ImageIcon, Plus, Trash2, LayoutGrid, AlertCircle, BookOpen } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConvexHttpClient } from "convex/browser";
+import {
+	AlertCircle,
+	BookOpen,
+	Edit,
+	Eye,
+	ImageIcon,
+	LayoutGrid,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import { useState } from "react";
-import { SEO } from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { AdminTable } from "@/components/admin/AdminTable";
+import { SEO } from "@/components/common/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -12,7 +26,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
 	Table,
 	TableBody,
@@ -20,10 +34,9 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { useAuth } from "../hooks/useAuth";
-import { useDeleteCourse, useCourses } from "../hooks/useCourses";
-import { ConvexHttpClient } from "convex/browser";
+} from "@/components/ui/table";
+import { useAuth } from "@/hooks/useAuth";
+import { useCourses, useDeleteCourse } from "@/hooks/useCourses";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 
@@ -38,7 +51,9 @@ export const Route = createFileRoute("/admin/courses/" as any)({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { courses: null };
 			}
 
@@ -62,12 +77,13 @@ function AdminCoursesPage() {
 	const clientCourses = useCourses({ publishedOnly: false });
 
 	// Prefer loader data, fallback to client fetch
-	const courses = ((loaderData as any)?.courses ?? clientCourses) as EnrichedCourse[] | null | undefined;
+	const courses = ((loaderData as any)?.courses ?? clientCourses) as
+		| EnrichedCourse[]
+		| null
+		| undefined;
 	const deleteCourse = useDeleteCourse();
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [selectedCourseId, setSelectedCourseId] = useState<string | null>(
-		null,
-	);
+	const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
 
 	if (isLoading) {
 		return (
@@ -142,6 +158,29 @@ function AdminCoursesPage() {
 		return new Date(timestamp).toLocaleDateString();
 	};
 
+	const totalCourses = courses?.length ?? 0;
+	const publishedCourses =
+		courses?.filter((course) => course.isPublished).length ?? 0;
+	const draftCourses = totalCourses - publishedCourses;
+	const featuredCoursesCount =
+		courses?.filter((course) => course.isFeatured).length ?? 0;
+	const totalEnrollment =
+		courses?.reduce((sum, course) => sum + (course.enrollmentCount ?? 0), 0) ??
+		0;
+	const durations = (courses ?? [])
+		.map((course) => course.duration)
+		.filter((value): value is number => typeof value === "number" && value > 0);
+	const averageDuration = durations.length
+		? `${Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)} mins`
+		: "—";
+	const accessCounts = (courses ?? []).reduce(
+		(acc, course) => {
+			acc[course.accessLevel as keyof typeof acc] += 1;
+			return acc;
+		},
+		{ public: 0, authenticated: 0, subscription: 0 },
+	);
+
 	return (
 		<>
 			<SEO
@@ -149,95 +188,110 @@ function AdminCoursesPage() {
 				description="Admin dashboard for managing courses, creating new content, and editing existing courses."
 				noIndex={true}
 			/>
-			<div className="w-full">
-				{/* Header Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-12">
-					<div className="container mx-auto px-4">
-						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-							<div>
-								<div className="mb-4 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<BookOpen className="h-6 w-6" />
-									</div>
-									<h1 className="text-3xl md:text-4xl font-bold">Manage Courses</h1>
-								</div>
-								<p className="text-lg text-muted-foreground">
-									Create and manage course content
-								</p>
-								<p className="text-sm text-muted-foreground mt-1">
-									{courses?.length ?? 0} course(s) total
-								</p>
-							</div>
-							<Button asChild size="lg" className="shadow-md">
-								<a href="/admin/courses/create">
-									<Plus className="mr-2 h-5 w-5" />
-									New Course
-								</a>
+			<div className="container space-y-12 py-12">
+				<AdminShell>
+					<AdminHeader
+						eyebrow="Content management"
+						title="Manage courses"
+						description="Keep learning paths current, highlight premium tracks, and monitor student progress at a glance."
+						actions={
+							<Button asChild size="lg" className="gap-2">
+								<Link to="/admin/courses/create">
+									<Plus className="h-5 w-5" />
+									New course
+								</Link>
 							</Button>
-						</div>
+						}
+						stats={[
+							{ label: "Published", value: publishedCourses },
+							{ label: "Drafts", value: draftCourses },
+							{ label: "Featured", value: featuredCoursesCount },
+							{
+								label: "Total students",
+								value: totalEnrollment.toLocaleString(),
+							},
+						]}
+					/>
+					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+						<AdminStatCard
+							label="Average duration"
+							value={averageDuration}
+							description="Across published courses"
+						/>
+						<AdminStatCard
+							label="Public access"
+							value={accessCounts.public}
+							description="Open to all visitors"
+						/>
+						<AdminStatCard
+							label="Members"
+							value={accessCounts.authenticated}
+							description="Requires sign-in"
+						/>
+						<AdminStatCard
+							label="Premium"
+							value={accessCounts.subscription}
+							description="Subscription exclusive"
+						/>
 					</div>
-
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-					</div>
-				</section>
-
-				{/* Courses Table Section */}
-				<section className="py-12">
-					<div className="container mx-auto px-4">
-						<div className="rounded-2xl border border-border bg-card shadow-lg overflow-hidden">
-							{!courses || courses.length === 0 ? (
-								<div className="p-12 text-center">
-									<div className="mb-4 inline-flex rounded-full bg-muted p-4">
-										<BookOpen className="h-12 w-12 text-muted-foreground" />
-									</div>
-									<h3 className="text-xl font-semibold mb-2">No Courses Yet</h3>
-									<p className="text-muted-foreground mb-6">
-										Create your first course to get started.
+					<AdminTable
+						title="All courses"
+						description="Maintain curricula, enrollment, and visibility in one place."
+						badge={<Badge variant="secondary">{totalCourses}</Badge>}
+					>
+						{!courses || courses.length === 0 ? (
+							<div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
+								<div className="rounded-full bg-muted p-5 text-muted-foreground">
+									<BookOpen className="h-10 w-10" />
+								</div>
+								<div className="space-y-2">
+									<h3 className="text-lg font-semibold text-foreground">
+										No courses yet
+									</h3>
+									<p className="text-sm text-muted-foreground">
+										Launch your first curriculum to onboard learners.
 									</p>
-									<Button asChild size="lg">
-										<a href="/admin/courses/create">
-											<Plus className="mr-2 h-5 w-5" />
-											Create Course
-										</a>
-									</Button>
 								</div>
-							) : (
-								<div className="overflow-x-auto">
-									<Table>
-										<TableHeader>
-											<TableRow className="bg-muted/50">
-												<TableHead>Image</TableHead>
-												<TableHead>Title</TableHead>
-												<TableHead>Level</TableHead>
-												<TableHead>Status</TableHead>
-												<TableHead>Published</TableHead>
-												<TableHead>Students</TableHead>
-												<TableHead className="text-right">Actions</TableHead>
-											</TableRow>
-										</TableHeader>
-										<TableBody>
-											{courses.map((course) => (
-												<CourseRow
-													key={course._id}
-													course={course}
-													handleDelete={handleDelete}
-													setSelectedCourseId={setSelectedCourseId}
-													setDeleteDialogOpen={setDeleteDialogOpen}
-													deleteDialogOpen={deleteDialogOpen}
-													selectedCourseId={selectedCourseId}
-													formatDate={formatDate}
-												/>
-											))}
-										</TableBody>
-									</Table>
-								</div>
-							)}
-						</div>
-					</div>
-				</section>
+								<Button asChild size="sm" className="gap-2">
+									<Link to="/admin/courses/create">
+										<Plus className="h-4 w-4" />
+										Create course
+									</Link>
+								</Button>
+							</div>
+						) : (
+							<div className="overflow-x-auto">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead className="w-20">Cover</TableHead>
+											<TableHead>Course</TableHead>
+											<TableHead>Level</TableHead>
+											<TableHead>Status</TableHead>
+											<TableHead>Published</TableHead>
+											<TableHead>Students</TableHead>
+											<TableHead className="text-right">Actions</TableHead>
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{courses.map((course) => (
+											<CourseRow
+												key={course._id}
+												course={course}
+												handleDelete={handleDelete}
+												setSelectedCourseId={setSelectedCourseId}
+												setDeleteDialogOpen={setDeleteDialogOpen}
+												deleteDialogOpen={deleteDialogOpen}
+												selectedCourseId={selectedCourseId}
+												formatDate={formatDate}
+											/>
+										))}
+									</TableBody>
+								</Table>
+							</div>
+						)}
+					</AdminTable>
+				</AdminShell>
 			</div>
 		</>
 	);
@@ -264,51 +318,60 @@ function CourseRow({
 		<TableRow>
 			<TableCell>
 				{course.coverAsset?.url ? (
-					<img
-						src={course.coverAsset.url}
-						alt={course.title}
-						className="w-16 h-16 object-cover rounded-lg shadow-sm"
-					/>
+					<div className="relative h-16 w-16 overflow-hidden rounded-xl border border-border bg-muted">
+						<img
+							src={course.coverAsset.url}
+							alt={course.title}
+							className="h-full w-full object-cover"
+						/>
+					</div>
 				) : (
-					<div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+					<div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-border bg-muted">
 						<ImageIcon className="h-6 w-6 text-muted-foreground" />
 					</div>
 				)}
 			</TableCell>
-			<TableCell className="font-medium">
-				{course.title}
-				{course.isFeatured && (
-					<Badge variant="secondary" className="ml-2">
-						Featured
-					</Badge>
-				)}
+			<TableCell>
+				<div className="space-y-1">
+					<p className="font-medium text-foreground">{course.title}</p>
+					{course.shortDescription ? (
+						<p className="line-clamp-1 text-xs text-muted-foreground">
+							{course.shortDescription}
+						</p>
+					) : null}
+					{course.isFeatured ? (
+						<Badge variant="secondary">Featured</Badge>
+					) : null}
+				</div>
 			</TableCell>
 			<TableCell>
 				<Badge variant="outline">{course.level}</Badge>
 			</TableCell>
 			<TableCell>
-				{course.isPublished ? (
-					<Badge variant="default">Published</Badge>
-				) : (
-					<Badge variant="secondary">Draft</Badge>
-				)}
+				<Badge variant={course.isPublished ? "default" : "secondary"}>
+					{course.isPublished ? "Published" : "Draft"}
+				</Badge>
 			</TableCell>
 			<TableCell>{formatDate(course.publishedAt)}</TableCell>
 			<TableCell>{course.enrollmentCount || 0}</TableCell>
 			<TableCell className="text-right">
-				<div className="flex items-center justify-end gap-2">
-					<Button variant="ghost" size="icon" asChild className="hover:bg-muted">
-						<a href={`/courses/${course.slug}`} title="View Course">
+				<div className="flex justify-end gap-2">
+					<Button variant="ghost" size="icon" asChild>
+						<Link
+							to="/courses/$slug"
+							params={{ slug: course.slug }}
+							target="_blank"
+						>
 							<Eye className="h-4 w-4" />
-						</a>
+						</Link>
 					</Button>
-					<Button variant="ghost" size="icon" asChild className="hover:bg-muted">
-						<a href={`/admin/courses/${course._id}/edit`} title="Edit Course">
+					<Button variant="ghost" size="icon" asChild>
+						<Link to="/admin/courses/$id/edit" params={{ id: course._id }}>
 							<Edit className="h-4 w-4" />
-						</a>
+						</Link>
 					</Button>
-					<Button variant="ghost" size="icon" asChild className="hover:bg-muted">
-						<a href={`/admin/courses/${course._id}/lessons`} title="Manage Lessons">
+					<Button variant="ghost" size="icon" asChild>
+						<a href={`/admin/courses/${course._id}/lessons`}>
 							<LayoutGrid className="h-4 w-4" />
 						</a>
 					</Button>
@@ -324,17 +387,16 @@ function CourseRow({
 								variant="ghost"
 								size="icon"
 								onClick={() => setSelectedCourseId(course._id)}
-								className="hover:bg-destructive/10"
-								title="Delete Course"
 							>
 								<Trash2 className="h-4 w-4 text-destructive" />
 							</Button>
 						</DialogTrigger>
-						<DialogContent className="sm:max-w-md">
+						<DialogContent>
 							<DialogHeader>
-								<DialogTitle>Delete Course</DialogTitle>
+								<DialogTitle>Delete course</DialogTitle>
 								<DialogDescription>
-									Are you sure you want to delete "{course.title}"? This action cannot be undone.
+									Are you sure you want to delete "{course.title}"? This action
+									cannot be undone.
 								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>
@@ -348,7 +410,6 @@ function CourseRow({
 									Cancel
 								</Button>
 								<Button variant="destructive" onClick={handleDelete}>
-									<Trash2 className="mr-2 h-4 w-4" />
 									Delete
 								</Button>
 							</DialogFooter>

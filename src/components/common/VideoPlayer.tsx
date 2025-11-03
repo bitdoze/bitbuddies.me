@@ -112,14 +112,21 @@ export function VideoPlayer({
 	title,
 	className = "",
 }: VideoPlayerProps) {
-	const embedUrl = getVideoEmbedUrl({ videoUrl, videoId, videoProvider, title });
+	const embedUrl = getVideoEmbedUrl({
+		videoUrl,
+		videoId,
+		videoProvider,
+		title,
+	});
 
 	if (!embedUrl) {
 		return null;
 	}
 
 	return (
-		<div className={`relative w-full rounded-lg overflow-hidden shadow-lg ${className}`}>
+		<div
+			className={`relative w-full rounded-lg overflow-hidden shadow-lg ${className}`}
+		>
 			<div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
 				<iframe
 					src={embedUrl}

@@ -1,54 +1,304 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Award, BookOpen, Code, Rocket, Users, Zap } from "lucide-react";
-import { LogoIcon } from "@/components/common/logo";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConvexHttpClient } from "convex/browser";
+import {
+	BookOpen,
+	Calendar,
+	Monitor,
+	Rocket,
+	Target,
+	Users,
+} from "lucide-react";
+import type { ReactNode } from "react";
+import { useMemo } from "react";
 import {
 	generateStructuredData,
 	SEO,
 	SEO_CONFIGS,
 } from "@/components/common/SEO";
-import { Button } from "@/components/ui/button";
+import { CommunityBanner } from "@/components/home/CommunityBanner";
+import { Hero } from "@/components/home/Hero";
+import type { HighlightSection } from "@/components/home/Highlights";
+import { buildContentCard, Highlights } from "@/components/home/Highlights";
+import { JourneySteps } from "@/components/home/JourneySteps";
 
-export const Route = createFileRoute("/")({ component: App });
+import { useCourses } from "@/hooks/useCourses";
+import { usePosts } from "@/hooks/usePosts";
+import { useWorkshops } from "@/hooks/useWorkshops";
+import { api } from "../../convex/_generated/api";
+import type { Doc } from "../../convex/_generated/dataModel";
 
-function App() {
-	const features = [
-		{
-			icon: <BookOpen className="w-10 h-10" />,
-			title: "Expert-Led Courses",
-			description:
-				"Learn from industry professionals with real-world experience. Our courses are designed to take you from beginner to expert.",
-		},
-		{
-			icon: <Users className="w-10 h-10" />,
-			title: "Vibrant Community",
-			description:
-				"Connect with thousands of developers worldwide. Share knowledge, collaborate on projects, and grow together.",
-		},
-		{
-			icon: <Zap className="w-10 h-10" />,
-			title: "Hands-On Workshops",
-			description:
-				"Practice makes perfect. Join live workshops and build real projects while learning cutting-edge technologies.",
-		},
-		{
-			icon: <Code className="w-10 h-10" />,
-			title: "Modern Tech Stack",
-			description:
-				"Stay ahead of the curve with courses on the latest frameworks, tools, and best practices in software development.",
-		},
-		{
-			icon: <Rocket className="w-10 h-10" />,
-			title: "Career Growth",
-			description:
-				"Advance your career with portfolio-worthy projects and certifications recognized by top tech companies.",
-		},
-		{
-			icon: <Award className="w-10 h-10" />,
-			title: "Lifetime Access",
-			description:
-				"Once you enroll, the content is yours forever. Learn at your own pace and revisit materials anytime.",
-		},
-	];
+type EnrichedCourse = Doc<"courses"> & {
+	coverAsset: Doc<"mediaAssets"> | null;
+};
+
+type EnrichedWorkshop = Doc<"workshops"> & {
+	coverAsset: Doc<"mediaAssets"> | null;
+};
+
+type EnrichedPost = Doc<"posts"> & {
+	coverAsset: any;
+};
+
+type LoaderData = {
+	courses: EnrichedCourse[] | null;
+	workshops: EnrichedWorkshop[] | null;
+	posts: EnrichedPost[] | null;
+};
+
+export const Route = createFileRoute("/")({
+	loader: async () => {
+		const convexUrl = import.meta.env.VITE_CONVEX_URL;
+		if (!convexUrl) {
+			return {
+				courses: null,
+				workshops: null,
+				posts: null,
+			} satisfies LoaderData;
+		}
+
+		try {
+			const client = new ConvexHttpClient(convexUrl);
+			const [courses, workshops, posts] = await Promise.all([
+				client.query(api.courses.list, { limit: 3, publishedOnly: true }),
+				client.query(api.workshops.list, { limit: 3, publishedOnly: true }),
+				client.query(api.posts.list, { limit: 3, publishedOnly: true }),
+			]);
+
+			return { courses, workshops, posts } satisfies LoaderData;
+		} catch (error) {
+			console.warn("Failed to prefetch home data:", error);
+			return {
+				courses: null,
+				workshops: null,
+				posts: null,
+			} satisfies LoaderData;
+		}
+	},
+	component: HomePage,
+});
+
+function HomePage() {
+	const loaderData = Route.useLoaderData() as LoaderData;
+	const clientCourses = useCourses({ publishedOnly: true, limit: 3 }) as
+		| EnrichedCourse[]
+		| undefined;
+	const clientWorkshops = useWorkshops({ publishedOnly: true, limit: 3 }) as
+		| EnrichedWorkshop[]
+		| undefined;
+	const clientPosts = usePosts({ publishedOnly: true, limit: 3 }) as
+		| EnrichedPost[]
+		| undefined;
+
+	const courses = loaderData.courses ?? clientCourses ?? [];
+	const workshops = loaderData.workshops ?? clientWorkshops ?? [];
+	const posts = loaderData.posts ?? clientPosts ?? [];
+
+	const heroStats = useMemo(
+		() => [
+			{
+				label: "Community",
+				value: "8k+ members",
+				icon: <Users className="h-4 w-4" />,
+			},
+			{
+				label: "Hands-on lessons",
+				value: "120+ modules",
+				icon: <Monitor className="h-4 w-4" />,
+			},
+			{
+				label: "Live sessions",
+				value: "40 monthly",
+				icon: <Calendar className="h-4 w-4" />,
+			},
+			{
+				label: "Launch success",
+				value: "250+ shipped",
+				icon: <Rocket className="h-4 w-4" />,
+			},
+		],
+		[],
+	);
+
+	const highlightSections = useMemo<HighlightSection[]>(() => {
+		const renderCover = (url?: string | null, alt?: string) =>
+			url ? (
+				<div className="relative aspect-[16/9] overflow-hidden">
+					<img
+						src={url}
+						alt={alt ?? ""}
+						className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+					/>
+				</div>
+			) : (
+				<div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 to-primary/5" />
+			);
+
+		const sections: HighlightSection[] = [];
+
+		if (courses.length > 0) {
+			sections.push({
+				id: "courses",
+				eyebrow: "Courses",
+				title: "Choose a guided learning path",
+				description:
+					"Structured learning modules with projects, assessments, and mentor feedback.",
+				items: courses.map((course) => {
+					const badges: Array<{
+						label: string;
+						variant?: "default" | "secondary" | "outline" | "destructive";
+					}> = [{ label: course.level, variant: "secondary" }];
+					if (course.accessLevel === "subscription") {
+						badges.push({ label: "Premium", variant: "default" });
+					}
+
+					const meta: Array<{ icon: ReactNode; label: string }> = [];
+					if (course.duration) {
+						meta.push({
+							icon: <BookOpen className="h-3.5 w-3.5" />,
+							label: `${course.duration} mins`,
+						});
+					}
+					if (course.enrollmentCount) {
+						meta.push({
+							icon: <Users className="h-3.5 w-3.5" />,
+							label: `${course.enrollmentCount} students`,
+						});
+					}
+
+					return {
+						id: course._id,
+						link: (
+							<Link
+								to="/courses/$slug"
+								params={{ slug: course.slug }}
+								className="block"
+							>
+								{buildContentCard({
+									cover: renderCover(course.coverAsset?.url, course.title),
+									title: course.title,
+									description: course.shortDescription ?? course.description,
+									badges,
+									meta,
+								})}
+							</Link>
+						),
+					};
+				}),
+			});
+		}
+
+		if (workshops.length > 0) {
+			sections.push({
+				id: "workshops",
+				eyebrow: "Workshops",
+				title: "Join the next live build",
+				description:
+					"Interactive sessions with live Q&A, recordings, and actionable resources.",
+				items: workshops.map((workshop) => {
+					const badges: Array<{
+						label: string;
+						variant?: "default" | "secondary" | "outline" | "destructive";
+					}> = [{ label: workshop.level, variant: "secondary" }];
+					if (workshop.isLive) {
+						badges.push({ label: "Live", variant: "destructive" });
+					}
+					if (workshop.isFeatured) {
+						badges.push({ label: "Featured", variant: "outline" });
+					}
+
+					const meta: Array<{ icon: ReactNode; label: string }> = [];
+					if (workshop.startDate) {
+						meta.push({
+							icon: <Calendar className="h-3.5 w-3.5" />,
+							label: new Date(workshop.startDate).toLocaleDateString(),
+						});
+					}
+					if (workshop.duration) {
+						meta.push({
+							icon: <Target className="h-3.5 w-3.5" />,
+							label: `${workshop.duration} mins`,
+						});
+					}
+
+					return {
+						id: workshop._id,
+						link: (
+							<Link
+								to="/workshops/$slug"
+								params={{ slug: workshop.slug }}
+								className="block"
+							>
+								{buildContentCard({
+									cover: renderCover(workshop.coverAsset?.url, workshop.title),
+									title: workshop.title,
+									description:
+										workshop.shortDescription ?? workshop.description,
+									badges,
+									meta,
+								})}
+							</Link>
+						),
+					};
+				}),
+			});
+		}
+
+		if (posts.length > 0) {
+			sections.push({
+				id: "posts",
+				eyebrow: "Blog",
+				title: "Fresh ideas from the crew",
+				description:
+					"Guides, breakdowns, and playbooks to help you learn faster.",
+				items: posts.map((post) => {
+					const badges: Array<{
+						label: string;
+						variant?: "default" | "secondary" | "outline" | "destructive";
+					}> = [];
+					if (post.category) {
+						badges.push({ label: post.category, variant: "secondary" });
+					}
+
+					const meta: Array<{ icon: ReactNode; label: string }> = [];
+					if (post.publishedAt) {
+						meta.push({
+							icon: <Calendar className="h-3.5 w-3.5" />,
+							label: new Date(post.publishedAt).toLocaleDateString(),
+						});
+					}
+					if (post.readTime) {
+						meta.push({
+							icon: <BookOpen className="h-3.5 w-3.5" />,
+							label: `${post.readTime} min read`,
+						});
+					}
+
+					return {
+						id: post._id,
+						link: (
+							<Link
+								to="/posts/$slug"
+								params={{ slug: post.slug }}
+								className="block"
+							>
+								{buildContentCard({
+									cover: renderCover(post.coverAsset?.url, post.title),
+									title: post.title,
+									description: post.excerpt ?? post.metaDescription,
+									badges,
+									meta,
+								})}
+							</Link>
+						),
+					};
+				}),
+			});
+		}
+
+		return sections;
+	}, [courses, workshops, posts]);
+
+	const communitySectionId = "community";
 
 	return (
 		<>
@@ -87,115 +337,39 @@ function App() {
 				description: "Empowering developers to build amazing things together",
 				sameAs: [],
 			})}
-			<div className="flex flex-col w-full">
-				{/* Hero Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-20 md:py-32">
-					<div className="container mx-auto px-4">
-						<div className="mx-auto max-w-4xl text-center">
-							<div className="mb-8 flex justify-center">
-								<div className="rounded-2xl bg-primary/10 p-6">
-									<LogoIcon className="h-20 w-auto" />
-								</div>
-							</div>
-							<h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-								Welcome to{" "}
-								<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-									BitBuddies
-								</span>
-							</h1>
-							<p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
-								Empowering developers to build amazing things together
-							</p>
-							<p className="mx-auto mb-12 max-w-2xl text-base text-muted-foreground md:text-lg">
-								Join thousands of developers learning, building, and growing
-								their careers with expert-led courses, hands-on workshops, and a
-								supportive community.
-							</p>
-							<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-								<Button size="lg" className="w-full sm:w-auto" asChild>
-									<a href="#features">Explore Courses</a>
-								</Button>
-								<Button
-									size="lg"
-									variant="outline"
-									className="w-full sm:w-auto"
-									asChild
-								>
-									<a href="#community">Join Community</a>
-								</Button>
-							</div>
+			<main className="flex flex-col">
+				<Hero stats={heroStats} secondaryHref={`#${communitySectionId}`} />
+				{highlightSections.length > 0 ? (
+					<div className="section-spacing bg-background" id="highlights">
+						<div className="container space-y-24">
+							<Highlights sections={highlightSections} />
 						</div>
 					</div>
-
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-					</div>
-				</section>
-
-				{/* Features Section */}
-				<section id="features" className="py-20 md:py-32">
-					<div className="container mx-auto px-4">
-						<div className="mb-16 text-center">
-							<h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-								Why Choose BitBuddies?
-							</h2>
-							<p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-								Everything you need to accelerate your development journey and
-								achieve your career goals.
-							</p>
-						</div>
-
-						<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-							{features.map((feature, index) => (
-								<div
-									key={index}
-									className="group relative rounded-lg border border-border bg-card p-8 transition-all hover:border-primary/50 hover:shadow-lg"
-								>
-									<div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-										{feature.icon}
-									</div>
-									<h3 className="mb-3 text-xl font-semibold">
-										{feature.title}
-									</h3>
-									<p className="text-muted-foreground">{feature.description}</p>
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
-
-				{/* CTA Section */}
-				<section
-					id="get-started"
-					className="bg-gradient-to-b from-background to-primary/5 py-20 md:py-32"
-				>
-					<div className="container mx-auto px-4">
-						<div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 text-center shadow-lg md:p-12">
-							<h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
-								Ready to Start Your Journey?
-							</h2>
-							<p className="mb-8 text-lg text-muted-foreground">
-								Join BitBuddies today and get access to premium courses,
-								exclusive workshops, and a thriving community of developers.
-							</p>
-							<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-								<Button size="lg" className="w-full sm:w-auto">
-									Get Started Free
-								</Button>
-								<Button
-									size="lg"
-									variant="outline"
-									className="w-full sm:w-auto"
-								>
-									View Pricing
-								</Button>
-							</div>
-						</div>
-					</div>
-				</section>
-			</div>
+				) : null}
+				<JourneySteps
+					steps={[
+						{
+							step: "Step 01",
+							title: "Assess your baseline",
+							description:
+								"Pick a path and get tailored recommendations based on your goals.",
+						},
+						{
+							step: "Step 02",
+							title: "Build with support",
+							description:
+								"Follow expert-led sessions, attend office hours, and ship real projects.",
+						},
+						{
+							step: "Step 03",
+							title: "Showcase & grow",
+							description:
+								"Publish your builds, receive reviews, and unlock advanced mentorship.",
+						},
+					]}
+				/>
+				<CommunityBanner sectionId={communitySectionId} />
+			</main>
 		</>
 	);
 }

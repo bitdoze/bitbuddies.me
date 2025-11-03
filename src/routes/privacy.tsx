@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+	Database,
+	Eye,
+	FileText,
+	Globe,
+	Lock,
+	Mail,
+	Shield,
+	UserCheck,
+} from "lucide-react";
 import { SEO } from "../components/common/SEO";
 import { SITE_CONFIG } from "../lib/config";
-import {
-	Shield,
-	Lock,
-	Eye,
-	Database,
-	UserCheck,
-	Globe,
-	FileText,
-	Mail,
-} from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
 	component: PrivacyPage,
@@ -38,8 +38,8 @@ function PrivacyPage() {
 					</p>
 					<p className="mt-4">
 						By using BitBuddies, you agree to the collection and use of
-						information in accordance with this policy. If you do not agree
-						with our policies and practices, please do not use our services.
+						information in accordance with this policy. If you do not agree with
+						our policies and practices, please do not use our services.
 					</p>
 				</>
 			),
@@ -107,9 +107,7 @@ function PrivacyPage() {
 						<li className="flex items-start gap-2">
 							<span className="text-primary mt-1">•</span>
 							<span>
-								<strong className="text-foreground">
-									Account Management:
-								</strong>{" "}
+								<strong className="text-foreground">Account Management:</strong>{" "}
 								Manage your account, enrollment, and access to content
 							</span>
 						</li>
@@ -157,9 +155,7 @@ function PrivacyPage() {
 							backend services
 						</li>
 						<li>
-							<strong className="text-foreground">
-								Plausible Analytics:
-							</strong>{" "}
+							<strong className="text-foreground">Plausible Analytics:</strong>{" "}
 							Privacy-friendly analytics (GDPR compliant, no cookies)
 						</li>
 					</ul>
@@ -191,9 +187,8 @@ function PrivacyPage() {
 						<li>Secure data storage with Convex backend</li>
 					</ul>
 					<p className="mt-4 text-sm text-muted-foreground">
-						While we strive to use commercially acceptable means to protect
-						your data, no method of transmission over the Internet is 100%
-						secure.
+						While we strive to use commercially acceptable means to protect your
+						data, no method of transmission over the Internet is 100% secure.
 					</p>
 				</>
 			),
@@ -283,14 +278,11 @@ function PrivacyPage() {
 						place.
 					</p>
 
-					<h3 className="font-semibold text-lg mb-3">
-						Analytics and Cookies
-					</h3>
+					<h3 className="font-semibold text-lg mb-3">Analytics and Cookies</h3>
 					<p>
-						We use Plausible Analytics, which is GDPR, CCPA, and PECR
-						compliant. It doesn't use cookies, doesn't track users across
-						websites, and doesn't collect personal information. No consent
-						banner is required.
+						We use Plausible Analytics, which is GDPR, CCPA, and PECR compliant.
+						It doesn't use cookies, doesn't track users across websites, and
+						doesn't collect personal information. No consent banner is required.
 					</p>
 				</>
 			),

@@ -1,23 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConvexHttpClient } from "convex/browser";
 import {
 	ArrowRight,
 	BookOpen,
 	Clock,
 	GraduationCap,
-	ImageIcon,
-	Lock,
 	Sparkles,
 	Users,
 } from "lucide-react";
-import {
-	generateStructuredData,
-	SEO,
-} from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { useAuth } from "../hooks/useAuth";
-import { useCourses } from "../hooks/useCourses";
-import { ConvexHttpClient } from "convex/browser";
+import type { ReactNode } from "react";
+import { generateStructuredData, SEO } from "@/components/common/SEO";
+import { SectionHeader } from "@/components/common/SectionHeader";
+import { StatBadge } from "@/components/common/StatBadge";
+import { ContentCard } from "@/components/content/ContentCard";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useCourses } from "@/hooks/useCourses";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 
@@ -32,7 +30,9 @@ export const Route = createFileRoute("/courses/" as any)({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { courses: null };
 			}
 
@@ -52,9 +52,13 @@ function CoursesPage() {
 	// Use prefetched data from loader, fallback to client-side fetch
 	const loaderData = Route.useLoaderData();
 	const clientCourses = useCourses({ publishedOnly: true });
+	const { isAuthenticated } = useAuth();
 
 	// Prefer loader data, fallback to client fetch
-	const courses = ((loaderData as any)?.courses ?? clientCourses) as EnrichedCourse[] | null | undefined;
+	const courses = ((loaderData as any)?.courses ?? clientCourses) as
+		| EnrichedCourse[]
+		| null
+		| undefined;
 
 	if (courses === undefined) {
 		return (
@@ -64,8 +68,108 @@ function CoursesPage() {
 		);
 	}
 
-	const featuredCourses = courses?.filter((c: EnrichedCourse) => c.isFeatured) || [];
-	const regularCourses = courses?.filter((c: EnrichedCourse) => !c.isFeatured) || [];
+	const featuredCourses = courses?.filter((course) => course.isFeatured) ?? [];
+	const regularCourses = courses?.filter((course) => !course.isFeatured) ?? [];
+
+	const siteOrigin =
+		typeof window !== "undefined" ? window.location.origin : "";
+	const heroStats = [
+		{
+			label: "Course tracks",
+			value: `${courses?.length ?? 0}+`,
+			icon: <GraduationCap className="h-4 w-4" />,
+		},
+		{
+			label: "Guided lessons",
+			value: "200+",
+			icon: <Sparkles className="h-4 w-4" />,
+		},
+		{
+			label: "Learners enrolled",
+			value: "8k+",
+			icon: <Users className="h-4 w-4" />,
+		},
+	];
+
+	const renderCourseCard = (course: EnrichedCourse) => {
+		const requiresAuth = course.accessLevel !== "public";
+		const badges = [
+			course.level
+				? { label: course.level, variant: "secondary" as const }
+				: undefined,
+			course.accessLevel === "subscription"
+				? { label: "Premium", variant: "default" as const }
+				: undefined,
+			!isAuthenticated && requiresAuth
+				? {
+						label:
+							course.accessLevel === "subscription"
+								? "Subscription required"
+								: "Login required",
+						variant: "outline" as const,
+					}
+				: undefined,
+		].filter(Boolean) as Array<{
+			label: string;
+			variant?: "default" | "secondary" | "outline" | "destructive";
+		}>;
+
+		const meta = [
+			course.duration
+				? {
+						icon: <Clock className="h-3.5 w-3.5" />,
+						label: `${course.duration} minutes`,
+					}
+				: null,
+			course.enrollmentCount
+				? {
+						icon: <Users className="h-3.5 w-3.5" />,
+						label: `${course.enrollmentCount} enrolled`,
+					}
+				: null,
+		].filter(Boolean) as Array<{ icon: ReactNode; label: string }>;
+
+		const actionVariant =
+			!requiresAuth || isAuthenticated ? "default" : "outline";
+		const actionLabel =
+			!requiresAuth || isAuthenticated ? "View course" : "Preview course";
+
+		return (
+			<ContentCard
+				key={course._id}
+				className="group"
+				cover={
+					course.coverAsset?.url ? (
+						<div className="relative aspect-[16/9] overflow-hidden">
+							<img
+								src={course.coverAsset.url}
+								alt={course.title}
+								className="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
+							/>
+						</div>
+					) : (
+						<div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 to-primary/5" />
+					)
+				}
+				title={course.title}
+				description={course.shortDescription ?? course.description}
+				badges={badges}
+				meta={meta}
+				footer={
+					<Button
+						asChild
+						variant={actionVariant}
+						className="w-full justify-center gap-2"
+					>
+						<Link to="/courses/$slug" params={{ slug: course.slug }}>
+							{actionLabel}
+							<ArrowRight className="h-4 w-4" />
+						</Link>
+					</Button>
+				}
+			/>
+		);
+	};
 
 	return (
 		<>
@@ -83,220 +187,105 @@ function CoursesPage() {
 						"@type": "ListItem",
 						position: 1,
 						name: "Home",
-						item: typeof window !== "undefined" ? window.location.origin : "",
+						item: siteOrigin,
 					},
 					{
 						"@type": "ListItem",
 						position: 2,
 						name: "Courses",
-						item:
-							typeof window !== "undefined"
-								? `${window.location.origin}/courses`
-								: "",
+						item: siteOrigin ? `${siteOrigin}/courses` : "",
 					},
 				],
 			})}
-			<div className="w-full">
-				{/* Hero Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background py-20 md:py-32">
-					<div className="container mx-auto px-4">
-						<div className="mx-auto max-w-4xl text-center">
-							<div className="mb-6 inline-flex rounded-full bg-primary/10 p-4">
-								<GraduationCap className="h-12 w-12 text-primary" />
-							</div>
-							<h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-								Master New{" "}
-								<span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-									Skills
-								</span>
-							</h1>
-							<p className="text-xl text-muted-foreground md:text-2xl">
-								Comprehensive courses designed to take you from beginner to expert
-								with structured lessons and hands-on projects
-							</p>
+			<div className="section-spacing relative overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background">
+				<div className="container grid gap-10 md:grid-cols-[minmax(0,0.65fr)_minmax(0,0.35fr)] md:items-center">
+					<div className="space-y-8">
+						<SectionHeader
+							eyebrow="Guided learning paths"
+							title="Master new skills with project-based courses"
+							description="Follow structured, hands-on curriculums designed by mentors and industry experts. Build real-world projects while learning at your own pace."
+						/>
+						<div className="flex flex-wrap items-center gap-3">
+							<Button asChild size="lg" className="gap-2">
+								<Link to="/courses">
+									Explore courses
+									<ArrowRight className="h-4 w-4" />
+								</Link>
+							</Button>
+							<Button asChild variant="outline" size="lg" className="gap-2">
+								<Link to="/workshops">
+									Browse workshops
+									<ArrowRight className="h-4 w-4" />
+								</Link>
+							</Button>
 						</div>
 					</div>
-
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
+					<div className="grid gap-4">
+						{heroStats.map((stat) => (
+							<StatBadge
+								key={stat.label}
+								label={stat.label}
+								value={stat.value}
+								icon={stat.icon}
+							/>
+						))}
 					</div>
-				</section>
+				</div>
+				<div
+					className="pointer-events-none absolute -right-40 top-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl"
+					aria-hidden="true"
+				/>
+				<div
+					className="pointer-events-none absolute -left-32 bottom-10 h-64 w-64 rounded-full bg-secondary/20 blur-3xl"
+					aria-hidden="true"
+				/>
+			</div>
 
-				{/* Featured Courses */}
-				{featuredCourses.length > 0 && (
-					<section className="py-16 md:py-24">
-						<div className="container mx-auto px-4">
-							<div className="mb-12 flex items-center gap-3">
-								<div className="rounded-lg bg-primary/10 p-2 text-primary">
-									<Sparkles className="h-6 w-6" />
-								</div>
-								<h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-									Featured Courses
-								</h2>
-							</div>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-								{featuredCourses.map((course) => (
-									<CourseCard key={course._id} course={course} />
-								))}
+			<div className="section-spacing">
+				<div className="container space-y-16">
+					{featuredCourses.length > 0 ? (
+						<div className="space-y-8">
+							<SectionHeader
+								eyebrow="Standout picks"
+								title="Featured courses"
+								description="Curated programs that learners love right now."
+							/>
+							<div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+								{featuredCourses.map(renderCourseCard)}
 							</div>
 						</div>
-					</section>
-				)}
-
-				{/* All Courses */}
-				<section className={`py-16 md:py-24 ${featuredCourses.length > 0 ? 'bg-muted/30' : ''}`}>
-					<div className="container mx-auto px-4">
-						<h2 className="mb-12 text-3xl font-bold tracking-tight sm:text-4xl">
-							{featuredCourses.length > 0
-								? "All Courses"
-								: "Available Courses"}
-						</h2>
+					) : null}
+					<div className="space-y-8">
+						<SectionHeader
+							eyebrow={featuredCourses.length ? "Every path" : "Start learning"}
+							title={
+								featuredCourses.length ? "All courses" : "Available courses"
+							}
+							description="Choose the experience that matches your goals—every course blends guided lessons with community feedback."
+						/>
 						{regularCourses.length === 0 && featuredCourses.length === 0 ? (
-							<div className="mx-auto max-w-2xl">
-								<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
-									<div className="mb-4 inline-flex rounded-full bg-muted p-4">
-										<BookOpen className="h-12 w-12 text-muted-foreground" />
-									</div>
-									<h3 className="mb-2 text-xl font-semibold">
-										No Courses Yet
-									</h3>
-									<p className="text-muted-foreground">
-										Check back soon for new courses!
-									</p>
-								</div>
+							<div className="surface-muted mx-auto max-w-2xl space-y-3 p-10 text-center">
+								<BookOpen className="mx-auto h-10 w-10 text-muted-foreground" />
+								<h3 className="text-xl font-semibold">No courses yet</h3>
+								<p className="text-sm text-muted-foreground">
+									We’re crafting the first curriculum. Join the newsletter to be
+									notified when it launches.
+								</p>
 							</div>
 						) : regularCourses.length === 0 ? (
-							<div className="mx-auto max-w-2xl">
-								<div className="rounded-2xl border border-border bg-card p-8 text-center shadow-md">
-									<p className="text-muted-foreground">
-										All available courses are featured above.
-									</p>
-								</div>
+							<div className="surface-muted mx-auto max-w-2xl p-8 text-center">
+								<p className="text-sm text-muted-foreground">
+									All available courses are featured above.
+								</p>
 							</div>
 						) : (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-								{regularCourses.map((course) => (
-									<CourseCard key={course._id} course={course} />
-								))}
+							<div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+								{regularCourses.map(renderCourseCard)}
 							</div>
 						)}
 					</div>
-				</section>
+				</div>
 			</div>
 		</>
-	);
-}
-
-function CourseCard({ course }: { course: EnrichedCourse }) {
-	const { isAuthenticated } = useAuth();
-	const requiresAuth = course.accessLevel !== "public";
-
-	return (
-		<div className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all hover:shadow-xl hover:border-primary/50">
-			{/* Cover Image with 16:9 aspect ratio */}
-			<div className="relative overflow-hidden">
-				{course.coverAsset?.url ? (
-					<div className="w-full relative" style={{ paddingBottom: "56.25%" }}>
-						<img
-							src={course.coverAsset.url}
-							alt={course.title}
-							className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
-						/>
-					</div>
-				) : (
-					<div
-						className="w-full relative bg-muted"
-						style={{ paddingBottom: "56.25%" }}
-					>
-						<div className="absolute inset-0 flex items-center justify-center">
-							<ImageIcon className="h-12 w-12 text-muted-foreground" />
-						</div>
-					</div>
-				)}
-			</div>
-			<div className="flex flex-col flex-1 p-6">
-				<div className="flex items-start justify-between gap-2 mb-3">
-					<div className="flex flex-wrap items-center gap-2">
-						<Badge variant="secondary" className="shadow-sm">{course.level}</Badge>
-						{requiresAuth && !isAuthenticated && (
-							<Badge variant="secondary" className="gap-1">
-								<Lock className="h-3 w-3" />
-								Login Required
-							</Badge>
-						)}
-						{course.accessLevel === "subscription" && (
-							<Badge variant="default" className="gap-1">
-								Premium
-							</Badge>
-						)}
-					</div>
-				</div>
-				<h3 className="text-xl font-semibold line-clamp-2 mb-2">{course.title}</h3>
-				{course.shortDescription && (
-					<p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-						{course.shortDescription}
-					</p>
-				)}
-			</div>
-			<div className="flex-1 px-6">
-				<p className="text-sm text-muted-foreground line-clamp-3">
-					{course.description}
-				</p>
-				<div className="mt-4 space-y-2">
-					{course.duration && (
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<div className="rounded bg-muted p-1">
-								<Clock className="h-4 w-4" />
-							</div>
-							<span>{course.duration} minutes</span>
-						</div>
-					)}
-					{course.enrollmentCount > 0 && (
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<div className="rounded bg-muted p-1">
-								<Users className="h-4 w-4" />
-							</div>
-							<span>{course.enrollmentCount} students enrolled</span>
-						</div>
-					)}
-				</div>
-				{course.tags.length > 0 && (
-					<div className="flex flex-wrap gap-2 mt-4">
-						{course.tags.slice(0, 3).map((tag: string) => (
-							<span
-								key={tag}
-								className="text-xs px-2 py-1 bg-muted rounded-md text-muted-foreground font-medium"
-							>
-								#{tag}
-							</span>
-						))}
-						{course.tags.length > 3 && (
-							<span className="text-xs px-2 py-1 text-muted-foreground">
-								+{course.tags.length - 3}
-							</span>
-						)}
-					</div>
-				)}
-			</div>
-			<div className="p-6 pt-0 mt-auto">
-				{isAuthenticated || !requiresAuth ? (
-					<Button asChild className="w-full shadow-sm">
-						<a href={`/courses/${course.slug}`}>
-							View Course
-							<ArrowRight className="ml-2 h-4 w-4" />
-						</a>
-					</Button>
-				) : (
-					<Button asChild className="w-full shadow-sm" variant="outline">
-						<a href={`/courses/${course.slug}`}>
-							<Lock className="mr-2 h-4 w-4" />
-							Sign In to View
-						</a>
-					</Button>
-				)}
-			</div>
-		</div>
 	);
 }

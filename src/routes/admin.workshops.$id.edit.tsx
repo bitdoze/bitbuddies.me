@@ -1,8 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { JSONContent } from "@/components/kibo-ui/editor";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ImageUpload } from "../components/common/ImageUpload";
+import {
+	createEmptyContent,
+	RichTextEditor,
+} from "../components/common/RichTextEditor";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
 import {
@@ -26,8 +31,6 @@ import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
 import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useUpdateWorkshop, useWorkshop } from "../hooks/useWorkshops";
-import { RichTextEditor, createEmptyContent } from "../components/common/RichTextEditor";
-import type { JSONContent } from "@/components/kibo-ui/editor";
 
 export const Route = createFileRoute("/admin/workshops/$id/edit")({
 	component: EditWorkshopPage,
@@ -389,7 +392,9 @@ function EditWorkshopPage() {
 											<div className="flex items-center justify-center min-h-[500px] border rounded-lg bg-muted/20">
 												<div className="text-center">
 													<div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent mb-2" />
-													<p className="text-sm text-muted-foreground">Loading editor...</p>
+													<p className="text-sm text-muted-foreground">
+														Loading editor...
+													</p>
 												</div>
 											</div>
 										)}

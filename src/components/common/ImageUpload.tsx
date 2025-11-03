@@ -114,7 +114,9 @@ export function ImageUpload({
 			console.log("Upload complete!");
 		} catch (error) {
 			console.error("Upload failed:", error);
-			alert(`Failed to upload image: ${error instanceof Error ? error.message : "Unknown error"}`);
+			alert(
+				`Failed to upload image: ${error instanceof Error ? error.message : "Unknown error"}`,
+			);
 		} finally {
 			setIsUploading(false);
 		}
@@ -163,7 +165,7 @@ export function ImageUpload({
 		imageUrl,
 		previewUrl,
 		currentImageUrl,
-		hasSelectedFile: !!selectedFile
+		hasSelectedFile: !!selectedFile,
 	});
 
 	return (

@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Calendar, Clock, Eye, Lock, FileText, ArrowRight } from "lucide-react";
-import { SEO } from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { usePosts } from "../hooks/usePosts";
-import { useAuth } from "../hooks/useAuth";
 import { ConvexHttpClient } from "convex/browser";
+import { ArrowRight, Calendar, Clock, Eye, Lock } from "lucide-react";
+import type { ReactNode } from "react";
+import { SectionHeader } from "@/components/common/SectionHeader";
+import { ContentCard } from "@/components/content/ContentCard";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { api } from "../../convex/_generated/api";
+import { SEO } from "../components/common/SEO";
+import { useAuth } from "../hooks/useAuth";
+import { usePosts } from "../hooks/usePosts";
 
 export const Route = createFileRoute("/posts/")({
 	component: PostsPage,
@@ -15,7 +18,9 @@ export const Route = createFileRoute("/posts/")({
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
-				console.warn("VITE_CONVEX_URL not found, skipping server-side prefetch");
+				console.warn(
+					"VITE_CONVEX_URL not found, skipping server-side prefetch",
+				);
 				return { posts: null };
 			}
 
@@ -69,195 +74,175 @@ function PostsPage() {
 				description="Read our latest articles, tutorials, and insights on web development, programming, and technology."
 				keywords="blog, articles, tutorials, web development, programming, technology"
 			/>
-			<div className="w-full">
-				{/* Hero Section */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/10 via-primary/5 to-background py-20">
-					<div className="container mx-auto px-4">
-						<div className="relative z-10 mx-auto max-w-3xl text-center">
-							<div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5">
-								<FileText className="h-4 w-4 text-primary" />
-								<span className="text-sm font-medium text-primary">
-									Our Blog
-								</span>
-							</div>
-							<h1 className="mb-6 text-5xl font-bold tracking-tight">
-								Latest Articles & Tutorials
-							</h1>
-							<p className="text-xl text-muted-foreground">
-								Discover insights, tutorials, and best practices from our community
+			<div className="section-spacing bg-gradient-to-b from-primary/10 via-background to-background">
+				<div className="container space-y-12">
+					<SectionHeader
+						eyebrow="The BitBuddies Journal"
+						title="Latest articles & tutorials"
+						description="Deep dives, playbooks, and community highlights to help you ship better products faster."
+						align="center"
+					/>
+					{!posts || posts.length === 0 ? (
+						<div className="surface-muted mx-auto max-w-xl p-10 text-center">
+							<h2 className="text-2xl font-semibold">No posts yet</h2>
+							<p className="mt-2 text-sm text-muted-foreground">
+								We’re drafting something special—check back soon.
 							</p>
 						</div>
-					</div>
+					) : (
+						<div className="space-y-12">
+							{posts.find((p) => p.isFeatured)
+								? (() => {
+										const featured = posts.find((p) => p.isFeatured);
+										if (!featured) return null;
 
-					{/* Decorative blur circles */}
-					<div className="pointer-events-none absolute -right-64 top-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-					<div className="pointer-events-none absolute -left-64 bottom-0 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-				</section>
-
-				{/* Posts Grid Section */}
-				<section className="py-16">
-					<div className="container mx-auto px-4">
-						{!posts || posts.length === 0 ? (
-							<div className="mx-auto max-w-2xl">
-								<div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center shadow-md">
-									<div className="mb-4 inline-flex rounded-full bg-muted p-6">
-										<FileText className="h-12 w-12 text-muted-foreground" />
-									</div>
-									<h2 className="mb-2 text-2xl font-bold">No posts yet</h2>
-									<p className="text-muted-foreground">
-										Check back soon for new content!
-									</p>
-								</div>
-							</div>
-						) : (
-							<div className="mx-auto max-w-7xl">
-								{/* Featured Post (if exists) */}
-								{posts.find((p) => p.isFeatured) && (
-									<div className="mb-12">
-										{(() => {
-											const featuredPost = posts.find((p) => p.isFeatured);
-											if (!featuredPost) return null;
-
-											return (
-												<div className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg transition-all hover:shadow-xl">
-													{featuredPost.coverAsset?.url && (
-														<div className="aspect-[21/9] overflow-hidden">
+										return (
+											<div className="card-surface overflow-hidden rounded-3xl bg-card/90">
+												<div className="grid gap-0 md:grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)]">
+													<div className="relative hidden aspect-[4/3] md:block">
+														{featured.coverAsset?.url ? (
 															<img
-																src={featuredPost.coverAsset.url}
-																alt={featuredPost.title}
-																className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+																src={featured.coverAsset.url}
+																alt={featured.title}
+																className="h-full w-full object-cover"
 															/>
-														</div>
-													)}
-													<div className="p-8">
-														<div className="mb-4 flex flex-wrap items-center gap-3">
+														) : (
+															<div className="h-full w-full bg-gradient-to-br from-primary/20 to-primary/5" />
+														)}
+													</div>
+													<div className="space-y-6 p-8">
+														<div className="flex flex-wrap items-center gap-2">
 															<Badge variant="default">Featured</Badge>
-															{featuredPost.category && (
-																<Badge variant="outline">
-																	{featuredPost.category}
+															{featured.category ? (
+																<Badge variant="secondary">
+																	{featured.category}
 																</Badge>
-															)}
-															{!canAccessPost(featuredPost) && (
+															) : null}
+															{!canAccessPost(featured) ? (
 																<Badge variant="secondary" className="gap-1">
 																	<Lock className="h-3 w-3" />
-																	{featuredPost.accessLevel === "authenticated"
-																		? "Login Required"
-																		: "Subscription Required"}
+																	{featured.accessLevel === "authenticated"
+																		? "Login required"
+																		: "Subscription"}
 																</Badge>
-															)}
+															) : null}
 														</div>
-														<h2 className="mb-3 text-3xl font-bold">
-															{featuredPost.title}
+														<h2 className="text-3xl font-bold md:text-4xl">
+															{featured.title}
 														</h2>
-														{featuredPost.excerpt && (
-															<p className="mb-4 text-lg text-muted-foreground">
-																{featuredPost.excerpt}
+														{featured.excerpt ? (
+															<p className="text-base text-muted-foreground">
+																{featured.excerpt}
 															</p>
-														)}
-														<div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-															{featuredPost.publishedAt && (
-																<div className="flex items-center gap-1.5">
+														) : null}
+														<div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+															{featured.publishedAt ? (
+																<span className="flex items-center gap-1.5">
 																	<Calendar className="h-4 w-4" />
-																	{formatDate(featuredPost.publishedAt)}
-																</div>
-															)}
-															{featuredPost.readTime && (
-																<div className="flex items-center gap-1.5">
+																	{formatDate(featured.publishedAt)}
+																</span>
+															) : null}
+															{featured.readTime ? (
+																<span className="flex items-center gap-1.5">
 																	<Clock className="h-4 w-4" />
-																	{formatReadTime(featuredPost.readTime)}
-																</div>
-															)}
-															<div className="flex items-center gap-1.5">
+																	{formatReadTime(featured.readTime)}
+																</span>
+															) : null}
+															<span className="flex items-center gap-1.5">
 																<Eye className="h-4 w-4" />
-																{featuredPost.viewCount} views
-															</div>
+																{featured.viewCount} views
+															</span>
 														</div>
-														<Link
-															to="/posts/$slug"
-															params={{ slug: featuredPost.slug }}
-														>
-															<Button size="lg" className="gap-2">
-																{canAccessPost(featuredPost)
-																	? "Read Article"
-																	: "View Details"}
+														<Button asChild size="lg" className="gap-2">
+															<Link
+																to="/posts/$slug"
+																params={{ slug: featured.slug }}
+															>
+																{canAccessPost(featured)
+																	? "Read article"
+																	: "View details"}
 																<ArrowRight className="h-4 w-4" />
-															</Button>
-														</Link>
+															</Link>
+														</Button>
 													</div>
 												</div>
-											);
-										})()}
-									</div>
-								)}
-
-								{/* Posts Grid */}
-								<div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-									{posts
-										.filter((post) => !post.isFeatured)
-										.map((post) => (
-											<Link
-												key={post._id}
-												to="/posts/$slug"
-												params={{ slug: post.slug }}
-												className="group"
-											>
-												<article className="h-full overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all hover:shadow-xl">
-													{post.coverAsset?.url ? (
-														<div className="aspect-[16/9] overflow-hidden">
+											</div>
+										);
+									})()
+								: null}
+							<div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+								{posts
+									.filter((post) => !post.isFeatured)
+									.map((post) => (
+										<Link
+											key={post._id}
+											to="/posts/$slug"
+											params={{ slug: post.slug }}
+											className="group"
+										>
+											<ContentCard
+												cover={
+													post.coverAsset?.url ? (
+														<div className="relative aspect-[16/9] overflow-hidden">
 															<img
 																src={post.coverAsset.url}
 																alt={post.title}
 																className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
 															/>
 														</div>
-													) : (
-														<div className="aspect-[16/9] bg-gradient-to-br from-primary/10 to-primary/5" />
-													)}
-													<div className="p-6">
-														<div className="mb-3 flex flex-wrap items-center gap-2">
-															{post.category && (
-																<Badge variant="outline">{post.category}</Badge>
-															)}
-															{!canAccessPost(post) && (
-																<Badge variant="secondary" className="gap-1">
-																	<Lock className="h-3 w-3" />
-																	{post.accessLevel === "authenticated"
-																		? "Login Required"
-																		: "Subscription"}
-																</Badge>
-															)}
-														</div>
-														<h3 className="mb-2 line-clamp-2 text-xl font-bold transition-colors group-hover:text-primary">
-															{post.title}
-														</h3>
-														{post.excerpt && (
-															<p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
-																{post.excerpt}
-															</p>
-														)}
-														<div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-															{post.publishedAt && (
-																<div className="flex items-center gap-1">
-																	<Calendar className="h-3 w-3" />
-																	{formatDate(post.publishedAt)}
-																</div>
-															)}
-															{post.readTime && (
-																<div className="flex items-center gap-1">
-																	<Clock className="h-3 w-3" />
-																	{formatReadTime(post.readTime)}
-																</div>
-															)}
-														</div>
-													</div>
-												</article>
-											</Link>
-										))}
-								</div>
+													) : undefined
+												}
+												title={post.title}
+												description={post.excerpt ?? post.metaDescription}
+												badges={
+													[
+														post.category
+															? { label: post.category, variant: "secondary" }
+															: undefined,
+														!canAccessPost(post)
+															? {
+																	label:
+																		post.accessLevel === "authenticated"
+																			? "Login required"
+																			: "Subscription",
+																	variant: "outline",
+																}
+															: undefined,
+													].filter(Boolean) as Array<{
+														label: string;
+														variant?:
+															| "default"
+															| "secondary"
+															| "outline"
+															| "destructive";
+													}>
+												}
+												meta={
+													[
+														post.publishedAt
+															? {
+																	icon: <Calendar className="h-3.5 w-3.5" />,
+																	label: formatDate(post.publishedAt),
+																}
+															: null,
+														post.readTime
+															? {
+																	icon: <Clock className="h-3.5 w-3.5" />,
+																	label: formatReadTime(post.readTime) ?? "",
+																}
+															: null,
+													].filter(Boolean) as Array<{
+														icon: ReactNode;
+														label: string;
+													}>
+												}
+											/>
+										</Link>
+									))}
 							</div>
-						)}
-					</div>
-				</section>
+						</div>
+					)}
+				</div>
 			</div>
 		</>
 	);

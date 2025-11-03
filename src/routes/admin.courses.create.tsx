@@ -1,5 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Plus, AlertCircle, FileText, Settings, Lock, BookOpen } from "lucide-react";
+import {
+	AlertCircle,
+	ArrowLeft,
+	BookOpen,
+	FileText,
+	Lock,
+	Plus,
+	Settings,
+} from "lucide-react";
 import { useState } from "react";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ImageUpload } from "../components/common/ImageUpload";
@@ -17,8 +25,8 @@ import {
 import { Switch } from "../components/ui/switch";
 import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
-import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useCreateCourse } from "../hooks/useCourses";
+import { useMediaAsset } from "../hooks/useMediaAssets";
 
 export const Route = createFileRoute("/admin/courses/create" as any)({
 	component: CreateCoursePage,
@@ -138,7 +146,9 @@ function CreateCoursePage() {
 				level: formData.level,
 				category: formData.category || undefined,
 				tags: tagsArray,
-				duration: formData.duration ? Number.parseInt(formData.duration) : undefined,
+				duration: formData.duration
+					? Number.parseInt(formData.duration)
+					: undefined,
 				accessLevel: formData.accessLevel,
 				requiredTier: formData.requiredTier,
 				isPublished: formData.isPublished,
@@ -176,7 +186,9 @@ function CreateCoursePage() {
 							<div className="rounded-lg bg-primary/10 p-2 text-primary">
 								<BookOpen className="h-6 w-6" />
 							</div>
-							<h1 className="text-3xl md:text-4xl font-bold">Create New Course</h1>
+							<h1 className="text-3xl md:text-4xl font-bold">
+								Create New Course
+							</h1>
 						</div>
 					</div>
 
@@ -190,7 +202,10 @@ function CreateCoursePage() {
 				{/* Form */}
 				<section className="py-12">
 					<div className="container mx-auto px-4">
-						<form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
+						<form
+							onSubmit={handleSubmit}
+							className="max-w-4xl mx-auto space-y-8"
+						>
 							{/* Basic Information */}
 							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
 								<div className="flex items-center gap-3 mb-6">
@@ -224,7 +239,8 @@ function CreateCoursePage() {
 											required
 										/>
 										<p className="text-sm text-muted-foreground mt-1">
-											This will be used in the URL: /courses/{formData.slug || "your-slug"}
+											This will be used in the URL: /courses/
+											{formData.slug || "your-slug"}
 										</p>
 									</div>
 
@@ -249,7 +265,10 @@ function CreateCoursePage() {
 											id="description"
 											value={formData.description}
 											onChange={(e) =>
-												setFormData({ ...formData, description: e.target.value })
+												setFormData({
+													...formData,
+													description: e.target.value,
+												})
 											}
 											placeholder="Detailed course description (HTML supported)"
 											rows={8}
@@ -294,7 +313,9 @@ function CreateCoursePage() {
 											</SelectTrigger>
 											<SelectContent>
 												<SelectItem value="beginner">Beginner</SelectItem>
-												<SelectItem value="intermediate">Intermediate</SelectItem>
+												<SelectItem value="intermediate">
+													Intermediate
+												</SelectItem>
 												<SelectItem value="advanced">Advanced</SelectItem>
 											</SelectContent>
 										</Select>

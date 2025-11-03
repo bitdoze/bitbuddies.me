@@ -1,35 +1,39 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import React from "react";
+import { ConvexHttpClient } from "convex/browser";
 import {
 	ArrowLeft,
 	Calendar,
-	CheckCircle2,
 	Clock,
-	Download,
-	ImageIcon,
-	Users,
-	Sparkles,
 	FileText,
-	Play,
+	Users,
 } from "lucide-react";
 
+import { api } from "../../convex/_generated/api";
 import { generateStructuredData, SEO } from "../components/common/SEO";
+import { SectionHeader } from "../components/common/SectionHeader";
 import { WorkshopVideoPlayer } from "../components/common/VideoPlayer";
-import { Badge } from "../components/ui/badge";
+import {
+	ContentDetailLayout,
+	ContentDetailHeader,
+	ContentDetailCover,
+	MetaInfoCard,
+	AuthRequiredCard,
+	ResourcesList,
+	TopicsTags,
+	WorkshopStatus,
+	TiptapRenderer,
+} from "../components/content";
+import type { MetaItem, Resource } from "../components/content";
 import { Button } from "../components/ui/button";
-import { Separator } from "../components/ui/separator";
 import { useAuth } from "../hooks/useAuth";
 import {
 	useWorkshopAttachments,
 	useWorkshopBySlug,
 } from "../hooks/useWorkshops";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../../convex/_generated/api";
 
 export const Route = createFileRoute("/workshops/$slug")({
 	component: WorkshopPage,
 	loader: async ({ params }) => {
-		// Prefetch workshop data on the server
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
@@ -62,6 +66,7 @@ function WorkshopPage() {
 
 	const attachments = useWorkshopAttachments(workshop?._id);
 
+	// Loading state
 	if (authLoading || workshop === undefined) {
 		return (
 			<div className="w-full">
@@ -75,6 +80,7 @@ function WorkshopPage() {
 		);
 	}
 
+	// Not found state
 	if (!workshop) {
 		return (
 			<div className="w-full">
@@ -86,7 +92,8 @@ function WorkshopPage() {
 							</div>
 							<h1 className="mb-2 text-2xl font-bold">Workshop Not Found</h1>
 							<p className="mb-6 text-muted-foreground">
-								The workshop you're looking for doesn't exist or has been removed.
+								The workshop you're looking for doesn't exist or has been
+								removed.
 							</p>
 							<Button asChild variant="outline" size="lg">
 								<Link to="/workshops">
@@ -101,7 +108,7 @@ function WorkshopPage() {
 		);
 	}
 
-	// Define variables needed for preview
+	// Format date helper
 	const formatDate = (timestamp?: number) => {
 		if (!timestamp) return null;
 		return new Date(timestamp).toLocaleDateString("en-US", {
@@ -114,6 +121,7 @@ function WorkshopPage() {
 		});
 	};
 
+	// Workshop status
 	const isUpcoming = workshop.startDate && workshop.startDate > Date.now();
 	const isOngoing =
 		workshop.startDate &&
@@ -122,189 +130,82 @@ function WorkshopPage() {
 		workshop.endDate >= Date.now();
 	const isPast = workshop.endDate && workshop.endDate < Date.now();
 
-	if (!isAuthenticated) {
-		return (
-			<>
-				<SEO
-					title={workshop.title}
-					description={
-						workshop.shortDescription || workshop.description.substring(0, 160)
-					}
-					keywords={workshop.tags.join(", ")}
-					canonicalUrl={`/workshops/${workshop.slug}`}
-					ogImage={workshop.coverAsset?.url}
-					ogType="article"
-				/>
-				<div className="w-full">
-					{/* Hero Section with Cover Image */}
-					<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
-						<div className="container mx-auto px-4 py-8">
-							<Button variant="ghost" asChild className="mb-6">
-								<Link to="/workshops">
-									<ArrowLeft className="mr-2 h-4 w-4" />
-									Back to Workshops
-								</Link>
-							</Button>
+	// Prepare meta items for sidebar
+	const metaItems: MetaItem[] = [];
 
-							{/* Cover Image */}
-							{workshop.coverAsset?.url ? (
-								<div className="w-full relative rounded-2xl overflow-hidden shadow-xl mb-8" style={{ paddingBottom: "56.25%" }}>
-									<img
-										src={workshop.coverAsset.url}
-										alt={workshop.title}
-										className="absolute inset-0 w-full h-full object-cover"
-									/>
-								</div>
-							) : (
-								<div className="w-full relative bg-muted rounded-2xl mb-8 shadow-xl" style={{ paddingBottom: "56.25%" }}>
-									<div className="absolute inset-0 flex items-center justify-center">
-										<ImageIcon className="h-24 w-24 text-muted-foreground" />
-									</div>
-								</div>
-							)}
-
-							{/* Workshop Header */}
-							<div className="max-w-4xl mx-auto text-center mb-12">
-								<div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-									<Badge variant="outline" className="text-sm">{workshop.level}</Badge>
-									{workshop.isLive && workshop.startDate && (
-										<>
-											{isUpcoming && <Badge variant="default">Upcoming</Badge>}
-											{isOngoing && <Badge variant="destructive">Live Now</Badge>}
-											{isPast && workshop.videoUrl && (
-												<Badge variant="secondary">Recording Available</Badge>
-											)}
-										</>
-									)}
-									{workshop.isFeatured && <Badge variant="secondary">Featured</Badge>}
-								</div>
-								<h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-									{workshop.title}
-								</h1>
-								{workshop.shortDescription && (
-									<p className="text-xl text-muted-foreground mb-6">
-										{workshop.shortDescription}
-									</p>
-								)}
-
-								{/* Workshop Meta */}
-								<div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-									{workshop.instructorName && (
-										<div className="flex items-center gap-2">
-											<Users className="h-4 w-4" />
-											<span>By {workshop.instructorName}</span>
-										</div>
-									)}
-									{workshop.duration && (
-										<div className="flex items-center gap-2">
-											<Clock className="h-4 w-4" />
-											<span>{workshop.duration} minutes</span>
-										</div>
-									)}
-									{workshop.startDate && (
-										<div className="flex items-center gap-2">
-											<Calendar className="h-4 w-4" />
-											<span>{formatDate(workshop.startDate)}</span>
-										</div>
-									)}
-								</div>
-							</div>
-						</div>
-
-						{/* Decorative elements */}
-						<div className="absolute left-0 top-0 -z-10 h-full w-full">
-							<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-							<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-						</div>
-					</section>
-
-					{/* Authentication Required Section */}
-					<section className="py-16 bg-muted/30">
-						<div className="container mx-auto px-4">
-							<div className="max-w-3xl mx-auto">
-								<div className="rounded-2xl border border-primary/30 bg-card p-8 md:p-12 shadow-lg">
-									<div className="text-center mb-8">
-										<div className="inline-flex rounded-full bg-primary/10 p-4 mb-4">
-											<CheckCircle2 className="h-12 w-12 text-primary" />
-										</div>
-										<h2 className="text-3xl font-bold mb-3">
-											Sign In to Access This Workshop
-										</h2>
-										<p className="text-lg text-muted-foreground">
-											Create a free account or sign in to access workshop content, materials, and community features.
-										</p>
-									</div>
-
-									<div className="space-y-4 mb-8">
-										<div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-											<CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-											<span className="text-sm">Full access to all workshop content and videos</span>
-										</div>
-										<div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-											<CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-											<span className="text-sm">Download workshop materials and resources</span>
-										</div>
-										<div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-											<CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-											<span className="text-sm">Track your progress across courses and workshops</span>
-										</div>
-										<div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-											<CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-											<span className="text-sm">Join live workshop sessions and Q&A</span>
-										</div>
-									</div>
-
-									<Button size="lg" className="w-full shadow-md">
-										Sign In to Continue
-									</Button>
-								</div>
-							</div>
-						</div>
-					</section>
-
-					{/* About Section */}
-					<section className="py-16">
-						<div className="container mx-auto px-4">
-							<div className="max-w-4xl mx-auto">
-								<div className="mb-8 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<FileText className="h-6 w-6" />
-									</div>
-									<h2 className="text-3xl font-bold">About This Workshop</h2>
-								</div>
-								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-									<p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-										{workshop.description}
-									</p>
-								</div>
-
-								{workshop.tags.length > 0 && (
-									<div className="mt-8">
-										<h3 className="text-xl font-semibold mb-4">Topics Covered</h3>
-										<div className="flex flex-wrap gap-2">
-											{workshop.tags.map((tag: string) => (
-												<span
-													key={tag}
-													className="text-sm px-3 py-1.5 bg-muted rounded-lg text-muted-foreground font-medium hover:bg-muted/80 transition-colors"
-												>
-													#{tag}
-												</span>
-											))}
-										</div>
-									</div>
-								)}
-							</div>
-						</div>
-					</section>
-				</div>
-			</>
-		);
+	if (workshop.instructorName) {
+		metaItems.push({
+			icon: <Users className="h-4 w-4" />,
+			label: "Instructor",
+			value: workshop.instructorName,
+		});
 	}
 
-	// Format dates for SEO
-	const publishedTime = workshop.publishedAt
-		? new Date(workshop.publishedAt).toISOString()
-		: new Date(workshop.createdAt).toISOString();
+	if (workshop.duration) {
+		metaItems.push({
+			icon: <Clock className="h-4 w-4" />,
+			label: "Duration",
+			value: `${workshop.duration} minutes`,
+		});
+	}
+
+	if (workshop.startDate) {
+		metaItems.push({
+			icon: <Calendar className="h-4 w-4" />,
+			label: isUpcoming ? "Starts" : isPast ? "Started" : "Date",
+			value: formatDate(workshop.startDate) || "TBA",
+		});
+	}
+
+
+
+	// Prepare badges
+	const badges: Array<{ label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = [
+		{ label: workshop.level, variant: "secondary" },
+	];
+
+	if (isOngoing && workshop.isLive) {
+		badges.push({ label: "Live Now", variant: "destructive" });
+	} else if (isUpcoming) {
+		badges.push({ label: "Upcoming", variant: "default" });
+	} else if (isPast && workshop.videoUrl) {
+		badges.push({ label: "Recording Available", variant: "secondary" });
+	}
+
+	if (workshop.isFeatured) {
+		badges.push({ label: "Featured", variant: "secondary" });
+	}
+
+	// Prepare resources
+	const resources: Resource[] =
+		attachments?.map((attachment) => ({
+			id: attachment._id,
+			name: attachment.displayName || "Attachment",
+			type: attachment.asset?.mimeType || "file",
+			size: attachment.asset?.filesize ? `${(attachment.asset.filesize / 1024 / 1024).toFixed(2)} MB` : "Unknown",
+			url: attachment.asset?.url || "",
+		})) || [];
+
+	// Structured data for SEO
+	const workshopStructuredData = generateStructuredData({
+		type: "Course",
+		data: {
+			"@type": "Course",
+			name: workshop.title,
+			description: workshop.shortDescription || workshop.description,
+			provider: {
+				"@type": "Organization",
+				name: "BitBuddies",
+				sameAs: "https://bitbuddies.me",
+			},
+			...(workshop.instructorName && {
+				instructor: {
+					"@type": "Person",
+					name: workshop.instructorName,
+				},
+			}),
+		},
+	});
 
 	return (
 		<>
@@ -317,553 +218,106 @@ function WorkshopPage() {
 				canonicalUrl={`/workshops/${workshop.slug}`}
 				ogImage={workshop.coverAsset?.url}
 				ogType="article"
-				author={workshop.instructorName}
-				publishedTime={publishedTime}
 			/>
-			{generateStructuredData({
-				type: "Course",
-				name: workshop.title,
-				description: workshop.description,
-				provider: {
-					"@type": "Organization",
-					name: "BitBuddies",
-				},
-				instructor: {
-					"@type": "Person",
-					name: workshop.instructorName || "BitBuddies Instructor",
-				},
-				...(workshop.duration && {
-					timeRequired: `PT${workshop.duration}M`,
-				}),
-				...(workshop.coverAsset?.url && {
-					image: workshop.coverAsset.url,
-				}),
-				...(workshop.isLive &&
-					workshop.startDate && {
-						courseMode: "online",
-						startDate: new Date(workshop.startDate).toISOString(),
-						...(workshop.endDate && {
-							endDate: new Date(workshop.endDate).toISOString(),
-						}),
-					}),
-				educationalLevel: workshop.level,
-				inLanguage: "en",
-				isAccessibleForFree: workshop.accessLevel === "public",
-			})}
-			{generateStructuredData({
-				type: "BreadcrumbList",
-				itemListElement: [
-					{
-						"@type": "ListItem",
-						position: 1,
-						name: "Home",
-						item: typeof window !== "undefined" ? window.location.origin : "",
-					},
-					{
-						"@type": "ListItem",
-						position: 2,
-						name: "Workshops",
-						item:
-							typeof window !== "undefined"
-								? `${window.location.origin}/workshops`
-								: "",
-					},
-					{
-						"@type": "ListItem",
-						position: 3,
-						name: workshop.title,
-						item:
-							typeof window !== "undefined"
-								? `${window.location.origin}/workshops/${workshop.slug}`
-								: "",
-					},
-				],
-			})}
-			<div className="w-full">
-				{/* Hero Section with Cover Image */}
-				<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
-					<div className="container mx-auto px-4 py-8">
-						<Button variant="ghost" asChild className="mb-6">
-							<Link to="/workshops">
-								<ArrowLeft className="mr-2 h-4 w-4" />
-								Back to Workshops
-							</Link>
-						</Button>
+			{workshopStructuredData}
 
-						{/* Cover Image */}
-						{workshop.coverAsset?.url ? (
-							<div className="w-full relative rounded-2xl overflow-hidden shadow-xl mb-8" style={{ paddingBottom: "56.25%" }}>
-								<img
-									src={workshop.coverAsset.url}
-									alt={workshop.title}
-									className="absolute inset-0 w-full h-full object-cover"
-								/>
-							</div>
-						) : (
-							<div className="w-full relative bg-muted rounded-2xl mb-8 shadow-xl" style={{ paddingBottom: "56.25%" }}>
-								<div className="absolute inset-0 flex items-center justify-center">
-									<ImageIcon className="h-24 w-24 text-muted-foreground" />
-								</div>
-							</div>
+			<ContentDetailLayout
+				sidebar={
+					<>
+						<MetaInfoCard title="Workshop Details" items={metaItems} />
+
+						{workshop.isLive && (
+							<WorkshopStatus
+								startDate={workshop.startDate}
+								endDate={workshop.endDate}
+								isLive={workshop.isLive}
+								maxParticipants={workshop.maxParticipants}
+							/>
 						)}
 
-						{/* Workshop Header */}
-						<div className="max-w-4xl mx-auto text-center mb-12">
-							<div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-								<Badge variant="outline" className="text-sm">{workshop.level}</Badge>
-								{workshop.category && (
-									<Badge variant="secondary" className="text-sm">{workshop.category}</Badge>
-								)}
-								{workshop.isLive && isUpcoming && <Badge variant="default" className="text-sm">Upcoming Live</Badge>}
-								{workshop.isLive && isOngoing && <Badge variant="destructive" className="text-sm">Live Now</Badge>}
-								{workshop.isLive && isPast && <Badge variant="secondary" className="text-sm">Ended</Badge>}
-								{workshop.isFeatured && <Badge variant="secondary" className="text-sm">Featured</Badge>}
-							</div>
-							<h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-								{workshop.title}
-							</h1>
-							{workshop.shortDescription && (
-								<p className="text-xl text-muted-foreground mb-6">
-									{workshop.shortDescription}
+						{workshop.tags && workshop.tags.length > 0 && (
+							<TopicsTags
+								tags={workshop.tags}
+								title="Topics"
+								variant="card"
+							/>
+						)}
+					</>
+				}
+			>
+				<ContentDetailHeader
+					title={workshop.title}
+					description={workshop.shortDescription}
+					badges={badges}
+					backLink={{ to: "/workshops", label: "Back to Workshops" }}
+				/>
+
+				<ContentDetailCover
+					imageUrl={workshop.coverAsset?.url}
+					alt={workshop.title}
+				/>
+
+				{!isAuthenticated ? (
+					<AuthRequiredCard
+						title="Sign In to Access This Workshop"
+						description="Create a free account or sign in to access workshop content, materials, and community features."
+						features={[
+							"Full access to all workshop content and videos",
+							"Download workshop materials and resources",
+							"Track your progress across courses and workshops",
+							"Join the community and participate in discussions",
+						]}
+					/>
+				) : (
+					<>
+						{/* About Section */}
+						<section>
+							<SectionHeader eyebrow="Overview" title="About This Workshop" />
+							<div className="prose prose-slate dark:prose-invert max-w-none mt-6">
+								<p className="text-lg text-foreground leading-relaxed">
+									{workshop.description}
 								</p>
-							)}
+							</div>
+						</section>
 
-							{workshop.tags.length > 0 && (
-								<div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-									{workshop.tags.map((tag) => (
-										<span
-											key={tag}
-											className="text-xs px-2 py-1 bg-muted rounded-md text-muted-foreground font-medium"
-										>
-											#{tag}
-										</span>
-									))}
-								</div>
-							)}
-						</div>
-					</div>
-
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-					</div>
-				</section>
-
-				{/* Video Player Section */}
-				{(workshop.videoId || workshop.videoUrl) && (
-					<section className="py-16 bg-muted/30">
-						<div className="container mx-auto px-4">
-							<div className="max-w-5xl mx-auto">
-								<div className="mb-8 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Play className="h-6 w-6" />
-									</div>
-									<h2 className="text-3xl font-bold">Workshop Recording</h2>
-								</div>
-								<div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
+						{/* Video Section */}
+						{(workshop.videoUrl || workshop.videoId) && (
+							<section>
+								<SectionHeader
+									eyebrow="Video"
+									title={
+										isPast ? "Workshop Recording" : "Watch Workshop"
+									}
+								/>
+								<div className="mt-6">
 									<WorkshopVideoPlayer workshop={workshop} />
 								</div>
-							</div>
-						</div>
-					</section>
+							</section>
+						)}
+
+						{/* Content Section */}
+						{workshop.content && (
+							<section>
+								<SectionHeader eyebrow="Content" title="Workshop Materials" />
+								<div className="mt-6">
+									<TiptapRenderer content={workshop.content} />
+								</div>
+							</section>
+						)}
+
+						{/* Resources Section */}
+						{resources.length > 0 && (
+							<ResourcesList
+								resources={resources}
+								title="Workshop Materials"
+								eyebrow="Downloads"
+							/>
+						)}
+
+
+					</>
 				)}
-
-				{/* Main Content Section */}
-				<section className="py-16">
-					<div className="container mx-auto px-4">
-						<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-							{/* Main Content */}
-							<div className="lg:col-span-2 space-y-8">
-								{/* About Section */}
-								<div>
-									<div className="mb-6 flex items-center gap-3">
-										<div className="rounded-lg bg-primary/10 p-2 text-primary">
-											<FileText className="h-6 w-6" />
-										</div>
-										<h2 className="text-3xl font-bold">About This Workshop</h2>
-									</div>
-									<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-										<p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-											{workshop.description}
-										</p>
-									</div>
-								</div>
-
-								{/* Content Section */}
-								<div>
-									<div className="mb-6 flex items-center gap-3">
-										<div className="rounded-lg bg-primary/10 p-2 text-primary">
-											<Sparkles className="h-6 w-6" />
-										</div>
-										<h2 className="text-3xl font-bold">Workshop Content</h2>
-									</div>
-
-									<article className="prose prose-lg dark:prose-invert max-w-none">
-										<ContentRenderer content={workshop.content} />
-									</article>
-								</div>
-
-								{/* Attachments Section */}
-								{attachments && attachments.length > 0 && (
-									<div>
-										<div className="mb-6 flex items-center gap-3">
-											<div className="rounded-lg bg-primary/10 p-2 text-primary">
-												<Download className="h-6 w-6" />
-											</div>
-											<h2 className="text-3xl font-bold">Workshop Materials</h2>
-										</div>
-										<div className="rounded-2xl border border-border bg-card p-6 shadow-md">
-											<p className="text-sm text-muted-foreground mb-4">
-												Download resources and materials for this workshop
-											</p>
-											<div className="space-y-3">
-												{attachments.map((attachment: any) => (
-													<div
-														key={attachment._id}
-														className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-all hover:shadow-sm"
-													>
-														<div className="flex items-center space-x-3">
-															<div className="rounded-lg bg-primary/10 p-2">
-																<Download className="h-4 w-4 text-primary" />
-															</div>
-															<div>
-																<p className="font-medium text-sm">
-																	{attachment.displayName}
-																</p>
-																{attachment.asset && (
-																	<p className="text-xs text-muted-foreground">
-																		{attachment.asset.mimeType} •{" "}
-																		{(
-																			attachment.asset.filesize /
-																			1024 /
-																			1024
-																		).toFixed(2)}{" "}
-																		MB
-																	</p>
-																)}
-															</div>
-														</div>
-														{attachment.asset?.url && (
-															<Button size="sm" variant="ghost" asChild className="shadow-sm">
-																<a
-																	href={attachment.asset.url}
-																	download
-																	target="_blank"
-																	rel="noopener noreferrer"
-																>
-																	Download
-																</a>
-															</Button>
-														)}
-													</div>
-												))}
-											</div>
-										</div>
-									</div>
-								)}
-							</div>
-
-							{/* Sidebar */}
-							<div className="space-y-8">
-								{/* Workshop Details */}
-								<div className="rounded-2xl border border-border bg-card p-6 shadow-md">
-									<h3 className="text-xl font-bold mb-6">Workshop Details</h3>
-									<div className="space-y-5">
-										{workshop.duration && (
-											<div className="flex items-start gap-3">
-												<div className="rounded-lg bg-muted p-2">
-													<Clock className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<div>
-													<p className="font-medium text-sm">Duration</p>
-													<p className="text-sm text-muted-foreground">
-														{workshop.duration} minutes
-													</p>
-												</div>
-											</div>
-										)}
-
-										{workshop.startDate && (
-											<div className="flex items-start gap-3">
-												<div className="rounded-lg bg-muted p-2">
-													<Calendar className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<div>
-													<p className="font-medium text-sm">
-														{isUpcoming ? "Starts" : isPast ? "Started" : "Started"}
-													</p>
-													<p className="text-sm text-muted-foreground">
-														{formatDate(workshop.startDate)}
-													</p>
-												</div>
-											</div>
-										)}
-
-										{workshop.endDate && (
-											<div className="flex items-start gap-3">
-												<div className="rounded-lg bg-muted p-2">
-													<Calendar className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<div>
-													<p className="font-medium text-sm">
-														{isPast ? "Ended" : "Ends"}
-													</p>
-													<p className="text-sm text-muted-foreground">
-														{formatDate(workshop.endDate)}
-													</p>
-												</div>
-											</div>
-										)}
-
-										{workshop.maxParticipants && (
-											<div className="flex items-start gap-3">
-												<div className="rounded-lg bg-muted p-2">
-													<Users className="h-5 w-5 text-muted-foreground" />
-												</div>
-												<div>
-													<p className="font-medium text-sm">Participants</p>
-													<p className="text-sm text-muted-foreground">
-														{workshop.currentParticipants} /{" "}
-														{workshop.maxParticipants}
-													</p>
-												</div>
-											</div>
-										)}
-
-										{workshop.instructorName && (
-											<>
-												<Separator className="my-4" />
-												<div className="flex items-start gap-3">
-													<div className="rounded-lg bg-muted p-2">
-														<Users className="h-5 w-5 text-muted-foreground" />
-													</div>
-													<div>
-														<p className="font-medium text-sm">Instructor</p>
-														<p className="text-sm text-muted-foreground">
-															{workshop.instructorName}
-														</p>
-													</div>
-												</div>
-											</>
-										)}
-									</div>
-								</div>
-
-								{/* Enrollment Status */}
-								<div className="rounded-2xl border border-primary/30 bg-card p-6 shadow-md">
-									<h3 className="text-xl font-bold mb-4">Enrollment Status</h3>
-									<div className="flex items-center gap-3 p-4 rounded-lg bg-primary/5">
-										<CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0" />
-										<div>
-											<p className="font-medium text-sm">You have access</p>
-											<p className="text-xs text-muted-foreground">
-												You're enrolled and can access all materials
-											</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</section>
-			</div>
+			</ContentDetailLayout>
 		</>
-	);
-}
-
-// Content renderer for JSONContent with proper styling
-function ContentRenderer({ content }: { content: string }) {
-	let parsedContent: any;
-
-	try {
-		parsedContent = JSON.parse(content);
-	} catch {
-		// Fallback for old HTML content
-		return (
-			<div
-				className="prose prose-lg max-w-none dark:prose-invert"
-				dangerouslySetInnerHTML={{ __html: content }}
-			/>
-		);
-	}
-
-	if (!parsedContent || !parsedContent.content) {
-		return <p className="text-muted-foreground">No content available</p>;
-	}
-
-	const renderNode = (node: any, index: number): React.ReactNode => {
-		const key = `${node.type}-${index}`;
-
-		switch (node.type) {
-			case "paragraph":
-				return (
-					<p key={key} className="mb-4 leading-7">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</p>
-				);
-
-			case "heading":
-				const level = node.attrs?.level || 1;
-				const headingClasses: Record<number, string> = {
-					1: "text-4xl font-bold tracking-tight mb-6 mt-8",
-					2: "text-3xl font-bold tracking-tight mb-5 mt-7",
-					3: "text-2xl font-bold tracking-tight mb-4 mt-6",
-					4: "text-xl font-bold mb-3 mt-5",
-					5: "text-lg font-bold mb-3 mt-4",
-					6: "text-base font-bold mb-2 mt-4",
-				};
-				const className = headingClasses[level] || "text-base font-bold mb-2 mt-4";
-
-				return React.createElement(
-					`h${level}`,
-					{ key, className },
-					node.content?.map((child: any, i: number) => renderNode(child, i))
-				);
-
-			case "text":
-				let text: React.ReactNode = node.text;
-				if (node.marks) {
-					for (const mark of node.marks) {
-						switch (mark.type) {
-							case "bold":
-								text = <strong className="font-bold">{text}</strong>;
-								break;
-							case "italic":
-								text = <em className="italic">{text}</em>;
-								break;
-							case "underline":
-								text = <u className="underline">{text}</u>;
-								break;
-							case "strike":
-								text = <s className="line-through">{text}</s>;
-								break;
-							case "code":
-								text = <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">{text}</code>;
-								break;
-							case "link":
-								text = (
-									<a
-										href={mark.attrs?.href}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="text-primary underline underline-offset-4 hover:text-primary/80"
-									>
-										{text}
-									</a>
-								);
-								break;
-						}
-					}
-				}
-				return <span key={key}>{text}</span>;
-
-			case "bulletList":
-				return (
-					<ul key={key} className="my-6 ml-6 list-disc space-y-2">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</ul>
-				);
-
-			case "orderedList":
-				return (
-					<ol key={key} className="my-6 ml-6 list-decimal space-y-2" start={node.attrs?.start || 1}>
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</ol>
-				);
-
-			case "listItem":
-				return (
-					<li key={key} className="leading-7">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</li>
-				);
-
-			case "taskList":
-				return (
-					<ul key={key} className="my-6 ml-0 space-y-2 list-none">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</ul>
-				);
-
-			case "taskItem":
-				return (
-					<li key={key} className="flex items-start gap-2">
-						<input
-							type="checkbox"
-							checked={node.attrs?.checked || false}
-							readOnly
-							className="mt-1 h-4 w-4 rounded border-gray-300"
-						/>
-						<div className="flex-1">
-							{node.content?.map((child: any, i: number) => renderNode(child, i))}
-						</div>
-					</li>
-				);
-
-			case "blockquote":
-				return (
-					<blockquote key={key} className="my-6 border-l-4 border-primary pl-6 italic text-muted-foreground">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</blockquote>
-				);
-
-			case "codeBlock":
-				const language = node.attrs?.language || "text";
-				return (
-					<pre key={key} className="my-6 overflow-x-auto rounded-lg bg-muted p-4">
-						<code className="font-mono text-sm" data-language={language}>
-							{node.content?.map((child: any, i: number) =>
-								child.type === "text" ? child.text : renderNode(child, i)
-							)}
-						</code>
-					</pre>
-				);
-
-			case "table":
-				return (
-					<div key={key} className="my-6 overflow-x-auto">
-						<table className="w-full border-collapse border border-border">
-							<tbody>
-								{node.content?.map((child: any, i: number) => renderNode(child, i))}
-							</tbody>
-						</table>
-					</div>
-				);
-
-			case "tableRow":
-				return (
-					<tr key={key} className="border-b border-border">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</tr>
-				);
-
-			case "tableCell":
-				return (
-					<td key={key} className="border border-border px-4 py-2">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</td>
-				);
-
-			case "tableHeader":
-				return (
-					<th key={key} className="border border-border bg-muted px-4 py-2 font-bold text-left">
-						{node.content?.map((child: any, i: number) => renderNode(child, i))}
-					</th>
-				);
-
-			case "hardBreak":
-				return <br key={key} />;
-
-			default:
-				console.warn("Unhandled node type:", node.type);
-				return null;
-		}
-	};
-
-	return (
-		<div className="content-renderer">
-			{parsedContent.content.map((node: any, index: number) => renderNode(node, index))}
-		</div>
 	);
 }

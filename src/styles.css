@@ -180,4 +180,108 @@ code {
         @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
         max-width: 1280px;
     }
+
+    .section-spacing {
+        @apply relative py-16 md:py-24;
+    }
+
+    .section-heading {
+        @apply flex flex-col gap-3 text-center md:text-left;
+    }
+
+    .section-heading__eyebrow {
+        @apply inline-flex items-center gap-2 self-center md:self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary;
+    }
+
+    .section-heading__title {
+        @apply text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl;
+    }
+
+    .section-heading__description {
+        @apply text-base md:text-lg text-muted-foreground max-w-2xl;
+    }
+
+    .card-surface {
+        @apply rounded-2xl border border-border bg-card shadow-md transition-shadow;
+    }
+
+    .card-surface:hover {
+        @apply shadow-xl;
+    }
+
+    .surface-muted {
+        @apply rounded-2xl border border-border/60 bg-muted/60;
+    }
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@layer utilities {
+    .animate-fade-up {
+        animation: fade-up 0.4s ease-out both;
+    }
+
+    .animate-scale-in {
+        animation: scale-in 0.35s ease-out both;
+    }
+
+    .animate-stagger > * {
+        animation: fade-up 0.45s ease-out both;
+    }
+
+    .animate-stagger > *:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .animate-stagger > *:nth-child(2) {
+        animation-delay: 0.05s;
+    }
+
+    .animate-stagger > *:nth-child(3) {
+        animation-delay: 0.1s;
+    }
+
+    .animate-stagger > *:nth-child(4) {
+        animation-delay: 0.15s;
+    }
+
+    .animate-stagger > *:nth-child(5) {
+        animation-delay: 0.2s;
+    }
+
+    .animate-stagger > *:nth-child(6) {
+        animation-delay: 0.25s;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    .animate-scale-in,
+    .animate-stagger > * {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        animation-name: none !important;
+    }
 }

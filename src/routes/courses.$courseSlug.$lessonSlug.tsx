@@ -1,16 +1,17 @@
+import { SignInButton } from "@clerk/clerk-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
 	CheckCircle2,
+	ChevronRight,
 	Circle,
 	Clock,
+	FileText,
 	Lock,
 	PlayCircle,
-	FileText,
-	ChevronRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { SignInButton } from "@clerk/clerk-react";
+import type { Doc } from "../../convex/_generated/dataModel";
 import { SEO } from "../components/common/SEO";
 import { LessonVideoPlayer } from "../components/common/VideoPlayer";
 import { Badge } from "../components/ui/badge";
@@ -18,15 +19,14 @@ import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { useAuth } from "../hooks/useAuth";
+import { useChaptersByCourse } from "../hooks/useChapters";
 import { useCourseBySlug } from "../hooks/useCourses";
 import { useLessonsByCourse } from "../hooks/useLessons";
-import { useChaptersByCourse } from "../hooks/useChapters";
 import {
-	useUserCourseProgress,
-	useToggleLessonCompletion,
 	useLessonCompletion,
+	useToggleLessonCompletion,
+	useUserCourseProgress,
 } from "../hooks/useProgress";
-import type { Doc } from "../../convex/_generated/dataModel";
 import { cn } from "../lib/utils";
 
 type EnrichedCourse = Doc<"courses"> & {
@@ -36,9 +36,11 @@ type EnrichedCourse = Doc<"courses"> & {
 type LessonDoc = Doc<"lessons">;
 type ChapterDoc = Doc<"chapters">;
 
-export const Route = createFileRoute("/courses/$courseSlug/$lessonSlug" as any)({
-	component: LessonPage,
-});
+export const Route = createFileRoute("/courses/$courseSlug/$lessonSlug" as any)(
+	{
+		component: LessonPage,
+	},
+);
 
 function LessonPage() {
 	const params = Route.useParams();
@@ -47,11 +49,20 @@ function LessonPage() {
 	const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
 	// Fetch course data
-	const course = useCourseBySlug(courseSlug) as EnrichedCourse | null | undefined;
+	const course = useCourseBySlug(courseSlug) as
+		| EnrichedCourse
+		| null
+		| undefined;
 
 	// Only fetch lessons/chapters if we have a course ID
-	const lessons = useLessonsByCourse(course?._id, { publishedOnly: true }) as LessonDoc[] | null | undefined;
-	const chapters = useChaptersByCourse(course?._id, { publishedOnly: true }) as ChapterDoc[] | null | undefined;
+	const lessons = useLessonsByCourse(course?._id, { publishedOnly: true }) as
+		| LessonDoc[]
+		| null
+		| undefined;
+	const chapters = useChaptersByCourse(course?._id, { publishedOnly: true }) as
+		| ChapterDoc[]
+		| null
+		| undefined;
 
 	// Get current lesson
 	const currentLesson = lessons?.find((l) => l.slug === lessonSlug);
@@ -108,7 +119,8 @@ function LessonPage() {
 					<Lock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
 					<h1 className="text-2xl font-bold mb-2">Authentication Required</h1>
 					<p className="text-muted-foreground mb-6">
-						Please sign in to access this lesson. Some lessons are available for free preview.
+						Please sign in to access this lesson. Some lessons are available for
+						free preview.
 					</p>
 					<SignInButton mode="modal">
 						<Button>Sign In</Button>
@@ -138,8 +150,10 @@ function LessonPage() {
 
 	// Calculate progress
 	const totalLessons = lessons?.length || 0;
-	const completedCount = progressRecords?.filter((p) => p.isCompleted).length || 0;
-	const progressPercentage = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+	const completedCount =
+		progressRecords?.filter((p) => p.isCompleted).length || 0;
+	const progressPercentage =
+		totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
 	return (
 		<>
@@ -158,15 +172,24 @@ function LessonPage() {
 					)}
 				>
 					<div className="p-4 border-b border-border">
-						<Button variant="ghost" size="sm" asChild className="mb-3 w-full justify-start">
+						<Button
+							variant="ghost"
+							size="sm"
+							asChild
+							className="mb-3 w-full justify-start"
+						>
 							<Link to="/courses/$slug" params={{ slug: course.slug }}>
 								<ArrowLeft className="mr-2 h-4 w-4" />
 								Back to Course
 							</Link>
 						</Button>
-						<h2 className="font-semibold text-sm line-clamp-2 mb-2">{course.title}</h2>
+						<h2 className="font-semibold text-sm line-clamp-2 mb-2">
+							{course.title}
+						</h2>
 						<div className="flex items-center gap-2 text-xs text-muted-foreground">
-							<span>{completedCount} / {totalLessons} lessons</span>
+							<span>
+								{completedCount} / {totalLessons} lessons
+							</span>
 							<span>•</span>
 							<span>{progressPercentage}% complete</span>
 						</div>
@@ -182,9 +205,10 @@ function LessonPage() {
 						<div className="p-4 space-y-4">
 							{/* Chapters with lessons */}
 							{sortedChapters.map((chapter, chapterIndex) => {
-								const chapterLessons = lessons
-									?.filter((l) => l.chapterId === chapter._id)
-									.sort((a, b) => a.order - b.order) || [];
+								const chapterLessons =
+									lessons
+										?.filter((l) => l.chapterId === chapter._id)
+										.sort((a, b) => a.order - b.order) || [];
 
 								return (
 									<div key={chapter._id}>
@@ -201,7 +225,10 @@ function LessonPage() {
 													lesson={lesson}
 													course={course}
 													isActive={lesson._id === currentLesson._id}
-													isCompleted={useLessonCompletion(progressRecords, lesson._id)}
+													isCompleted={useLessonCompletion(
+														progressRecords,
+														lesson._id,
+													)}
 													onToggleCompletion={async () => {
 														if (user?.id && course?._id) {
 															await toggleCompletion({
@@ -229,7 +256,10 @@ function LessonPage() {
 												lesson={lesson}
 												course={course}
 												isActive={lesson._id === currentLesson._id}
-												isCompleted={useLessonCompletion(progressRecords, lesson._id)}
+												isCompleted={useLessonCompletion(
+													progressRecords,
+													lesson._id,
+												)}
 												onToggleCompletion={async () => {
 													if (user?.id && course?._id) {
 														await toggleCompletion({
@@ -255,9 +285,13 @@ function LessonPage() {
 						<div className="mb-6">
 							<div className="flex items-start justify-between gap-4 mb-4">
 								<div className="flex-1">
-									<h1 className="text-3xl font-bold mb-2">{currentLesson.title}</h1>
+									<h1 className="text-3xl font-bold mb-2">
+										{currentLesson.title}
+									</h1>
 									{currentLesson.description && (
-										<p className="text-muted-foreground">{currentLesson.description}</p>
+										<p className="text-muted-foreground">
+											{currentLesson.description}
+										</p>
 									)}
 								</div>
 								{isAuthenticated && (
@@ -290,14 +324,15 @@ function LessonPage() {
 									</div>
 								)}
 								{currentLesson.isFree && (
-									<Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+									<Badge
+										variant="secondary"
+										className="bg-green-500/10 text-green-700 dark:text-green-400"
+									>
 										Free Preview
 									</Badge>
 								)}
 								{!isAuthenticated && currentLesson.isFree && (
-									<Badge variant="outline">
-										Sign in to track progress
-									</Badge>
+									<Badge variant="outline">Sign in to track progress</Badge>
 								)}
 							</div>
 						</div>
@@ -328,7 +363,8 @@ function LessonPage() {
 										to="/courses/$courseSlug/$lessonSlug"
 										params={{
 											courseSlug: course.slug,
-											lessonSlug: getPreviousLesson(lessons, currentLesson)?.slug || "",
+											lessonSlug:
+												getPreviousLesson(lessons, currentLesson)?.slug || "",
 										}}
 									>
 										<ArrowLeft className="mr-2 h-4 w-4" />
@@ -345,7 +381,8 @@ function LessonPage() {
 										to="/courses/$courseSlug/$lessonSlug"
 										params={{
 											courseSlug: course.slug,
-											lessonSlug: getNextLesson(lessons, currentLesson)?.slug || "",
+											lessonSlug:
+												getNextLesson(lessons, currentLesson)?.slug || "",
 										}}
 									>
 										Next Lesson
@@ -433,7 +470,9 @@ function getPreviousLesson(
 ): LessonDoc | null {
 	if (!lessons) return null;
 	const sortedLessons = [...lessons].sort((a, b) => a.order - b.order);
-	const currentIndex = sortedLessons.findIndex((l) => l._id === currentLesson._id);
+	const currentIndex = sortedLessons.findIndex(
+		(l) => l._id === currentLesson._id,
+	);
 	return currentIndex > 0 ? sortedLessons[currentIndex - 1] : null;
 }
 
@@ -443,6 +482,10 @@ function getNextLesson(
 ): LessonDoc | null {
 	if (!lessons) return null;
 	const sortedLessons = [...lessons].sort((a, b) => a.order - b.order);
-	const currentIndex = sortedLessons.findIndex((l) => l._id === currentLesson._id);
-	return currentIndex < sortedLessons.length - 1 ? sortedLessons[currentIndex + 1] : null;
+	const currentIndex = sortedLessons.findIndex(
+		(l) => l._id === currentLesson._id,
+	);
+	return currentIndex < sortedLessons.length - 1
+		? sortedLessons[currentIndex + 1]
+		: null;
 }

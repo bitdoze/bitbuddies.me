@@ -1,8 +1,18 @@
-import { Link } from "@tanstack/react-router";
-import { BookOpen, Calendar, Home, Mail, Info, X, FileText, Shield, LayoutDashboard, Plus } from "lucide-react";
+import { Link, useMatchRoute } from "@tanstack/react-router";
+import {
+	BookOpen,
+	Calendar,
+	FileText,
+	Home,
+	Info,
+	LayoutDashboard,
+	Mail,
+	Plus,
+	Shield,
+	X,
+} from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 import {
 	Sidebar,
 	SidebarContent,
@@ -17,7 +27,9 @@ import {
 	SidebarRail,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/useAuth";
 import HeaderUser from "@/integrations/clerk/header-user";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
 	{
@@ -61,10 +73,11 @@ const menuItems = [
 export function AppSidebar() {
 	const { toggleSidebar } = useSidebar();
 	const { isAdmin } = useAuth();
+	const matchRoute = useMatchRoute();
 
 	return (
-		<Sidebar>
-			<SidebarHeader className="border-b border-sidebar-border p-4">
+		<Sidebar className="[&_[data-sidebar=sidebar]]:bg-gradient-to-b [&_[data-sidebar=sidebar]]:from-sidebar/80 [&_[data-sidebar=sidebar]]:to-sidebar/60">
+			<SidebarHeader className="border-b border-sidebar-border/70 p-4 backdrop-blur">
 				<div className="flex items-center justify-between gap-2 w-full">
 					<Link to="/" className="flex items-center gap-2 flex-1">
 						<Logo className="h-10 w-auto" />
@@ -80,68 +93,113 @@ export function AppSidebar() {
 					</Button>
 				</div>
 			</SidebarHeader>
-			<SidebarContent>
+			<SidebarContent className="space-y-6 py-4">
 				<SidebarGroup>
-					<SidebarGroupLabel>Navigation</SidebarGroupLabel>
+					<SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
+						Navigation
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{menuItems.map((item) => (
-								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild>
-										{item.isRoute ? (
-											<Link to={item.url}>
-												<item.icon />
-												<span>{item.title}</span>
-											</Link>
-										) : (
-											<a href={item.url}>
-												<item.icon />
-												<span>{item.title}</span>
-											</a>
-										)}
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
+							{menuItems.map((item) => {
+								const isActive =
+									item.isRoute &&
+									matchRoute({ to: item.url as any, fuzzy: item.url !== "/" });
+
+								return (
+									<SidebarMenuItem key={item.title}>
+										<SidebarMenuButton
+											asChild
+											className={cn(
+												"group relative overflow-hidden rounded-xl border border-transparent bg-transparent px-3 py-2 text-sm font-medium transition-all",
+												isActive
+													? "bg-primary/15 text-primary shadow-sm"
+													: "hover:border-sidebar-border hover:bg-sidebar-accent/40",
+											)}
+											data-active={isActive ? "true" : undefined}
+										>
+											{item.isRoute ? (
+												<Link to={item.url} className="flex items-center gap-3">
+													<item.icon
+														className={cn(
+															"h-4 w-4 transition-transform",
+															isActive && "scale-110",
+														)}
+													/>
+													<span>{item.title}</span>
+												</Link>
+											) : (
+												<a href={item.url} className="flex items-center gap-3">
+													<item.icon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+													<span>{item.title}</span>
+												</a>
+											)}
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								);
+							})}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
 
 				{isAdmin && (
 					<SidebarGroup>
-						<SidebarGroupLabel className="flex items-center gap-2">
+						<SidebarGroupLabel className="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
 							<Shield className="h-4 w-4" />
 							Admin Panel
+							<Button
+								asChild
+								size="sm"
+								variant="outline"
+								className="gap-1 rounded-full border-sidebar-border/70 px-3 py-1 text-xs"
+							>
+								<Link to="/admin/workshops/create">
+									<Plus className="h-3 w-3" />
+									New
+								</Link>
+							</Button>
 						</SidebarGroupLabel>
 						<SidebarGroupContent>
 							<SidebarMenu>
 								<SidebarMenuItem>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
 										<Link to="/admin" {...({} as any)}>
-											<LayoutDashboard />
+											<LayoutDashboard className="h-4 w-4" />
 											<span>Dashboard</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
 										<Link to="/admin/posts">
-											<FileText />
+											<FileText className="h-4 w-4" />
 											<span>Manage Posts</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
 										<Link to="/admin/workshops">
-											<Calendar />
+											<Calendar className="h-4 w-4" />
 											<span>Manage Workshops</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
 								<SidebarMenuItem>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
 										<Link to="/admin/courses">
-											<BookOpen />
+											<BookOpen className="h-4 w-4" />
 											<span>Manage Courses</span>
 										</Link>
 									</SidebarMenuButton>
@@ -151,7 +209,7 @@ export function AppSidebar() {
 					</SidebarGroup>
 				)}
 			</SidebarContent>
-			<SidebarFooter className="border-t border-sidebar-border p-4">
+			<SidebarFooter className="border-t border-sidebar-border/70 p-4 backdrop-blur">
 				<div className="flex flex-col gap-2">
 					<HeaderUser />
 					<p className="text-xs text-sidebar-foreground/60">

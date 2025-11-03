@@ -1,8 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Plus, AlertCircle, FileText, Settings, Video, Lock, Eye } from "lucide-react";
+import {
+	AlertCircle,
+	ArrowLeft,
+	Eye,
+	FileText,
+	Lock,
+	Plus,
+	Settings,
+	Video,
+} from "lucide-react";
 import { useState } from "react";
+import type { JSONContent } from "@/components/kibo-ui/editor";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ImageUpload } from "../components/common/ImageUpload";
+import {
+	createEmptyContent,
+	RichTextEditor,
+} from "../components/common/RichTextEditor";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -19,8 +33,6 @@ import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
 import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useCreateWorkshop } from "../hooks/useWorkshops";
-import { RichTextEditor, createEmptyContent } from "../components/common/RichTextEditor";
-import type { JSONContent } from "@/components/kibo-ui/editor";
 
 export const Route = createFileRoute("/admin/workshops/create")({
 	component: CreateWorkshopPage,
@@ -207,7 +219,9 @@ function CreateWorkshopPage() {
 							<div className="rounded-lg bg-primary/10 p-2 text-primary">
 								<Plus className="h-6 w-6" />
 							</div>
-							<h1 className="text-3xl md:text-4xl font-bold">Create New Workshop</h1>
+							<h1 className="text-3xl md:text-4xl font-bold">
+								Create New Workshop
+							</h1>
 						</div>
 						<p className="text-lg text-muted-foreground">
 							Add a new workshop with all the details and content
@@ -234,370 +248,385 @@ function CreateWorkshopPage() {
 									<h2 className="text-2xl font-bold">Basic Information</h2>
 								</div>
 								<div className="space-y-4">
-
-								<ImageUpload
-									value={coverAssetId}
-									imageUrl={coverAsset?.url}
-									onChange={setCoverAssetId}
-									label="Cover Image"
-									disabled={isSubmitting}
-								/>
-
-								<div className="space-y-2">
-									<Label htmlFor="title">Title *</Label>
-									<Input
-										id="title"
-										value={formData.title}
-										onChange={(e) => handleTitleChange(e.target.value)}
-										placeholder="Workshop title"
-										required
+									<ImageUpload
+										value={coverAssetId}
+										imageUrl={coverAsset?.url}
+										onChange={setCoverAssetId}
+										label="Cover Image"
+										disabled={isSubmitting}
 									/>
-								</div>
-
-								<div className="space-y-2">
-									<Label htmlFor="slug">Slug *</Label>
-									<Input
-										id="slug"
-										value={formData.slug}
-										onChange={(e) =>
-											setFormData({ ...formData, slug: e.target.value })
-										}
-										placeholder="workshop-slug"
-										required
-									/>
-									<p className="text-sm text-muted-foreground">
-										URL-friendly identifier (auto-generated from title)
-									</p>
-								</div>
-
-								<div className="space-y-2">
-									<Label htmlFor="shortDescription">Short Description</Label>
-									<Input
-										id="shortDescription"
-										value={formData.shortDescription}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												shortDescription: e.target.value,
-											})
-										}
-										placeholder="Brief one-line description"
-									/>
-								</div>
-
-								<div className="space-y-2">
-									<Label htmlFor="description">Description *</Label>
-									<Textarea
-										id="description"
-										value={formData.description}
-										onChange={(e) =>
-											setFormData({ ...formData, description: e.target.value })
-										}
-										placeholder="Detailed workshop description"
-										rows={4}
-										required
-									/>
-								</div>
-
-								<div className="space-y-2">
-									<Label htmlFor="content">Content *</Label>
-									<div className="min-h-[500px]">
-										<RichTextEditor
-											content={content}
-											onChange={setContent}
-											placeholder="Write the full workshop content with rich formatting..."
-											className="min-h-[500px]"
-										/>
-									</div>
-									<p className="text-sm text-muted-foreground">
-										Use the editor toolbar for rich text formatting
-									</p>
-								</div>
-							</div>
-
-							{/* Workshop Details */}
-							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-								<div className="mb-6 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Settings className="h-5 w-5" />
-									</div>
-									<h2 className="text-2xl font-bold">Workshop Details</h2>
-								</div>
-								<div className="space-y-4">
-									<div className="grid grid-cols-2 gap-4">
-									<div className="space-y-2">
-										<Label htmlFor="level">Level *</Label>
-										<Select
-											value={formData.level}
-											onValueChange={(value: any) =>
-												setFormData({ ...formData, level: value })
-											}
-										>
-											<SelectTrigger id="level">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="beginner">Beginner</SelectItem>
-												<SelectItem value="intermediate">
-													Intermediate
-												</SelectItem>
-												<SelectItem value="advanced">Advanced</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
 
 									<div className="space-y-2">
-										<Label htmlFor="duration">Duration (minutes)</Label>
+										<Label htmlFor="title">Title *</Label>
 										<Input
-											id="duration"
-											type="number"
-											value={formData.duration}
-											onChange={(e) =>
-												setFormData({ ...formData, duration: e.target.value })
-											}
-											placeholder="120"
+											id="title"
+											value={formData.title}
+											onChange={(e) => handleTitleChange(e.target.value)}
+											placeholder="Workshop title"
+											required
 										/>
-									</div>
 									</div>
 
 									<div className="space-y-2">
-										<Label htmlFor="category">Category</Label>
+										<Label htmlFor="slug">Slug *</Label>
 										<Input
-											id="category"
-											value={formData.category}
+											id="slug"
+											value={formData.slug}
 											onChange={(e) =>
-												setFormData({ ...formData, category: e.target.value })
+												setFormData({ ...formData, slug: e.target.value })
 											}
-											placeholder="Web Development, AI, etc."
+											placeholder="workshop-slug"
+											required
 										/>
-									</div>
-
-									<div className="space-y-2">
-										<Label htmlFor="tags">Tags</Label>
-										<Input
-											id="tags"
-											value={formData.tags}
-											onChange={(e) =>
-												setFormData({ ...formData, tags: e.target.value })
-											}
-											placeholder="react, typescript, hooks (comma-separated)"
-										/>
-									</div>
-								</div>
-							</div>
-
-							{/* Event Details */}
-							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-								<div className="mb-6 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Settings className="h-5 w-5" />
-									</div>
-									<h2 className="text-2xl font-bold">Event Details</h2>
-								</div>
-								<div className="space-y-4">
-									<div className="flex items-center space-x-2">
-									<Switch
-										id="isLive"
-										checked={formData.isLive}
-										onCheckedChange={(checked) =>
-											setFormData({ ...formData, isLive: checked })
-										}
-									/>
-										<Label htmlFor="isLive">This is a live workshop</Label>
-									</div>
-
-									{formData.isLive && (
-										<div className="grid grid-cols-2 gap-4">
-										<div className="space-y-2">
-											<Label htmlFor="startDate">Start Date</Label>
-											<Input
-												id="startDate"
-												type="datetime-local"
-												value={formData.startDate}
-												onChange={(e) =>
-													setFormData({
-														...formData,
-														startDate: e.target.value,
-													})
-												}
-											/>
-										</div>
-
-										<div className="space-y-2">
-											<Label htmlFor="endDate">End Date</Label>
-											<Input
-												id="endDate"
-												type="datetime-local"
-												value={formData.endDate}
-												onChange={(e) =>
-													setFormData({ ...formData, endDate: e.target.value })
-												}
-											/>
-										</div>
-
-										<div className="space-y-2">
-											<Label htmlFor="maxParticipants">Max Participants</Label>
-											<Input
-												id="maxParticipants"
-												type="number"
-												value={formData.maxParticipants}
-												onChange={(e) =>
-													setFormData({
-														...formData,
-														maxParticipants: e.target.value,
-													})
-												}
-												placeholder="50"
-											/>
-											</div>
-										</div>
-									)}
-								</div>
-							</div>
-
-							{/* Video Details */}
-							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-								<div className="mb-6 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Video className="h-5 w-5" />
-									</div>
-									<h2 className="text-2xl font-bold">Video Recording (Optional)</h2>
-								</div>
-								<div className="space-y-4">
-									<div className="grid grid-cols-2 gap-4">
-									<div className="space-y-2">
-										<Label htmlFor="videoProvider">Video Provider</Label>
-										<Select
-											value={formData.videoProvider}
-											onValueChange={(value: any) =>
-												setFormData({ ...formData, videoProvider: value })
-											}
-										>
-											<SelectTrigger id="videoProvider">
-												<SelectValue placeholder="Select provider" />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="youtube">YouTube</SelectItem>
-												<SelectItem value="bunny">Bunny Stream</SelectItem>
-											</SelectContent>
-										</Select>
-									</div>
-
-									<div className="space-y-2">
-										<Label htmlFor="videoId">Video ID</Label>
-										<Input
-											id="videoId"
-											value={formData.videoId}
-											onChange={(e) =>
-												setFormData({ ...formData, videoId: e.target.value })
-											}
-											placeholder="dQw4w9WgXcQ"
-										/>
-									</div>
-								</div>
-
-								<div className="space-y-2">
-									<Label htmlFor="videoUrl">
-										Video URL (Full URL or Embed URL)
-									</Label>
-									<Input
-										id="videoUrl"
-										value={formData.videoUrl}
-										onChange={(e) =>
-											setFormData({ ...formData, videoUrl: e.target.value })
-										}
-										placeholder="https://www.youtube.com/watch?v=... or https://www.youtube.com/embed/..."
-									/>
 										<p className="text-sm text-muted-foreground">
-											Paste any YouTube URL - it will be converted to embed format
-											automatically
+											URL-friendly identifier (auto-generated from title)
+										</p>
+									</div>
+
+									<div className="space-y-2">
+										<Label htmlFor="shortDescription">Short Description</Label>
+										<Input
+											id="shortDescription"
+											value={formData.shortDescription}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													shortDescription: e.target.value,
+												})
+											}
+											placeholder="Brief one-line description"
+										/>
+									</div>
+
+									<div className="space-y-2">
+										<Label htmlFor="description">Description *</Label>
+										<Textarea
+											id="description"
+											value={formData.description}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													description: e.target.value,
+												})
+											}
+											placeholder="Detailed workshop description"
+											rows={4}
+											required
+										/>
+									</div>
+
+									<div className="space-y-2">
+										<Label htmlFor="content">Content *</Label>
+										<div className="min-h-[500px]">
+											<RichTextEditor
+												content={content}
+												onChange={setContent}
+												placeholder="Write the full workshop content with rich formatting..."
+												className="min-h-[500px]"
+											/>
+										</div>
+										<p className="text-sm text-muted-foreground">
+											Use the editor toolbar for rich text formatting
 										</p>
 									</div>
 								</div>
-							</div>
 
-							{/* Access Control */}
-							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-								<div className="mb-6 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Lock className="h-5 w-5" />
+								{/* Workshop Details */}
+								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+									<div className="mb-6 flex items-center gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<Settings className="h-5 w-5" />
+										</div>
+										<h2 className="text-2xl font-bold">Workshop Details</h2>
 									</div>
-									<h2 className="text-2xl font-bold">Access Control</h2>
-								</div>
-								<div className="space-y-4">
-									<div className="space-y-2">
-									<Label htmlFor="accessLevel">Access Level *</Label>
-									<Select
-										value={formData.accessLevel}
-										onValueChange={(value: any) =>
-											setFormData({ ...formData, accessLevel: value })
-										}
-									>
-										<SelectTrigger id="accessLevel">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="public">Public</SelectItem>
-											<SelectItem value="authenticated">
-												Authenticated Users
-											</SelectItem>
-											<SelectItem value="subscription">
-												Subscription Only
-											</SelectItem>
-										</SelectContent>
-									</Select>
-									</div>
+									<div className="space-y-4">
+										<div className="grid grid-cols-2 gap-4">
+											<div className="space-y-2">
+												<Label htmlFor="level">Level *</Label>
+												<Select
+													value={formData.level}
+													onValueChange={(value: any) =>
+														setFormData({ ...formData, level: value })
+													}
+												>
+													<SelectTrigger id="level">
+														<SelectValue />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="beginner">Beginner</SelectItem>
+														<SelectItem value="intermediate">
+															Intermediate
+														</SelectItem>
+														<SelectItem value="advanced">Advanced</SelectItem>
+													</SelectContent>
+												</Select>
+											</div>
 
-									{formData.accessLevel === "subscription" && (
+											<div className="space-y-2">
+												<Label htmlFor="duration">Duration (minutes)</Label>
+												<Input
+													id="duration"
+													type="number"
+													value={formData.duration}
+													onChange={(e) =>
+														setFormData({
+															...formData,
+															duration: e.target.value,
+														})
+													}
+													placeholder="120"
+												/>
+											</div>
+										</div>
+
 										<div className="space-y-2">
-										<Label htmlFor="requiredTier">Required Tier</Label>
-										<Select
-											value={formData.requiredTier}
-											onValueChange={(value: any) =>
-												setFormData({ ...formData, requiredTier: value })
-											}
-										>
-											<SelectTrigger id="requiredTier">
-												<SelectValue placeholder="Select tier" />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="basic">Basic</SelectItem>
-												<SelectItem value="premium">Premium</SelectItem>
-											</SelectContent>
+											<Label htmlFor="category">Category</Label>
+											<Input
+												id="category"
+												value={formData.category}
+												onChange={(e) =>
+													setFormData({ ...formData, category: e.target.value })
+												}
+												placeholder="Web Development, AI, etc."
+											/>
+										</div>
+
+										<div className="space-y-2">
+											<Label htmlFor="tags">Tags</Label>
+											<Input
+												id="tags"
+												value={formData.tags}
+												onChange={(e) =>
+													setFormData({ ...formData, tags: e.target.value })
+												}
+												placeholder="react, typescript, hooks (comma-separated)"
+											/>
+										</div>
+									</div>
+								</div>
+
+								{/* Event Details */}
+								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+									<div className="mb-6 flex items-center gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<Settings className="h-5 w-5" />
+										</div>
+										<h2 className="text-2xl font-bold">Event Details</h2>
+									</div>
+									<div className="space-y-4">
+										<div className="flex items-center space-x-2">
+											<Switch
+												id="isLive"
+												checked={formData.isLive}
+												onCheckedChange={(checked) =>
+													setFormData({ ...formData, isLive: checked })
+												}
+											/>
+											<Label htmlFor="isLive">This is a live workshop</Label>
+										</div>
+
+										{formData.isLive && (
+											<div className="grid grid-cols-2 gap-4">
+												<div className="space-y-2">
+													<Label htmlFor="startDate">Start Date</Label>
+													<Input
+														id="startDate"
+														type="datetime-local"
+														value={formData.startDate}
+														onChange={(e) =>
+															setFormData({
+																...formData,
+																startDate: e.target.value,
+															})
+														}
+													/>
+												</div>
+
+												<div className="space-y-2">
+													<Label htmlFor="endDate">End Date</Label>
+													<Input
+														id="endDate"
+														type="datetime-local"
+														value={formData.endDate}
+														onChange={(e) =>
+															setFormData({
+																...formData,
+																endDate: e.target.value,
+															})
+														}
+													/>
+												</div>
+
+												<div className="space-y-2">
+													<Label htmlFor="maxParticipants">
+														Max Participants
+													</Label>
+													<Input
+														id="maxParticipants"
+														type="number"
+														value={formData.maxParticipants}
+														onChange={(e) =>
+															setFormData({
+																...formData,
+																maxParticipants: e.target.value,
+															})
+														}
+														placeholder="50"
+													/>
+												</div>
+											</div>
+										)}
+									</div>
+								</div>
+
+								{/* Video Details */}
+								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+									<div className="mb-6 flex items-center gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<Video className="h-5 w-5" />
+										</div>
+										<h2 className="text-2xl font-bold">
+											Video Recording (Optional)
+										</h2>
+									</div>
+									<div className="space-y-4">
+										<div className="grid grid-cols-2 gap-4">
+											<div className="space-y-2">
+												<Label htmlFor="videoProvider">Video Provider</Label>
+												<Select
+													value={formData.videoProvider}
+													onValueChange={(value: any) =>
+														setFormData({ ...formData, videoProvider: value })
+													}
+												>
+													<SelectTrigger id="videoProvider">
+														<SelectValue placeholder="Select provider" />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="youtube">YouTube</SelectItem>
+														<SelectItem value="bunny">Bunny Stream</SelectItem>
+													</SelectContent>
+												</Select>
+											</div>
+
+											<div className="space-y-2">
+												<Label htmlFor="videoId">Video ID</Label>
+												<Input
+													id="videoId"
+													value={formData.videoId}
+													onChange={(e) =>
+														setFormData({
+															...formData,
+															videoId: e.target.value,
+														})
+													}
+													placeholder="dQw4w9WgXcQ"
+												/>
+											</div>
+										</div>
+
+										<div className="space-y-2">
+											<Label htmlFor="videoUrl">
+												Video URL (Full URL or Embed URL)
+											</Label>
+											<Input
+												id="videoUrl"
+												value={formData.videoUrl}
+												onChange={(e) =>
+													setFormData({ ...formData, videoUrl: e.target.value })
+												}
+												placeholder="https://www.youtube.com/watch?v=... or https://www.youtube.com/embed/..."
+											/>
+											<p className="text-sm text-muted-foreground">
+												Paste any YouTube URL - it will be converted to embed
+												format automatically
+											</p>
+										</div>
+									</div>
+								</div>
+
+								{/* Access Control */}
+								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+									<div className="mb-6 flex items-center gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<Lock className="h-5 w-5" />
+										</div>
+										<h2 className="text-2xl font-bold">Access Control</h2>
+									</div>
+									<div className="space-y-4">
+										<div className="space-y-2">
+											<Label htmlFor="accessLevel">Access Level *</Label>
+											<Select
+												value={formData.accessLevel}
+												onValueChange={(value: any) =>
+													setFormData({ ...formData, accessLevel: value })
+												}
+											>
+												<SelectTrigger id="accessLevel">
+													<SelectValue />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="public">Public</SelectItem>
+													<SelectItem value="authenticated">
+														Authenticated Users
+													</SelectItem>
+													<SelectItem value="subscription">
+														Subscription Only
+													</SelectItem>
+												</SelectContent>
 											</Select>
 										</div>
-									)}
-								</div>
-							</div>
 
-							{/* Publishing Options */}
-							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-								<div className="mb-6 flex items-center gap-3">
-									<div className="rounded-lg bg-primary/10 p-2 text-primary">
-										<Eye className="h-5 w-5" />
+										{formData.accessLevel === "subscription" && (
+											<div className="space-y-2">
+												<Label htmlFor="requiredTier">Required Tier</Label>
+												<Select
+													value={formData.requiredTier}
+													onValueChange={(value: any) =>
+														setFormData({ ...formData, requiredTier: value })
+													}
+												>
+													<SelectTrigger id="requiredTier">
+														<SelectValue placeholder="Select tier" />
+													</SelectTrigger>
+													<SelectContent>
+														<SelectItem value="basic">Basic</SelectItem>
+														<SelectItem value="premium">Premium</SelectItem>
+													</SelectContent>
+												</Select>
+											</div>
+										)}
 									</div>
-									<h2 className="text-2xl font-bold">Publishing Options</h2>
 								</div>
-								<div className="space-y-4">
-									<div className="flex items-center space-x-2">
-										<Switch
-											id="isPublished"
-											checked={formData.isPublished}
-											onCheckedChange={(checked) =>
-												setFormData({ ...formData, isPublished: checked })
-											}
-										/>
-										<Label htmlFor="isPublished">Publish immediately</Label>
-									</div>
 
-									<div className="flex items-center space-x-2">
-										<Switch
-											id="isFeatured"
-											checked={formData.isFeatured}
-											onCheckedChange={(checked) =>
-												setFormData({ ...formData, isFeatured: checked })
-											}
-										/>
+								{/* Publishing Options */}
+								<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+									<div className="mb-6 flex items-center gap-3">
+										<div className="rounded-lg bg-primary/10 p-2 text-primary">
+											<Eye className="h-5 w-5" />
+										</div>
+										<h2 className="text-2xl font-bold">Publishing Options</h2>
+									</div>
+									<div className="space-y-4">
+										<div className="flex items-center space-x-2">
+											<Switch
+												id="isPublished"
+												checked={formData.isPublished}
+												onCheckedChange={(checked) =>
+													setFormData({ ...formData, isPublished: checked })
+												}
+											/>
+											<Label htmlFor="isPublished">Publish immediately</Label>
+										</div>
+
+										<div className="flex items-center space-x-2">
+											<Switch
+												id="isFeatured"
+												checked={formData.isFeatured}
+												onCheckedChange={(checked) =>
+													setFormData({ ...formData, isFeatured: checked })
+												}
+											/>
 											<Label htmlFor="isFeatured">Feature this workshop</Label>
 										</div>
 									</div>
@@ -616,7 +645,12 @@ function CreateWorkshopPage() {
 									>
 										Cancel
 									</Button>
-									<Button type="submit" size="lg" disabled={isSubmitting} className="shadow-md">
+									<Button
+										type="submit"
+										size="lg"
+										disabled={isSubmitting}
+										className="shadow-md"
+									>
 										{isSubmitting ? "Creating..." : "Create Workshop"}
 									</Button>
 								</div>

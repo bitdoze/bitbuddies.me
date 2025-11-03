@@ -1,27 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMutation } from "convex/react";
+import {
+	AlertCircle,
+	CheckCircle2,
+	Clock,
+	Github,
+	Globe,
+	Mail,
+	MapPin,
+	MessageSquare,
+	Send,
+	Twitter,
+	Youtube,
+} from "lucide-react";
+import { useState } from "react";
+import { api } from "../../convex/_generated/api";
 import { SEO } from "../components/common/SEO";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
 import { Label } from "../components/ui/label";
-import { SITE_CONFIG, SOCIAL_LINKS } from "../lib/config";
-import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { useState } from "react";
+import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
-import {
-	Mail,
-	Github,
-	Twitter,
-	Youtube,
-	Globe,
-	Send,
-	CheckCircle2,
-	AlertCircle,
-	MapPin,
-	Clock,
-	MessageSquare,
-} from "lucide-react";
+import { SITE_CONFIG, SOCIAL_LINKS } from "../lib/config";
 
 export const Route = createFileRoute("/contact")({
 	component: ContactPage,
@@ -38,7 +38,9 @@ function ContactPage() {
 		message: "",
 	});
 
-	const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+	const [status, setStatus] = useState<
+		"idle" | "submitting" | "success" | "error"
+	>("idle");
 	const [errorMessage, setErrorMessage] = useState("");
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -69,7 +71,9 @@ function ContactPage() {
 		} catch (error) {
 			setStatus("error");
 			setErrorMessage(
-				error instanceof Error ? error.message : "Failed to send message. Please try again.",
+				error instanceof Error
+					? error.message
+					: "Failed to send message. Please try again.",
 			);
 		}
 	};
@@ -312,7 +316,12 @@ function ContactPage() {
 									Check out our blog for in-depth articles, tutorials, and tech
 									insights.
 								</p>
-								<Button variant="outline" size="sm" asChild className="w-full shadow-sm">
+								<Button
+									variant="outline"
+									size="sm"
+									asChild
+									className="w-full shadow-sm"
+								>
 									<a
 										href={SOCIAL_LINKS.blog}
 										target="_blank"
