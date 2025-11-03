@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import React from "react";
 import {
 	ArrowLeft,
 	Calendar,
@@ -497,12 +498,10 @@ function WorkshopPage() {
 										</div>
 										<h2 className="text-3xl font-bold">Workshop Content</h2>
 									</div>
-									<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
-										<div
-											className="prose prose-sm max-w-none dark:prose-invert"
-											dangerouslySetInnerHTML={{ __html: workshop.content }}
-										/>
-									</div>
+
+									<article className="prose prose-lg dark:prose-invert max-w-none">
+										<ContentRenderer content={workshop.content} />
+									</article>
 								</div>
 
 								{/* Attachments Section */}
@@ -670,5 +669,201 @@ function WorkshopPage() {
 				</section>
 			</div>
 		</>
+	);
+}
+
+// Content renderer for JSONContent with proper styling
+function ContentRenderer({ content }: { content: string }) {
+	let parsedContent: any;
+
+	try {
+		parsedContent = JSON.parse(content);
+	} catch {
+		// Fallback for old HTML content
+		return (
+			<div
+				className="prose prose-lg max-w-none dark:prose-invert"
+				dangerouslySetInnerHTML={{ __html: content }}
+			/>
+		);
+	}
+
+	if (!parsedContent || !parsedContent.content) {
+		return <p className="text-muted-foreground">No content available</p>;
+	}
+
+	const renderNode = (node: any, index: number): React.ReactNode => {
+		const key = `${node.type}-${index}`;
+
+		switch (node.type) {
+			case "paragraph":
+				return (
+					<p key={key} className="mb-4 leading-7">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</p>
+				);
+
+			case "heading":
+				const level = node.attrs?.level || 1;
+				const headingClasses: Record<number, string> = {
+					1: "text-4xl font-bold tracking-tight mb-6 mt-8",
+					2: "text-3xl font-bold tracking-tight mb-5 mt-7",
+					3: "text-2xl font-bold tracking-tight mb-4 mt-6",
+					4: "text-xl font-bold mb-3 mt-5",
+					5: "text-lg font-bold mb-3 mt-4",
+					6: "text-base font-bold mb-2 mt-4",
+				};
+				const className = headingClasses[level] || "text-base font-bold mb-2 mt-4";
+
+				return React.createElement(
+					`h${level}`,
+					{ key, className },
+					node.content?.map((child: any, i: number) => renderNode(child, i))
+				);
+
+			case "text":
+				let text: React.ReactNode = node.text;
+				if (node.marks) {
+					for (const mark of node.marks) {
+						switch (mark.type) {
+							case "bold":
+								text = <strong className="font-bold">{text}</strong>;
+								break;
+							case "italic":
+								text = <em className="italic">{text}</em>;
+								break;
+							case "underline":
+								text = <u className="underline">{text}</u>;
+								break;
+							case "strike":
+								text = <s className="line-through">{text}</s>;
+								break;
+							case "code":
+								text = <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">{text}</code>;
+								break;
+							case "link":
+								text = (
+									<a
+										href={mark.attrs?.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-primary underline underline-offset-4 hover:text-primary/80"
+									>
+										{text}
+									</a>
+								);
+								break;
+						}
+					}
+				}
+				return <span key={key}>{text}</span>;
+
+			case "bulletList":
+				return (
+					<ul key={key} className="my-6 ml-6 list-disc space-y-2">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</ul>
+				);
+
+			case "orderedList":
+				return (
+					<ol key={key} className="my-6 ml-6 list-decimal space-y-2" start={node.attrs?.start || 1}>
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</ol>
+				);
+
+			case "listItem":
+				return (
+					<li key={key} className="leading-7">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</li>
+				);
+
+			case "taskList":
+				return (
+					<ul key={key} className="my-6 ml-0 space-y-2 list-none">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</ul>
+				);
+
+			case "taskItem":
+				return (
+					<li key={key} className="flex items-start gap-2">
+						<input
+							type="checkbox"
+							checked={node.attrs?.checked || false}
+							readOnly
+							className="mt-1 h-4 w-4 rounded border-gray-300"
+						/>
+						<div className="flex-1">
+							{node.content?.map((child: any, i: number) => renderNode(child, i))}
+						</div>
+					</li>
+				);
+
+			case "blockquote":
+				return (
+					<blockquote key={key} className="my-6 border-l-4 border-primary pl-6 italic text-muted-foreground">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</blockquote>
+				);
+
+			case "codeBlock":
+				const language = node.attrs?.language || "text";
+				return (
+					<pre key={key} className="my-6 overflow-x-auto rounded-lg bg-muted p-4">
+						<code className="font-mono text-sm" data-language={language}>
+							{node.content?.map((child: any, i: number) =>
+								child.type === "text" ? child.text : renderNode(child, i)
+							)}
+						</code>
+					</pre>
+				);
+
+			case "table":
+				return (
+					<div key={key} className="my-6 overflow-x-auto">
+						<table className="w-full border-collapse border border-border">
+							<tbody>
+								{node.content?.map((child: any, i: number) => renderNode(child, i))}
+							</tbody>
+						</table>
+					</div>
+				);
+
+			case "tableRow":
+				return (
+					<tr key={key} className="border-b border-border">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</tr>
+				);
+
+			case "tableCell":
+				return (
+					<td key={key} className="border border-border px-4 py-2">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</td>
+				);
+
+			case "tableHeader":
+				return (
+					<th key={key} className="border border-border bg-muted px-4 py-2 font-bold text-left">
+						{node.content?.map((child: any, i: number) => renderNode(child, i))}
+					</th>
+				);
+
+			case "hardBreak":
+				return <br key={key} />;
+
+			default:
+				console.warn("Unhandled node type:", node.type);
+				return null;
+		}
+	};
+
+	return (
+		<div className="content-renderer">
+			{parsedContent.content.map((node: any, index: number) => renderNode(node, index))}
+		</div>
 	);
 }

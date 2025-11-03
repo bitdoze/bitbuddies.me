@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Calendar, Home, Mail, Info, X } from "lucide-react";
+import { BookOpen, Calendar, Home, Mail, Info, X, FileText } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,12 @@ const menuItems = [
 		title: "Workshops",
 		url: "/workshops",
 		icon: Calendar,
+		isRoute: true,
+	},
+	{
+		title: "Blog",
+		url: "/posts",
+		icon: FileText,
 		isRoute: true,
 	},
 	{

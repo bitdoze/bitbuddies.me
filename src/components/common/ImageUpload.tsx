@@ -49,12 +49,14 @@ export function ImageUpload({
 			return;
 		}
 
+		console.log("Selected file:", file.name, file.type, file.size);
 		setSelectedFile(file);
 
 		// Create preview URL
 		const reader = new FileReader();
 		reader.onloadend = () => {
 			setPreviewUrl(reader.result as string);
+			console.log("Preview URL created");
 		};
 		reader.readAsDataURL(file);
 	};
@@ -69,8 +71,11 @@ export function ImageUpload({
 
 		setIsUploading(true);
 		try {
+			console.log("Starting upload...");
+
 			// Step 1: Get upload URL
 			const uploadUrl = await generateUploadUrl();
+			console.log("Got upload URL");
 
 			// Step 2: Upload file to Convex storage
 			const result = await fetch(uploadUrl, {
@@ -84,6 +89,7 @@ export function ImageUpload({
 			}
 
 			const { storageId } = await result.json();
+			console.log("File uploaded, storage ID:", storageId);
 
 			// Step 3: Create media asset record
 			const assetId = await createAsset({
@@ -93,6 +99,7 @@ export function ImageUpload({
 				filesize: selectedFile.size,
 				assetType: "image",
 			});
+			console.log("Asset created with ID:", assetId);
 
 			// Update parent component
 			onChange(assetId);
@@ -103,9 +110,11 @@ export function ImageUpload({
 			if (fileInputRef.current) {
 				fileInputRef.current.value = "";
 			}
+
+			console.log("Upload complete!");
 		} catch (error) {
 			console.error("Upload failed:", error);
-			alert("Failed to upload image. Please try again.");
+			alert(`Failed to upload image: ${error instanceof Error ? error.message : "Unknown error"}`);
 		} finally {
 			setIsUploading(false);
 		}
@@ -148,6 +157,14 @@ export function ImageUpload({
 	};
 
 	const currentImageUrl = previewUrl || imageUrl;
+
+	console.log("ImageUpload render:", {
+		value,
+		imageUrl,
+		previewUrl,
+		currentImageUrl,
+		hasSelectedFile: !!selectedFile
+	});
 
 	return (
 		<div className="space-y-3">

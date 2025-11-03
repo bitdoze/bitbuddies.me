@@ -71,14 +71,25 @@ export const create = mutation({
 })
 
 /**
- * Get a media asset by ID
+ * Get a media asset by ID with URL
  */
 export const getById = query({
 	args: {
 		assetId: v.id("mediaAssets"),
 	},
 	handler: async (ctx, args) => {
-		return await ctx.db.get(args.assetId)
+		const asset = await ctx.db.get(args.assetId)
+		if (!asset) {
+			return null
+		}
+
+		// Generate URL from storage
+		const url = await ctx.storage.getUrl(asset.storageId)
+
+		return {
+			...asset,
+			url: url ?? undefined,
+		}
 	},
 })
 
@@ -105,22 +116,34 @@ export const list = query({
 	handler: async (ctx, args) => {
 		const limit = args.limit ?? 100
 
+		let assets: any[] = []
+
 		if (args.assetType) {
 			const assetType = args.assetType // TypeScript narrowing
-			const assets = await ctx.db
+			assets = await ctx.db
 				.query("mediaAssets")
 				.withIndex("by_asset_type", (q) => q.eq("assetType", assetType))
 				.order("desc")
 				.take(limit)
-			return assets
+		} else {
+			assets = await ctx.db
+				.query("mediaAssets")
+				.order("desc")
+				.take(limit)
 		}
 
-		const assets = await ctx.db
-			.query("mediaAssets")
-			.order("desc")
-			.take(limit)
+		// Enrich with URLs
+		const enriched = await Promise.all(
+			assets.map(async (asset) => {
+				const url = await ctx.storage.getUrl(asset.storageId)
+				return {
+					...asset,
+					url: url ?? undefined,
+				}
+			})
+		)
 
-		return assets
+		return enriched
 	},
 })
 

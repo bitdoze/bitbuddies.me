@@ -44,6 +44,16 @@ export default function Header() {
 						Workshops
 					</Link>
 					<Link
+						to="/posts"
+						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+						activeProps={{
+							className:
+								"text-sm font-medium text-foreground transition-colors",
+						}}
+					>
+						Blog
+					</Link>
+					<Link
 						to="/about"
 						className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
 						activeProps={{

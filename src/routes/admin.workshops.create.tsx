@@ -19,6 +19,8 @@ import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
 import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useCreateWorkshop } from "../hooks/useWorkshops";
+import { RichTextEditor, createEmptyContent } from "../components/common/RichTextEditor";
+import type { JSONContent } from "@/components/kibo-ui/editor";
 
 export const Route = createFileRoute("/admin/workshops/create")({
 	component: CreateWorkshopPage,
@@ -35,12 +37,13 @@ function CreateWorkshopPage() {
 	>();
 	const coverAsset = useMediaAsset(coverAssetId);
 
+	const [content, setContent] = useState<JSONContent>(createEmptyContent());
+
 	const [formData, setFormData] = useState({
 		title: "",
 		slug: "",
 		description: "",
 		shortDescription: "",
-		content: "",
 		level: "beginner" as "beginner" | "intermediate" | "advanced",
 		category: "",
 		tags: "",
@@ -143,7 +146,7 @@ function CreateWorkshopPage() {
 				description: formData.description,
 				shortDescription: formData.shortDescription || undefined,
 				coverAssetId: coverAssetId,
-				content: formData.content,
+				content: JSON.stringify(content),
 				level: formData.level,
 				category: formData.category || undefined,
 				tags: tagsArray,
@@ -298,16 +301,17 @@ function CreateWorkshopPage() {
 
 								<div className="space-y-2">
 									<Label htmlFor="content">Content *</Label>
-									<Textarea
-										id="content"
-										value={formData.content}
-										onChange={(e) =>
-											setFormData({ ...formData, content: e.target.value })
-										}
-										placeholder="Full workshop content (supports HTML)"
-										rows={8}
-										required
-									/>
+									<div className="min-h-[500px]">
+										<RichTextEditor
+											content={content}
+											onChange={setContent}
+											placeholder="Write the full workshop content with rich formatting..."
+											className="min-h-[500px]"
+										/>
+									</div>
+									<p className="text-sm text-muted-foreground">
+										Use the editor toolbar for rich text formatting
+									</p>
 								</div>
 							</div>
 

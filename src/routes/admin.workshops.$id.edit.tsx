@@ -26,6 +26,8 @@ import { Textarea } from "../components/ui/textarea";
 import { useAuth } from "../hooks/useAuth";
 import { useMediaAsset } from "../hooks/useMediaAssets";
 import { useUpdateWorkshop, useWorkshop } from "../hooks/useWorkshops";
+import { RichTextEditor, createEmptyContent } from "../components/common/RichTextEditor";
+import type { JSONContent } from "@/components/kibo-ui/editor";
 
 export const Route = createFileRoute("/admin/workshops/$id/edit")({
 	component: EditWorkshopPage,
@@ -50,12 +52,13 @@ function EditWorkshopPage() {
 	>();
 	const coverAsset = useMediaAsset(coverAssetId);
 
+	const [content, setContent] = useState<JSONContent>(createEmptyContent());
+
 	const [formData, setFormData] = useState({
 		title: "",
 		slug: "",
 		description: "",
 		shortDescription: "",
-		content: "",
 		level: "beginner" as "beginner" | "intermediate" | "advanced",
 		category: "",
 		tags: "",
@@ -78,12 +81,20 @@ function EditWorkshopPage() {
 	useEffect(() => {
 		if (workshop) {
 			setCoverAssetId(workshop.coverAssetId);
+
+			// Parse content from JSON string
+			try {
+				const parsedContent = JSON.parse(workshop.content);
+				setContent(parsedContent);
+			} catch {
+				setContent(createEmptyContent());
+			}
+
 			setFormData({
 				title: workshop.title,
 				slug: workshop.slug,
 				description: workshop.description,
 				shortDescription: workshop.shortDescription || "",
-				content: workshop.content,
 				level: workshop.level,
 				category: workshop.category || "",
 				tags: workshop.tags.join(", "),
@@ -207,7 +218,7 @@ function EditWorkshopPage() {
 				description: formData.description,
 				shortDescription: formData.shortDescription || undefined,
 				coverAssetId: coverAssetId,
-				content: formData.content,
+				content: JSON.stringify(content),
 				level: formData.level,
 				category: formData.category || undefined,
 				tags: tagsArray,
@@ -348,16 +359,17 @@ function EditWorkshopPage() {
 
 								<div className="space-y-2">
 									<Label htmlFor="content">Content *</Label>
-									<Textarea
-										id="content"
-										value={formData.content}
-										onChange={(e) =>
-											setFormData({ ...formData, content: e.target.value })
-										}
-										placeholder="Full workshop content (supports HTML)"
-										rows={8}
-										required
-									/>
+									<div className="min-h-[500px]">
+										<RichTextEditor
+											content={content}
+											onChange={setContent}
+											placeholder="Write the full workshop content with rich formatting..."
+											className="min-h-[500px]"
+										/>
+									</div>
+									<p className="text-sm text-muted-foreground">
+										Use the editor toolbar for rich text formatting
+									</p>
 								</div>
 							</div>
 
