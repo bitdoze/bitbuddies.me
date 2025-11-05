@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConvexHttpClient } from "convex/browser";
 import { ArrowLeft, Calendar, Clock, FileText, Users } from "lucide-react";
+import { useEffect } from "react";
 
 import { api } from "../../convex/_generated/api";
 import { generateStructuredData, SEO } from "../components/common/SEO";
@@ -18,11 +19,13 @@ import {
 	TopicsTags,
 	WorkshopStatus,
 } from "../components/content";
+import { WorkshopViews } from "../components/content/workshop/WorkshopViews";
 import { Button } from "../components/ui/button";
 import { useAuth } from "../hooks/useAuth";
 import {
 	useWorkshopAttachments,
 	useWorkshopBySlug,
+	useIncrementWorkshopViewCount,
 } from "../hooks/useWorkshops";
 
 export const Route = createFileRoute("/workshops/$slug")({
@@ -61,6 +64,21 @@ function WorkshopPage() {
 	const workshop = loaderData?.workshop ?? clientWorkshop;
 
 	const attachments = useWorkshopAttachments(workshop?._id);
+	const incrementViewCount = useIncrementWorkshopViewCount();
+
+	// Increment view count on mount (only for accessible workshops)
+	useEffect(() => {
+		if (workshop && canAccessWorkshop(workshop)) {
+			incrementViewCount({ workshopId: workshop._id });
+		}
+	}, [workshop?._id]);
+
+	const canAccessWorkshop = (workshop: any) => {
+		if (workshop.accessLevel === "public") return true;
+		if (workshop.accessLevel === "authenticated" && isAuthenticated) return true;
+		if (workshop.accessLevel === "subscription" && isAuthenticated) return true;
+		return false;
+	};
 
 	// Loading state
 	if (authLoading || workshop === undefined) {
@@ -222,6 +240,9 @@ function WorkshopPage() {
 				sidebarTitle="Workshop Info"
 				sidebar={
 					<>
+						{/* Workshop Views */}
+						<WorkshopViews viewCount={workshop.viewCount || 0} variant="default" />
+
 						<MetaInfoCard title="Workshop Details" items={metaItems} />
 
 						{workshop.isLive && (
@@ -267,13 +288,13 @@ function WorkshopPage() {
 
 						{/* Video Section */}
 						{(workshop.videoUrl || workshop.videoId) && (
-							<section>
+							<section className="-mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
 								<SectionHeader
 									eyebrow="Video"
 									title={isPast ? "Workshop Recording" : "Watch Workshop"}
 								/>
 								<div className="mt-6">
-									<WorkshopVideoPlayer workshop={workshop} />
+									<WorkshopVideoPlayer workshop={workshop} className="w-full" />
 								</div>
 							</section>
 						)}

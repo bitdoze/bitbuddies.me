@@ -118,6 +118,7 @@ export const create = mutation({
 			instructorId: args.instructorId,
 			instructorName: args.instructorName,
 			enrollmentCount: 0,
+			viewCount: 0,
 			isDeleted: false,
 			deletedAt: undefined,
 			publishedAt: isPublished
@@ -324,6 +325,7 @@ export const getBySlug = query({
 		return {
 			...workshop,
 			coverAsset,
+			viewCount: workshop.viewCount ?? 0, // Handle existing workshops without viewCount
 		}
 	},
 })
@@ -348,6 +350,24 @@ export const getById = query({
 		return {
 			...workshop,
 			coverAsset,
+			viewCount: workshop.viewCount ?? 0, // Handle existing workshops without viewCount
 		}
+	},
+})
+
+export const incrementViewCount = mutation({
+	args: {
+		workshopId: v.id("workshops"),
+	},
+	handler: async (ctx, args) => {
+		const workshop = await ctx.db.get(args.workshopId)
+
+		if (!workshop || workshop.isDeleted) {
+			return
+		}
+
+		await ctx.db.patch(args.workshopId, {
+			viewCount: (workshop.viewCount ?? 0) + 1, // Handle existing workshops without viewCount
+		})
 	},
 })

@@ -90,7 +90,7 @@ export function PostMeta({
 		return (
 			<div
 				className={cn(
-					"flex flex-wrap items-center gap-4 text-sm text-muted-foreground",
+					"flex flex-wrap items-center gap-4 text-xs text-muted-foreground",
 					className,
 				)}
 			>
@@ -116,13 +116,13 @@ export function PostMeta({
 				{author && (
 					<div className="flex items-center gap-2">
 						<User className="h-4 w-4" />
-						<span className="text-sm md:text-base font-medium">{author}</span>
+						<span className="text-xs md:text-sm font-medium">{author}</span>
 					</div>
 				)}
 				{publishedDate && (
 					<div className="flex items-center gap-2">
 						<Calendar className="h-4 w-4" />
-						<span className="text-sm md:text-base">
+						<span className="text-xs md:text-sm">
 							{formatDate(publishedDate)}
 						</span>
 					</div>
@@ -130,7 +130,7 @@ export function PostMeta({
 				{readTime && (
 					<div className="flex items-center gap-2">
 						<Clock className="h-4 w-4" />
-						<span className="text-sm md:text-base">
+						<span className="text-xs md:text-sm">
 							{formatReadTime(readTime)}
 						</span>
 					</div>
@@ -153,7 +153,7 @@ export function PostMeta({
 						<User className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
 						<div className="flex-1 min-w-0">
 							<dt className="text-xs text-muted-foreground mb-0.5">Author</dt>
-							<dd className="text-sm font-semibold truncate">{author}</dd>
+							<dd className="text-xs font-medium truncate">{author}</dd>
 						</div>
 					</div>
 				)}
@@ -164,7 +164,7 @@ export function PostMeta({
 							<dt className="text-xs text-muted-foreground mb-0.5">
 								Published
 							</dt>
-							<dd className="text-sm font-semibold">
+							<dd className="text-xs font-medium">
 								{formatDate(publishedDate)}
 							</dd>
 						</div>
@@ -177,7 +177,7 @@ export function PostMeta({
 							<dt className="text-xs text-muted-foreground mb-0.5">
 								Read Time
 							</dt>
-							<dd className="text-sm font-semibold">
+							<dd className="text-xs font-medium">
 								{formatReadTime(readTime)}
 							</dd>
 						</div>

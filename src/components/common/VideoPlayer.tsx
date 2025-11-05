@@ -162,7 +162,7 @@ export function LessonVideoPlayer({ lesson }: { lesson: LessonDoc }) {
 	);
 }
 
-export function WorkshopVideoPlayer({ workshop }: { workshop: WorkshopDoc }) {
+export function WorkshopVideoPlayer({ workshop, className }: { workshop: WorkshopDoc; className?: string }) {
 	if (!workshop.videoUrl && !workshop.videoId) {
 		return null;
 	}
@@ -173,6 +173,7 @@ export function WorkshopVideoPlayer({ workshop }: { workshop: WorkshopDoc }) {
 			videoId={workshop.videoId}
 			videoProvider={workshop.videoProvider}
 			title={workshop.title}
+			className={className}
 		/>
 	);
 }

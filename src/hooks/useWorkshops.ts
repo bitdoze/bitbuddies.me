@@ -48,5 +48,9 @@ export function useUpdateWorkshopAttachment() {
 }
 
 export function useDeleteWorkshopAttachment() {
-	return useMutation(api.workshopAttachments.remove);
+	return useMutation(api.workshops.remove);
+}
+
+export function useIncrementWorkshopViewCount() {
+	return useMutation(api.workshops.incrementViewCount);
 }
