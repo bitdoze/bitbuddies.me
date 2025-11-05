@@ -44,7 +44,7 @@ export function Hero({
 						{/* Announcement badge */}
 						<div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 text-sm font-medium text-primary shadow-sm backdrop-blur-sm">
 							<Star className="h-4 w-4 fill-current" />
-							<span>Trusted by 8,000+ developers</span>
+							<span>Trusted by 100+ developers</span>
 						</div>
 
 						{/* Main heading */}
@@ -122,7 +122,7 @@ export function Hero({
 										<div>
 											<Badge className="mb-2">This Week</Badge>
 											<h3 className="text-xl font-bold text-foreground">
-												Next.js 15 Masterclass
+											Dokploy Setup
 											</h3>
 										</div>
 									</div>
@@ -178,7 +178,7 @@ export function Hero({
 										<div className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-orange-500 to-red-500" />
 									</div>
 									<div>
-										<div className="text-sm font-semibold text-foreground">8k+</div>
+										<div className="text-sm font-semibold text-foreground">100+</div>
 										<div className="text-xs text-muted-foreground">Active learners</div>
 									</div>
 								</div>

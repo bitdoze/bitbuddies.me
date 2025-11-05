@@ -23,7 +23,7 @@ import HeaderUser from "@/integrations/clerk/header-user";
 
 const primaryLinks = [
 	{ label: "Home", to: "/" },
-	{ label: "Courses", href: "/courses" },
+	{ label: "Courses", to: "/courses" },
 	{ label: "Workshops", to: "/workshops" },
 	{ label: "Blog", to: "/posts" },
 	{ label: "About", to: "/about" },
@@ -34,7 +34,7 @@ export default function Header() {
 	const { isAdmin } = useAuth();
 
 	return (
-		<header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
 			<div className="container grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
 				<div className="flex items-center gap-3">
 					<SidebarTrigger className="rounded-full border border-border/60 bg-background/80 shadow-sm" />
@@ -47,31 +47,19 @@ export default function Header() {
 				</div>
 				<nav className="hidden h-full items-center justify-center gap-1  px-2 py-1 lg:flex">
 					{primaryLinks.map((link) => {
-						if (link.to) {
-							return (
-								<Link
-									key={link.label}
-									to={link.to}
-									activeProps={{
-										className: "text-foreground",
-										"data-active": "true",
-									}}
-									className="group relative rounded-full px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-								>
-									<span>{link.label}</span>
-									<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 scale-x-0 rounded-full bg-primary transition-transform duration-200 group-data-[active=true]:scale-x-100" />
-								</Link>
-							);
-						}
 						return (
-							<a
+							<Link
 								key={link.label}
-								href={link.href}
+								to={link.to}
+								activeProps={{
+									className: "text-foreground",
+									"data-active": "true",
+								}}
 								className="group relative rounded-full px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
 							>
-								{link.label}
-								<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 scale-x-0 rounded-full bg-primary transition-transform duration-200 group-hover:scale-x-100" />
-							</a>
+								<span>{link.label}</span>
+								<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 scale-x-0 rounded-full bg-primary transition-transform duration-200 group-data-[active=true]:scale-x-100" />
+							</Link>
 						);
 					})}
 				</nav>

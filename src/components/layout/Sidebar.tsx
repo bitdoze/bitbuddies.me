@@ -42,7 +42,7 @@ const menuItems = [
 		title: "Courses",
 		url: "/courses",
 		icon: BookOpen,
-		isRoute: false,
+		isRoute: true,
 	},
 	{
 		title: "Workshops",
