@@ -241,7 +241,7 @@ function WorkshopPage() {
 				sidebar={
 					<>
 						{/* Workshop Views */}
-						<WorkshopViews viewCount={workshop.viewCount || 0} variant="default" />
+						<WorkshopViews viewCount={workshop.viewCount ?? 0} variant="default" />
 
 						<MetaInfoCard title="Workshop Details" items={metaItems} />
 

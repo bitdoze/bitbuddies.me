@@ -21,6 +21,7 @@ import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
 import { Route as PostsSlugRouteImport } from './routes/posts.$slug'
+import { Route as DebugMigrateWorkshopsRouteImport } from './routes/debug.migrate-workshops'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
@@ -95,6 +96,11 @@ const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
 const PostsSlugRoute = PostsSlugRouteImport.update({
   id: '/posts/$slug',
   path: '/posts/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugMigrateWorkshopsRoute = DebugMigrateWorkshopsRouteImport.update({
+  id: '/debug/migrate-workshops',
+  path: '/debug/migrate-workshops',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesSlugRoute = CoursesSlugRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
+  '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -240,6 +248,7 @@ export interface FileRoutesById {
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
+  '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/workshops'
     | '/courses/$slug'
+    | '/debug/migrate-workshops'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin/'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/courses/$slug'
+    | '/debug/migrate-workshops'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/workshops'
     | '/courses/$slug'
+    | '/debug/migrate-workshops'
     | '/posts/$slug'
     | '/workshops/$slug'
     | '/admin/'
@@ -352,6 +364,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
+  DebugMigrateWorkshopsRoute: typeof DebugMigrateWorkshopsRoute
   PostsSlugRoute: typeof PostsSlugRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
@@ -444,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/posts/$slug'
       fullPath: '/posts/$slug'
       preLoaderRoute: typeof PostsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug/migrate-workshops': {
+      id: '/debug/migrate-workshops'
+      path: '/debug/migrate-workshops'
+      fullPath: '/debug/migrate-workshops'
+      preLoaderRoute: typeof DebugMigrateWorkshopsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/$slug': {
@@ -628,6 +648,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   CoursesSlugRoute: CoursesSlugRoute,
+  DebugMigrateWorkshopsRoute: DebugMigrateWorkshopsRoute,
   PostsSlugRoute: PostsSlugRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,

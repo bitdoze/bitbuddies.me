@@ -349,7 +349,7 @@ export default defineSchema({
 		instructorName: v.optional(v.string()),
 		// Stats
 		enrollmentCount: v.number(),
-		viewCount: v.number(),
+		viewCount: v.optional(v.number()),
 		// Soft delete
 		isDeleted: v.boolean(),
 		deletedAt: v.optional(v.number()),
