@@ -102,7 +102,7 @@ function WorkshopsPage() {
 		},
 		{
 			label: "Community builders",
-			value: "3.2k+",
+			value: "150+",
 			icon: <Users className="h-4 w-4" />,
 		},
 	];

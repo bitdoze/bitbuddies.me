@@ -44,7 +44,7 @@ export function Hero({
 						{/* Announcement badge */}
 						<div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 text-sm font-medium text-primary shadow-sm backdrop-blur-sm">
 							<Star className="h-4 w-4 fill-current" />
-							<span>Trusted by 100+ developers</span>
+							<span>Trusted by 50+ developers</span>
 						</div>
 
 						{/* Main heading */}
@@ -137,7 +137,7 @@ export function Hero({
 											</span>
 										</div>
 										<p className="text-sm text-muted-foreground">
-											40+ developers already registered
+											15+ developers already registered
 										</p>
 									</div>
 
@@ -163,7 +163,7 @@ export function Hero({
 								<div className="flex items-center gap-2">
 									<TrendingUp className="h-5 w-5 text-green-500" />
 									<div>
-										<div className="text-sm font-semibold text-foreground">250+</div>
+										<div className="text-sm font-semibold text-foreground">25+</div>
 										<div className="text-xs text-muted-foreground">Projects shipped</div>
 									</div>
 								</div>
@@ -178,7 +178,7 @@ export function Hero({
 										<div className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-orange-500 to-red-500" />
 									</div>
 									<div>
-										<div className="text-sm font-semibold text-foreground">100+</div>
+										<div className="text-sm font-semibold text-foreground">50+</div>
 										<div className="text-xs text-muted-foreground">Active learners</div>
 									</div>
 								</div>

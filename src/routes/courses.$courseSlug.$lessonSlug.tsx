@@ -235,7 +235,7 @@ function LessonPage() {
 							<div className="space-y-1.5">
 								<div className="h-2 bg-muted rounded-full overflow-hidden">
 									<div
-										className="h-full bg-gradient-to-r from-primary to-sky-500 transition-all duration-500"
+										className="h-full bg-linear-to-r from-primary to-sky-500 transition-all duration-500"
 										style={{ width: `${progressPercentage}%` }}
 									/>
 								</div>
@@ -261,8 +261,8 @@ function LessonPage() {
 						</Button>
 					</div>
 
-					<ScrollArea className="flex-1">
-						<div className="p-4 space-y-4">
+					<ScrollArea className="flex-1 h-0" type="auto">
+						<div className="p-4 space-y-4 min-w-0 overflow-x-auto">
 							{/* Chapters with lessons */}
 							{sortedChapters.map((chapter, chapterIndex) => {
 								const chapterLessons =
@@ -271,14 +271,14 @@ function LessonPage() {
 										.sort((a, b) => a.order - b.order) || [];
 
 								return (
-									<div key={chapter._id}>
-										<div className="flex items-center gap-2 mb-2">
+									<div key={chapter._id} className="min-w-0">
+										<div className="flex items-center gap-2 mb-2 min-w-0">
 											<div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
 												{chapterIndex + 1}
 											</div>
-											<h3 className="font-semibold text-sm">{chapter.title}</h3>
+											<h3 className="font-semibold text-sm truncate">{chapter.title}</h3>
 										</div>
-										<div className="ml-8 space-y-1">
+										<div className="ml-8 space-y-1 min-w-0">
 											{chapterLessons.map((lesson) => (
 												<LessonNavItem
 													key={lesson._id}
@@ -307,9 +307,9 @@ function LessonPage() {
 
 							{/* Lessons without chapter */}
 							{lessonsWithoutChapter.length > 0 && (
-								<div>
+								<div className="min-w-0">
 									<h3 className="font-semibold text-sm mb-2">Other Lessons</h3>
-									<div className="space-y-1">
+									<div className="space-y-1 min-w-0">
 										{lessonsWithoutChapter.map((lesson) => (
 											<LessonNavItem
 												key={lesson._id}
@@ -498,7 +498,7 @@ function LessonNavItem({
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors group",
+				"flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors group min-w-0",
 				isActive && "bg-primary/10 hover:bg-primary/15",
 			)}
 		>
@@ -520,12 +520,13 @@ function LessonNavItem({
 						isActive && "font-semibold text-primary",
 						isCompleted && !isActive && "text-muted-foreground line-through",
 					)}
+					title={lesson.title}
 				>
 					{lesson.title}
 				</span>
 			</Link>
 			{lesson.videoDuration && (
-				<span className="text-xs text-muted-foreground shrink-0">
+				<span className="text-xs text-muted-foreground shrink-0 whitespace-nowrap">
 					{formatDuration(lesson.videoDuration)}
 				</span>
 			)}

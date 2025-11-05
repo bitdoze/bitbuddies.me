@@ -97,22 +97,22 @@ function HomePage() {
 		() => [
 			{
 				label: "Community",
-				value: "8k+ members",
+				value: "500+ members",
 				icon: <Users className="h-4 w-4" />,
 			},
 			{
 				label: "Hands-on lessons",
-				value: "120+ modules",
+				value: "30+ modules",
 				icon: <Monitor className="h-4 w-4" />,
 			},
 			{
 				label: "Live sessions",
-				value: "40 monthly",
+				value: "4 monthly",
 				icon: <Calendar className="h-4 w-4" />,
 			},
 			{
 				label: "Launch success",
-				value: "250+ shipped",
+				value: "25+ shipped",
 				icon: <Rocket className="h-4 w-4" />,
 			},
 		],
@@ -122,7 +122,7 @@ function HomePage() {
 	const highlightSections = useMemo<HighlightSection[]>(() => {
 		const renderCover = (url?: string | null, alt?: string) =>
 			url ? (
-				<div className="relative aspect-[16/9] overflow-hidden">
+				<div className="relative aspect-video overflow-hidden">
 					<img
 						src={url}
 						alt={alt ?? ""}
@@ -130,7 +130,7 @@ function HomePage() {
 					/>
 				</div>
 			) : (
-				<div className="relative aspect-[16/9] bg-gradient-to-br from-primary/15 to-primary/5" />
+				<div className="relative aspect-video bg-linear-to-br from-primary/15 to-primary/5" />
 			);
 
 		const sections: HighlightSection[] = [];

@@ -34,7 +34,7 @@ export function CommunityBanner({
 								<div className="inline-flex items-center gap-2 rounded-full border-2 border-primary/20 bg-primary/10 px-5 py-2 shadow-sm backdrop-blur-sm">
 									<Users className="h-4 w-4 text-primary" />
 									<span className="text-sm font-semibold text-primary">
-										Join 8,000+ developers worldwide
+										Join 150+ developers worldwide
 									</span>
 								</div>
 
@@ -129,7 +129,7 @@ export function CommunityBanner({
 											</div>
 											<div>
 												<div className="text-3xl font-bold text-foreground">
-													8,247
+													127
 												</div>
 												<div className="text-sm text-muted-foreground">
 													Active members this month
@@ -146,7 +146,7 @@ export function CommunityBanner({
 											</div>
 											<div>
 												<div className="text-3xl font-bold text-foreground">
-													40+
+													4
 												</div>
 												<div className="text-sm text-muted-foreground">
 													Live events monthly
@@ -163,7 +163,7 @@ export function CommunityBanner({
 											</div>
 											<div>
 												<div className="text-3xl font-bold text-foreground">
-													250+
+													25+
 												</div>
 												<div className="text-sm text-muted-foreground">
 													Projects shipped

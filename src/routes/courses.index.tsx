@@ -82,12 +82,12 @@ function CoursesPage() {
 		},
 		{
 			label: "Guided lessons",
-			value: "200+",
+			value: "30+",
 			icon: <Sparkles className="h-4 w-4" />,
 		},
 		{
 			label: "Learners enrolled",
-			value: "8k+",
+			value: "50+",
 			icon: <Users className="h-4 w-4" />,
 		},
 	];
