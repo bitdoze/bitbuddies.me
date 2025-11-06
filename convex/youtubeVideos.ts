@@ -9,6 +9,51 @@ import { internal } from "./_generated/api"
 import type { Id } from "./_generated/dataModel"
 
 /**
+ * Helper function to require admin role (for mutations/queries)
+ */
+async function requireAdmin(
+	ctx: any,
+	clerkId: string,
+): Promise<Id<"users">> {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
+		.unique()
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Unauthorized: Admin access required")
+	}
+
+	return user._id
+}
+
+/**
+ * Helper function to require admin role (for actions)
+ */
+async function requireAdminAction(
+	ctx: any,
+	clerkId: string,
+): Promise<Id<"users">> {
+	const user = await ctx.runQuery(internal.youtubeVideos.getUserByClerkId, {
+		clerkId,
+	}) as any
+
+	if (!user) {
+		throw new Error("User not found")
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Unauthorized: Admin access required")
+	}
+
+	return user._id
+}
+
+/**
  * List videos with filtering and pagination
  */
 export const list = query({
@@ -201,6 +246,8 @@ export const syncChannel = internalAction({
 		}
 
 		try {
+			console.log(`Starting sync for channel: ${channel.channelName} (${channel.channelId})`)
+
 			// Fetch RSS feed
 			const response = await fetch(channel.feedUrl)
 			if (!response.ok) {
@@ -211,12 +258,24 @@ export const syncChannel = internalAction({
 
 			// Parse feed
 			const videos = parseYouTubeFeed(xmlText)
+			console.log(`Parsed ${videos.length} videos from feed for ${channel.channelName}`)
+
+			// Deduplicate videos by videoId (in case feed has duplicates)
+			const uniqueVideos = Array.from(
+				new Map(videos.map((v) => [v.videoId, v])).values(),
+			)
+
+			if (uniqueVideos.length < videos.length) {
+				console.log(
+					`Removed ${videos.length - uniqueVideos.length} duplicate videos from feed`,
+				)
+			}
 
 			// Store videos
 			let newVideos = 0
 			let updatedVideos = 0
 
-			for (const video of videos) {
+			for (const video of uniqueVideos) {
 				// Check if video already exists
 				const existing = await ctx.runQuery(
 					internal.youtubeVideos.getByVideoId,
@@ -273,6 +332,11 @@ export const syncChannel = internalAction({
 				videoCount: totalVideos,
 			})
 
+			console.log(
+				`✓ Sync completed for ${channel.channelName}: ` +
+				`${newVideos} new, ${updatedVideos} updated, ${totalVideos} total videos`
+			)
+
 			return {
 				success: true,
 				channelName: channel.channelName,
@@ -281,11 +345,14 @@ export const syncChannel = internalAction({
 				totalVideos,
 			}
 		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : "Unknown error"
+			console.error(`✗ Sync failed for ${channel.channelName}: ${errorMessage}`)
+
 			// Update channel sync status with error
 			await ctx.runMutation(internal.youtubeChannels.updateSyncStatus, {
 				id: args.channelDbId,
 				status: "failed",
-				error: error instanceof Error ? error.message : "Unknown error",
+				error: errorMessage,
 			})
 
 			throw error
@@ -298,9 +365,13 @@ export const syncChannel = internalAction({
  */
 export const manualSyncChannel = action({
 	args: {
+		clerkId: v.string(),
 		channelDbId: v.id("youtubeChannels"),
 	},
 	handler: async (ctx, args): Promise<{ success: boolean; channelName?: string; newVideos?: number; updatedVideos?: number; totalVideos?: number; message?: string; error?: string }> => {
+		// Verify admin authorization
+		await requireAdminAction(ctx, args.clerkId)
+
 		return await ctx.runAction(internal.youtubeVideos.syncChannel, {
 			channelDbId: args.channelDbId,
 		}) as any
@@ -311,54 +382,123 @@ export const manualSyncChannel = action({
  * Public action: Manually sync all channels (for admin use)
  */
 export const manualSyncAllChannels = action({
-	args: {},
-	handler: async (ctx): Promise<Array<{ success: boolean; channelName?: string; newVideos?: number; updatedVideos?: number; totalVideos?: number; message?: string; error?: string }>> => {
+	args: {
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args): Promise<Array<{ success: boolean; channelName?: string; newVideos?: number; updatedVideos?: number; totalVideos?: number; message?: string; error?: string }>> => {
+		// Verify admin authorization
+		await requireAdminAction(ctx, args.clerkId)
+
 		return await ctx.runAction(internal.youtubeVideos.syncAllChannels, {}) as any
 	},
 })
 
 /**
- * Internal: Remove videos older than retention window
+ * Batched cleanup wrapper - schedules continuation if more videos need cleanup
+ * This is called by the daily cron job
  */
-export const cleanupOldVideos = internalMutation({
+export const cleanupOldVideosBatched = internalMutation({
 	args: {},
 	handler: async (ctx) => {
+		// Directly perform the first batch of cleanup
+		const result = await cleanupOldVideosInternal(ctx, { batchSize: 100 })
+
+		return {
+			message: "Cleanup started",
+			...result,
+		}
+	},
+})
+
+/**
+ * Internal helper function for cleanup logic
+ */
+async function cleanupOldVideosInternal(
+	ctx: any,
+	args: { batchSize?: number },
+): Promise<{ removed: number; hasMore: boolean; channelsAffected: number }> {
 		const now = Date.now()
 		const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000
 		const cutoff = now - fourteenDaysMs
+		const maxBatchSize = args.batchSize ?? 100
 
+		// Query old videos with limit to avoid loading too many at once
 		const oldVideos = await ctx.db
 			.query("youtubeVideos")
-			.withIndex("by_published_at", (q) => q.lt("publishedAt", cutoff))
-			.collect()
+			.withIndex("by_published_at", (q: any) => q.lt("publishedAt", cutoff))
+			.take(maxBatchSize)
 
 		if (oldVideos.length === 0) {
-			return { removed: 0 }
+			return {
+				removed: 0,
+				hasMore: false,
+				channelsAffected: 0,
+			}
 		}
 
+		// Track removals per channel for efficient count updates
 		const removedByChannel = new Map<Id<"youtubeChannels">, number>()
 
+		// Delete videos
 		for (const video of oldVideos) {
 			await ctx.db.delete(video._id)
 			const current = removedByChannel.get(video.channelRef) ?? 0
 			removedByChannel.set(video.channelRef, current + 1)
 		}
 
-		for (const [channelRef] of removedByChannel) {
-			const remainingVideos = await ctx.db
-				.query("youtubeVideos")
-				.withIndex("by_channel_ref", (q) => q.eq("channelRef", channelRef))
-				.collect()
+		// Update channel video counts efficiently (decrement instead of recount)
+		for (const [channelRef, removedCount] of removedByChannel) {
 			const channel = await ctx.db.get(channelRef)
 			if (channel) {
+				const newCount = Math.max(0, channel.videoCount - removedCount)
 				await ctx.db.patch(channelRef, {
-					videoCount: remainingVideos.length,
+					videoCount: newCount,
 					updatedAt: now,
 				})
 			}
 		}
 
-		return { removed: oldVideos.length }
+		// Check if there are more videos to clean up
+		const hasMore = oldVideos.length === maxBatchSize
+
+		// Log warning if we're removing many videos
+		if (oldVideos.length > 50) {
+			console.warn(
+				`Cleanup removed ${oldVideos.length} videos older than 14 days. ` +
+				`Channels affected: ${removedByChannel.size}. ` +
+				`${hasMore ? "More videos to clean up in next run." : "Cleanup complete."}`,
+			)
+		}
+
+		// If there are more videos to cleanup, schedule another batch
+		if (hasMore) {
+			console.log(
+				`Scheduling another cleanup batch. ${oldVideos.length} videos removed in this batch.`,
+			)
+			await ctx.scheduler.runAfter(
+				1000, // Wait 1 second between batches
+				internal.youtubeVideos.cleanupOldVideos,
+				{ batchSize: maxBatchSize },
+			)
+		}
+
+		return {
+			removed: oldVideos.length,
+			hasMore,
+			channelsAffected: removedByChannel.size,
+		}
+}
+
+/**
+ * Internal: Remove videos older than retention window
+ * Uses batching to avoid mutation timeouts with large datasets
+ */
+export const cleanupOldVideos = internalMutation({
+	args: {
+		batchSize: v.optional(v.number()), // Max videos to delete per run (default: 100)
+	},
+	handler: async (ctx, args) => {
+		return await cleanupOldVideosInternal(ctx, args)
 	},
 })
 
@@ -374,7 +514,14 @@ export const syncAllChannels = internalAction({
 			activeOnly: true,
 		}) as any[]
 
+		console.log(`Starting daily sync for ${channels.length} active channels`)
+		const startTime = Date.now()
+
 		const results = []
+		let successCount = 0
+		let failureCount = 0
+		let totalNewVideos = 0
+		let totalUpdatedVideos = 0
 
 		for (const channel of channels) {
 			try {
@@ -382,11 +529,15 @@ export const syncAllChannels = internalAction({
 					channelDbId: channel._id,
 				}) as any
 				results.push(result)
+				successCount++
+				totalNewVideos += result.newVideos || 0
+				totalUpdatedVideos += result.updatedVideos || 0
 			} catch (error) {
 				console.error(
 					`Failed to sync channel ${channel.channelName}:`,
 					error,
 				)
+				failureCount++
 				results.push({
 					success: false,
 					channelName: channel.channelName,
@@ -394,6 +545,13 @@ export const syncAllChannels = internalAction({
 				})
 			}
 		}
+
+		const duration = Date.now() - startTime
+		console.log(
+			`Daily sync completed in ${Math.round(duration / 1000)}s: ` +
+			`${successCount} succeeded, ${failureCount} failed. ` +
+			`Total: ${totalNewVideos} new videos, ${totalUpdatedVideos} updated.`
+		)
 
 		return results
 	},
@@ -487,5 +645,155 @@ export const countByChannel = internalQuery({
 			.collect()
 
 		return videos.length
+	},
+})
+
+/**
+ * Internal: Get user by Clerk ID (for action authorization)
+ */
+export const getUserByClerkId = internalQuery({
+	args: {
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query("users")
+			.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", args.clerkId))
+			.unique()
+	},
+})
+
+/**
+ * Manual cleanup action for admins
+ * Allows admins to manually trigger cleanup with custom parameters
+ */
+export const manualCleanupOldVideos = action({
+	args: {
+		clerkId: v.string(),
+		daysOld: v.optional(v.number()), // Custom retention period (default: 14 days)
+		dryRun: v.optional(v.boolean()), // Preview what would be deleted without deleting
+	},
+	handler: async (ctx, args) => {
+		// Verify admin authorization
+		await requireAdminAction(ctx, args.clerkId)
+
+		const daysOld = args.daysOld ?? 14
+		const dryRun = args.dryRun ?? false
+
+		// Safety check: don't allow less than 7 days
+		if (daysOld < 7) {
+			throw new Error("Safety limit: Cannot delete videos newer than 7 days old")
+		}
+
+		const now = Date.now()
+		const retentionMs = daysOld * 24 * 60 * 60 * 1000
+		const cutoff = now - retentionMs
+
+		// Query videos that would be deleted
+		const oldVideos = await ctx.runQuery(
+			internal.youtubeVideos.getVideosByPublishedDate,
+			{ cutoff, limit: 500 }, // Safety limit: max 500 videos per manual cleanup
+		) as any[]
+
+		if (oldVideos.length === 0) {
+			return {
+				removed: 0,
+				dryRun,
+				message: `No videos found older than ${daysOld} days`,
+			}
+		}
+
+		// Count by channel for reporting
+		const videosByChannel = new Map<string, number>()
+		for (const video of oldVideos) {
+			const count = videosByChannel.get(video.channelName) ?? 0
+			videosByChannel.set(video.channelName, count + 1)
+		}
+
+		if (dryRun) {
+			// Preview mode - don't delete anything
+			return {
+				removed: 0,
+				dryRun: true,
+				wouldRemove: oldVideos.length,
+				affectedChannels: Array.from(videosByChannel.entries()).map(
+					([channelName, count]) => ({
+						channelName,
+						videoCount: count,
+					}),
+				),
+				oldestVideo: oldVideos[oldVideos.length - 1]?.publishedAt,
+				message: `Would delete ${oldVideos.length} videos older than ${daysOld} days`,
+			}
+		}
+
+		// Actually delete videos
+		let removed = 0
+		for (const video of oldVideos) {
+			await ctx.runMutation(internal.youtubeVideos.deleteVideo, {
+				id: video._id,
+			})
+			removed++
+		}
+
+		// Update channel counts
+		for (const [channelName, count] of videosByChannel) {
+			console.log(`Cleaned up ${count} videos from channel: ${channelName}`)
+		}
+
+		return {
+			removed,
+			dryRun: false,
+			affectedChannels: Array.from(videosByChannel.entries()).map(
+				([channelName, count]) => ({
+					channelName,
+					videoCount: count,
+				}),
+			),
+			message: `Successfully deleted ${removed} videos older than ${daysOld} days`,
+		}
+	},
+})
+
+/**
+ * Internal: Get videos by published date for cleanup operations
+ */
+export const getVideosByPublishedDate = internalQuery({
+	args: {
+		cutoff: v.number(),
+		limit: v.number(),
+	},
+	handler: async (ctx, args) => {
+		return await ctx.db
+			.query("youtubeVideos")
+			.withIndex("by_published_at", (q) => q.lt("publishedAt", args.cutoff))
+			.take(args.limit)
+	},
+})
+
+/**
+ * Internal: Delete a single video
+ */
+export const deleteVideo = internalMutation({
+	args: {
+		id: v.id("youtubeVideos"),
+	},
+	handler: async (ctx, args) => {
+		const video = await ctx.db.get(args.id)
+		if (!video) {
+			return
+		}
+
+		// Delete the video
+		await ctx.db.delete(args.id)
+
+		// Update channel video count
+		const channel = await ctx.db.get(video.channelRef)
+		if (channel) {
+			await ctx.db.patch(video.channelRef, {
+				videoCount: Math.max(0, channel.videoCount - 1),
+				updatedAt: Date.now(),
+			})
+		}
 	},
 })

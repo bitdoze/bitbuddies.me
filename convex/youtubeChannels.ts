@@ -291,3 +291,126 @@ export const updateSyncStatus = internalMutation({
 		})
 	},
 })
+
+/**
+ * Get sync health status - monitors channels that haven't synced recently or have errors
+ * Returns channels with issues for admin monitoring
+ */
+export const getSyncHealth = query({
+	args: {},
+	handler: async (ctx) => {
+		const now = Date.now()
+		const oneDayMs = 24 * 60 * 60 * 1000
+		const threeDaysMs = 3 * 24 * 60 * 60 * 1000
+
+		const channels = await ctx.db
+			.query("youtubeChannels")
+			.withIndex("by_is_active", (q) => q.eq("isActive", true))
+			.collect()
+
+		const issues: Array<{
+			channelId: string
+			channelName: string
+			issue: string
+			severity: "warning" | "error"
+			lastSyncedAt?: number
+			lastSyncError?: string
+		}> = []
+
+		for (const channel of channels) {
+			// Check for channels that have never been synced
+			if (!channel.lastSyncedAt) {
+				issues.push({
+					channelId: channel._id,
+					channelName: channel.channelName,
+					issue: "Never synced",
+					severity: "error",
+				})
+				continue
+			}
+
+			// Check for channels with sync failures
+			if (channel.lastSyncStatus === "failed") {
+				issues.push({
+					channelId: channel._id,
+					channelName: channel.channelName,
+					issue: `Sync failed: ${channel.lastSyncError || "Unknown error"}`,
+					severity: "error",
+					lastSyncedAt: channel.lastSyncedAt,
+					lastSyncError: channel.lastSyncError,
+				})
+				continue
+			}
+
+			// Check for channels that haven't synced in 3 days (cron runs daily, so this is concerning)
+			const timeSinceSync = now - channel.lastSyncedAt
+			if (timeSinceSync > threeDaysMs) {
+				issues.push({
+					channelId: channel._id,
+					channelName: channel.channelName,
+					issue: `No sync for ${Math.floor(timeSinceSync / oneDayMs)} days`,
+					severity: "error",
+					lastSyncedAt: channel.lastSyncedAt,
+				})
+			} else if (timeSinceSync > oneDayMs * 1.5) {
+				// Warning if sync is overdue by more than 12 hours
+				issues.push({
+					channelId: channel._id,
+					channelName: channel.channelName,
+					issue: `Sync overdue by ${Math.floor((timeSinceSync - oneDayMs) / (60 * 60 * 1000))} hours`,
+					severity: "warning",
+					lastSyncedAt: channel.lastSyncedAt,
+				})
+			}
+		}
+
+		return {
+			totalActiveChannels: channels.length,
+			healthyChannels: channels.length - issues.length,
+			issues,
+			lastChecked: now,
+		}
+	},
+})
+
+/**
+ * Get detailed sync history for a specific channel
+ * Useful for debugging sync issues
+ */
+export const getChannelSyncHistory = query({
+	args: {
+		channelId: v.id("youtubeChannels"),
+	},
+	handler: async (ctx, args) => {
+		const channel = await ctx.db.get(args.channelId)
+		if (!channel) {
+			throw new Error("Channel not found")
+		}
+
+		// Get video count over time (most recent videos)
+		const recentVideos = await ctx.db
+			.query("youtubeVideos")
+			.withIndex("by_channel_ref", (q) => q.eq("channelRef", args.channelId))
+			.order("desc")
+			.take(10)
+
+		return {
+			channel: {
+				id: channel._id,
+				name: channel.channelName,
+				isActive: channel.isActive,
+				videoCount: channel.videoCount,
+			},
+			syncStatus: {
+				lastSyncedAt: channel.lastSyncedAt,
+				lastSyncStatus: channel.lastSyncStatus,
+				lastSyncError: channel.lastSyncError,
+			},
+			recentVideos: recentVideos.map((v) => ({
+				title: v.title,
+				publishedAt: v.publishedAt,
+				syncedAt: v.syncedAt,
+			})),
+		}
+	},
+})

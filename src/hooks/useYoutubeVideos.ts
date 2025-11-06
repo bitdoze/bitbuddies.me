@@ -6,6 +6,7 @@
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import { useAuth } from "./useAuth";
 
 /**
  * Hook to list YouTube videos with pagination
@@ -42,16 +43,39 @@ export function useYoutubeChannelList() {
 
 /**
  * Hook to manually sync a single channel
+ * Automatically includes clerkId from current user
  */
 export function useSyncYoutubeChannel() {
-	return useAction(api.youtubeVideos.manualSyncChannel);
+	const { user } = useAuth();
+	const syncAction = useAction(api.youtubeVideos.manualSyncChannel);
+
+	return async (args: { channelDbId: Id<"youtubeChannels"> }) => {
+		if (!user?.id) {
+			throw new Error("User not authenticated");
+		}
+		return await syncAction({
+			clerkId: user.id,
+			channelDbId: args.channelDbId,
+		});
+	};
 }
 
 /**
  * Hook to manually sync all channels
+ * Automatically includes clerkId from current user
  */
 export function useSyncAllYoutubeChannels() {
-	return useAction(api.youtubeVideos.manualSyncAllChannels);
+	const { user } = useAuth();
+	const syncAction = useAction(api.youtubeVideos.manualSyncAllChannels);
+
+	return async () => {
+		if (!user?.id) {
+			throw new Error("User not authenticated");
+		}
+		return await syncAction({
+			clerkId: user.id,
+		});
+	};
 }
 
 /**

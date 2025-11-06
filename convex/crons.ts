@@ -21,11 +21,13 @@ crons.daily(
 /**
  * Clean up stale YouTube videos daily at 7 AM UTC
  * Removes videos older than two weeks to keep the library fresh
+ * Uses batching (100 videos per run) to avoid timeouts with large datasets
+ * If more videos need cleanup, schedules another run automatically
  */
 crons.daily(
 	"cleanup-youtube-videos",
 	{ hourUTC: 7, minuteUTC: 0 },
-	internal.youtubeVideos.cleanupOldVideos,
+	internal.youtubeVideos.cleanupOldVideosBatched,
 )
 
 export default crons
