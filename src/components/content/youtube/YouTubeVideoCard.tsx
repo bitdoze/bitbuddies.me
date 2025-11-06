@@ -39,7 +39,7 @@ export function YouTubeVideoCard({ video, className }: YouTubeVideoCardProps) {
 					label: formatViews(video.views)!,
 				}
 			: undefined,
-	].filter(Boolean) as Array<{ icon: JSX.Element; label: string }>;
+	].filter(Boolean) as Array<{ icon: React.ReactNode; label: string }>;
 
 	return (
 		<a
@@ -56,7 +56,7 @@ export function YouTubeVideoCard({ video, className }: YouTubeVideoCardProps) {
 				badges={[{ label: "YouTube", variant: "secondary" }]}
 				meta={meta}
 				cover={
-					<div className="relative aspect-[16/9] overflow-hidden">
+					<div className="relative aspect-video overflow-hidden">
 						<img
 							src={video.thumbnailUrl}
 							alt={video.title}
@@ -71,7 +71,7 @@ export function YouTubeVideoCard({ video, className }: YouTubeVideoCardProps) {
 						</div>
 						<div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
 							<Youtube className="h-3.5 w-3.5 text-red-400" />
-							<span className="line-clamp-1 max-w-[160px]">
+							<span className="line-clamp-1 max-w-40">
 								{video.channelName}
 							</span>
 						</div>
