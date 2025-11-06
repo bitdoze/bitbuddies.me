@@ -24,6 +24,9 @@ export { CourseProgress, CourseCurriculum } from "./course";
 // Post components
 export { PostMeta, PostViews, PostSharing } from "./post";
 
+// YouTube components
+export { YouTubeVideoCard } from "./youtube/YouTubeVideoCard";
+
 // Types
 export type { MetaItem } from "./blocks";
 export type { Resource } from "./blocks";

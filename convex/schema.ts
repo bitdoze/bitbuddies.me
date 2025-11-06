@@ -563,4 +563,77 @@ export default defineSchema({
 		.index('by_email', ['email'])
 		.index('by_user_id', ['userId'])
 		.index('by_created_at', ['createdAt']),
+
+	// ============================================================================
+	// YOUTUBE CHANNELS & VIDEOS
+	// ============================================================================
+
+	/**
+	 * YouTube channels - channels to track for video updates
+	 */
+	youtubeChannels: defineTable({
+		// Channel identification
+		channelId: v.string(), // YouTube channel ID (e.g., UCGsUtKhXsRrMvYAWm8q0bCg)
+		channelName: v.string(), // Channel display name
+		channelUrl: v.string(), // Full YouTube channel URL
+		// Feed details
+		feedUrl: v.string(), // RSS feed URL
+		// Channel metadata
+		description: v.optional(v.string()),
+		thumbnailUrl: v.optional(v.string()),
+		// Sync tracking
+		lastSyncedAt: v.optional(v.number()),
+		lastSyncStatus: v.optional(v.union(
+			v.literal('success'),
+			v.literal('failed'),
+		)),
+		lastSyncError: v.optional(v.string()),
+		videoCount: v.number(), // Total videos synced from this channel
+		// Status
+		isActive: v.boolean(), // Whether to sync this channel
+		// Timestamps
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_channel_id', ['channelId'])
+		.index('by_is_active', ['isActive'])
+		.index('by_last_synced', ['lastSyncedAt'])
+		.searchIndex('search_name', {
+			searchField: 'channelName',
+			filterFields: ['isActive'],
+		}),
+
+	/**
+	 * YouTube videos - videos synced from tracked channels
+	 */
+	youtubeVideos: defineTable({
+		// Video identification
+		videoId: v.string(), // YouTube video ID
+		channelId: v.string(), // YouTube channel ID
+		channelRef: v.id('youtubeChannels'), // Reference to our channel record
+		// Video metadata
+		title: v.string(),
+		description: v.string(),
+		thumbnailUrl: v.string(),
+		videoUrl: v.string(), // Full YouTube watch URL
+		// Channel info (denormalized for easy display)
+		channelName: v.string(),
+		// Stats
+		views: v.optional(v.number()),
+		// Dates
+		publishedAt: v.number(), // When video was published on YouTube
+		updatedAt: v.number(), // When video was last updated on YouTube
+		// Timestamps
+		syncedAt: v.number(), // When we synced this video
+		createdAt: v.number(), // When we first added this video to our DB
+	})
+		.index('by_video_id', ['videoId'])
+		.index('by_channel_id', ['channelId'])
+		.index('by_channel_ref', ['channelRef'])
+		.index('by_published_at', ['publishedAt'])
+		.index('by_synced_at', ['syncedAt'])
+		.index('by_channel_and_published', ['channelId', 'publishedAt'])
+		.searchIndex('search_title', {
+			searchField: 'title',
+		}),
 })

@@ -12,6 +12,7 @@ import type * as chapters from "../chapters.js";
 import type * as contactMessages from "../contactMessages.js";
 import type * as contactMessagesActions from "../contactMessagesActions.js";
 import type * as courses from "../courses.js";
+import type * as crons from "../crons.js";
 import type * as enrollments from "../enrollments.js";
 import type * as lessonAttachments from "../lessonAttachments.js";
 import type * as lessons from "../lessons.js";
@@ -24,6 +25,8 @@ import type * as users from "../users.js";
 import type * as utils from "../utils.js";
 import type * as workshopAttachments from "../workshopAttachments.js";
 import type * as workshops from "../workshops.js";
+import type * as youtubeChannels from "../youtubeChannels.js";
+import type * as youtubeVideos from "../youtubeVideos.js";
 
 import type {
   ApiFromModules,
@@ -44,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   contactMessages: typeof contactMessages;
   contactMessagesActions: typeof contactMessagesActions;
   courses: typeof courses;
+  crons: typeof crons;
   enrollments: typeof enrollments;
   lessonAttachments: typeof lessonAttachments;
   lessons: typeof lessons;
@@ -56,6 +60,8 @@ declare const fullApi: ApiFromModules<{
   utils: typeof utils;
   workshopAttachments: typeof workshopAttachments;
   workshops: typeof workshops;
+  youtubeChannels: typeof youtubeChannels;
+  youtubeVideos: typeof youtubeVideos;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

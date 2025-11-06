@@ -15,6 +15,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as YoutubeIndexRouteImport } from './routes/youtube.index'
 import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
@@ -26,6 +27,7 @@ import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as AdminWorkshopsRouteImport } from './routes/admin.workshops'
 import { Route as AdminPostsRouteImport } from './routes/admin.posts'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
+import { Route as AdminYoutubeIndexRouteImport } from './routes/admin.youtube.index'
 import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin.workshops.index'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin.posts.index'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin.courses.index'
@@ -66,6 +68,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YoutubeIndexRoute = YoutubeIndexRouteImport.update({
+  id: '/youtube/',
+  path: '/youtube/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkshopsIndexRoute = WorkshopsIndexRouteImport.update({
@@ -121,6 +128,11 @@ const AdminPostsRoute = AdminPostsRouteImport.update({
 const AdminCoursesRoute = AdminCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminYoutubeIndexRoute = AdminYoutubeIndexRouteImport.update({
+  id: '/youtube/',
+  path: '/youtube/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminWorkshopsIndexRoute = AdminWorkshopsIndexRouteImport.update({
@@ -198,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesIndexRoute
   '/posts': typeof PostsIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
+  '/youtube': typeof YoutubeIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
@@ -205,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/youtube': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
@@ -224,6 +238,7 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesIndexRoute
   '/posts': typeof PostsIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
+  '/youtube': typeof YoutubeIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
@@ -231,6 +246,7 @@ export interface FileRoutesByTo {
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/workshops': typeof AdminWorkshopsIndexRoute
+  '/admin/youtube': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
@@ -255,6 +271,7 @@ export interface FileRoutesById {
   '/courses/': typeof CoursesIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/workshops/': typeof WorkshopsIndexRoute
+  '/youtube/': typeof YoutubeIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
@@ -262,6 +279,7 @@ export interface FileRoutesById {
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
+  '/admin/youtube/': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
@@ -287,6 +305,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/posts'
     | '/workshops'
+    | '/youtube'
     | '/admin/courses/create'
     | '/admin/posts/create'
     | '/admin/workshops/create'
@@ -294,6 +313,7 @@ export interface FileRouteTypes {
     | '/admin/courses/'
     | '/admin/posts/'
     | '/admin/workshops/'
+    | '/admin/youtube'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
     | '/admin/posts/$id/edit'
@@ -313,6 +333,7 @@ export interface FileRouteTypes {
     | '/courses'
     | '/posts'
     | '/workshops'
+    | '/youtube'
     | '/admin/courses/create'
     | '/admin/posts/create'
     | '/admin/workshops/create'
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/posts'
     | '/admin/workshops'
+    | '/admin/youtube'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
     | '/admin/posts/$id/edit'
@@ -343,6 +365,7 @@ export interface FileRouteTypes {
     | '/courses/'
     | '/posts/'
     | '/workshops/'
+    | '/youtube/'
     | '/admin/courses/create'
     | '/admin/posts/create'
     | '/admin/workshops/create'
@@ -350,6 +373,7 @@ export interface FileRouteTypes {
     | '/admin/courses/'
     | '/admin/posts/'
     | '/admin/workshops/'
+    | '/admin/youtube/'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
     | '/admin/posts/$id/edit'
@@ -370,6 +394,7 @@ export interface RootRouteChildren {
   CoursesIndexRoute: typeof CoursesIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
   WorkshopsIndexRoute: typeof WorkshopsIndexRoute
+  YoutubeIndexRoute: typeof YoutubeIndexRoute
   CoursesCourseSlugLessonSlugRoute: typeof CoursesCourseSlugLessonSlugRoute
 }
 
@@ -415,6 +440,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/youtube/': {
+      id: '/youtube/'
+      path: '/youtube'
+      fullPath: '/youtube'
+      preLoaderRoute: typeof YoutubeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/workshops/': {
@@ -492,6 +524,13 @@ declare module '@tanstack/react-router' {
       path: '/courses'
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/youtube/': {
+      id: '/admin/youtube/'
+      path: '/youtube'
+      fullPath: '/admin/youtube'
+      preLoaderRoute: typeof AdminYoutubeIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/workshops/': {
@@ -629,6 +668,7 @@ interface AdminRouteChildren {
   AdminPostsRoute: typeof AdminPostsRouteWithChildren
   AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminYoutubeIndexRoute: typeof AdminYoutubeIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -636,6 +676,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPostsRoute: AdminPostsRouteWithChildren,
   AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminYoutubeIndexRoute: AdminYoutubeIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -654,6 +695,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesIndexRoute: CoursesIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
   WorkshopsIndexRoute: WorkshopsIndexRoute,
+  YoutubeIndexRoute: YoutubeIndexRoute,
   CoursesCourseSlugLessonSlugRoute: CoursesCourseSlugLessonSlugRoute,
 }
 export const routeTree = rootRouteImport

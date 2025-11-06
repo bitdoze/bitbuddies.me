@@ -150,4 +150,11 @@ export const SEO_CONFIGS = {
 			"Get in touch with BitBuddies. We're here to help with questions about courses, workshops, or partnerships.",
 		keywords: "contact, support, help, questions, partnerships",
 	},
+	youtube: {
+		title: "YouTube Videos",
+		description:
+			"Watch the latest tutorials, guides, and insights from our curated YouTube channels. Fresh content added daily covering web development, AI, and modern tech.",
+		keywords:
+			"youtube videos, video tutorials, coding videos, web development videos, AI videos, tech tutorials, programming videos, developer content",
+	},
 } as const;

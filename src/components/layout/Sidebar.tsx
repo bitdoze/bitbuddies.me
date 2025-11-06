@@ -10,6 +10,7 @@ import {
 	Plus,
 	Shield,
 	X,
+	Youtube,
 } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,12 @@ const menuItems = [
 		title: "Workshops",
 		url: "/workshops",
 		icon: Calendar,
+		isRoute: true,
+	},
+	{
+		title: "Videos",
+		url: "/youtube",
+		icon: Youtube,
 		isRoute: true,
 	},
 	{
@@ -201,6 +208,17 @@ export function AppSidebar() {
 										<Link to="/admin/courses">
 											<BookOpen className="h-4 w-4" />
 											<span>Manage Courses</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
+										<Link to="/admin/youtube">
+											<Youtube className="h-4 w-4" />
+											<span>Manage YouTube</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>

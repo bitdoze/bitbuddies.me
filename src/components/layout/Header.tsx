@@ -5,6 +5,7 @@ import {
 	FileText,
 	LayoutDashboard,
 	Shield,
+	Youtube,
 } from "lucide-react";
 import { LogoHeader } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -25,6 +26,7 @@ const primaryLinks = [
 	{ label: "Home", to: "/" },
 	{ label: "Courses", to: "/courses" },
 	{ label: "Workshops", to: "/workshops" },
+	{ label: "Videos", to: "/youtube" },
 	{ label: "Blog", to: "/posts" },
 	{ label: "About", to: "/about" },
 	{ label: "Contact", to: "/contact" },
@@ -103,6 +105,12 @@ export default function Header() {
 									<Link to="/admin/courses" className="cursor-pointer">
 										<BookOpen className="mr-2 h-4 w-4" />
 										Manage Courses
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem asChild>
+									<Link to="/admin/youtube" className="cursor-pointer">
+										<Youtube className="mr-2 h-4 w-4" />
+										Manage YouTube
 									</Link>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
