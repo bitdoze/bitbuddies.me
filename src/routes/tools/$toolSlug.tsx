@@ -377,12 +377,8 @@ function ToolPage() {
 		setCopiedCardId(null);
 
 		try {
-			const response = await runTool({
+			const response = await (runTool as any)({
 				data: { slug: tool.slug, inputs },
-				signal: controller.signal,
-				headers: {
-					Accept: "text/plain",
-				},
 			});
 
 			if (!response.ok || !response.body) {
@@ -605,7 +601,7 @@ const renderJsonArray = (
 				description={tool.description}
 				canonicalUrl={`/tools/${tool.slug}`}
 			/>
-			<section className="border-b bg-gradient-to-br from-primary/10 via-background to-secondary/10 py-16">
+			<section className="border-b bg-linear-to-br from-primary/10 via-background to-secondary/10 py-16">
 				<div className="container mx-auto px-4">
 					<div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 						<div className="space-y-4">
@@ -726,7 +722,7 @@ const renderJsonArray = (
 							</Tabs>
 						) : (
 							<ScrollArea className="h-72 rounded-lg border border-border/70 bg-background/60 p-4">
-								<pre className="whitespace-pre-wrap text-sm text-muted-foreground">{output || outputView.content}</pre>
+								<pre className="whitespace-pre-wrap text-sm text-muted-foreground">{output}</pre>
 							</ScrollArea>
 						)}
 						</CardContent>
