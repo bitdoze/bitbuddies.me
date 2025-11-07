@@ -201,8 +201,8 @@ function EditCoursePage() {
 					duration: formData.duration
 						? Number.parseInt(formData.duration)
 						: undefined,
-					accessLevel: formData.accessLevel,
-					requiredTier: formData.requiredTier,
+					accessLevel: formData.accessLevel || "authenticated",
+					requiredTier: formData.requiredTier || undefined,
 					isPublished: formData.isPublished,
 					isFeatured: formData.isFeatured,
 				},

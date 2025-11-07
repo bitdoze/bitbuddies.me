@@ -173,13 +173,13 @@ function CreateWorkshopPage() {
 				maxParticipants: formData.maxParticipants
 					? Number(formData.maxParticipants)
 					: undefined,
-				videoProvider: formData.videoId
-					? formData.videoProvider || "youtube"
+				videoProvider: formData.videoId && formData.videoProvider
+					? formData.videoProvider
 					: undefined,
 				videoId: formData.videoId || undefined,
 				videoUrl: formData.videoUrl || undefined,
-				accessLevel: formData.accessLevel,
-				requiredTier: formData.requiredTier,
+				accessLevel: formData.accessLevel || "authenticated",
+				requiredTier: formData.requiredTier || undefined,
 				isPublished: formData.isPublished,
 				isFeatured: formData.isFeatured,
 				instructorId: convexUser._id,

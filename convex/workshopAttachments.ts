@@ -1,25 +1,6 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
-
-/**
- * Helper to verify admin role
- */
-async function requireAdmin(ctx: any, clerkId: string) {
-	const user = await ctx.db
-		.query("users")
-		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
-		.first()
-
-	if (!user) {
-		throw new Error("User not found")
-	}
-
-	if (user.role !== "admin") {
-		throw new Error("Admin access required")
-	}
-
-	return user
-}
+import { requireAdmin } from "./utils"
 
 export const create = mutation({
 	args: {

@@ -117,6 +117,167 @@ const enriched = await Promise.all(
 - **Type Convex responses**: Use generated types from `convex/_generated/dataModel`
 - **Strict mode**: Keep TypeScript strict mode enabled
 
+### Type Patterns and Examples
+
+#### Using Generated Types
+
+```typescript
+import type { Doc, Id } from "./_generated/dataModel";
+
+// Type a document from the database
+const workshop: Doc<"workshops"> | null = await ctx.db.get(workshopId);
+
+// Type an ID reference
+const userId: Id<"users"> = args.userId;
+
+// Type arrays of documents
+const workshops: Doc<"workshops">[] = await ctx.db.query("workshops").collect();
+```
+
+#### Enriched Response Types
+
+```typescript
+// Define enriched types for responses that include related data
+type WorkshopWithAsset = Doc<"workshops"> & {
+	coverAsset: Doc<"mediaAssets"> | null;
+};
+
+export const list = query({
+	args: { publishedOnly: v.boolean() },
+	handler: async (ctx, args): Promise<WorkshopWithAsset[]> => {
+		const workshops = await ctx.db.query("workshops").collect();
+
+		return await Promise.all(
+			workshops.map(async (workshop) => {
+				let coverAsset = null;
+				if (workshop.coverAssetId) {
+					coverAsset = await ctx.db.get(workshop.coverAssetId);
+				}
+				return { ...workshop, coverAsset };
+			}),
+		);
+	},
+});
+```
+
+#### Validator Types for Reusable Args
+
+```typescript
+// Define reusable validator schemas
+const workshopWriteFields = {
+	title: v.string(),
+	slug: v.string(),
+	description: v.string(),
+	level: v.union(
+		v.literal("beginner"),
+		v.literal("intermediate"),
+		v.literal("advanced"),
+	),
+	tags: v.array(v.string()),
+	isPublished: v.optional(v.boolean()),
+};
+
+// Use in multiple mutations
+export const create = mutation({
+	args: {
+		...workshopWriteFields,
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		await requireAdmin(ctx, args.clerkId);
+		// ...
+	},
+});
+
+export const update = mutation({
+	args: {
+		...workshopWriteFields,
+		workshopId: v.id("workshops"),
+		clerkId: v.string(),
+	},
+	handler: async (ctx, args) => {
+		await requireAdmin(ctx, args.clerkId);
+		// ...
+	},
+});
+```
+
+#### Type-Safe Query Filters
+
+```typescript
+// Use proper typing for query filters
+export const getBySlug = query({
+	args: { slug: v.string() },
+	handler: async (ctx, args): Promise<Doc<"workshops"> | null> => {
+		return await ctx.db
+			.query("workshops")
+			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
+			.first();
+	},
+});
+```
+
+#### Context Types for Helper Functions
+
+```typescript
+import type { MutationCtx, QueryCtx } from "./_generated/server";
+
+// Type helper functions that work with both mutations and queries
+type Ctx = MutationCtx | QueryCtx;
+
+export const requireAdmin = async (
+	ctx: Ctx,
+	clerkId: string,
+): Promise<Doc<"users">> => {
+	const user = await ctx.db
+		.query("users")
+		.withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
+		.first();
+
+	if (!user) {
+		throw new Error("User not found");
+	}
+
+	if (user.role !== "admin") {
+		throw new Error("Admin access required");
+	}
+
+	return user;
+};
+```
+
+#### Optional Fields and Undefined Handling
+
+```typescript
+export const update = mutation({
+	args: {
+		workshopId: v.id("workshops"),
+		title: v.optional(v.string()),
+		description: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const workshop = await ctx.db.get(args.workshopId);
+		if (!workshop) {
+			throw new Error("Workshop not found");
+		}
+
+		// Build updates object with proper typing
+		const updates: Partial<Doc<"workshops">> = {
+			updatedAt: Date.now(),
+		};
+
+		if (args.title !== undefined) {
+			updates.title = args.title;
+		}
+		if (args.description !== undefined) {
+			updates.description = args.description;
+		}
+
+		await ctx.db.patch(args.workshopId, updates);
+	},
+});
+```
+
 ## Utility Functions
 
 Located in `utils.ts`:

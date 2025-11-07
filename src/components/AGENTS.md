@@ -46,15 +46,93 @@ The image library provides a centralized way to manage and reuse uploaded images
 - `ImageUpload` - Upload UI with library access button
 - `ImageLibrary` - Modal dialog for browsing/selecting images
 
-### Usage
+### Usage Examples
+
+#### Basic Usage in a Form
 ```typescript
-<ImageUpload
-	value={coverAssetId}
-	imageUrl={coverAsset?.url}
-	onChange={setCoverAssetId}
-	label="Cover Image"
-/>
+import { ImageUpload } from "@/components/common/ImageUpload";
+
+function WorkshopForm() {
+	const [coverAssetId, setCoverAssetId] = useState<Id<"mediaAssets"> | undefined>();
+	const coverAsset = useQuery(api.mediaAssets.getById,
+		coverAssetId ? { assetId: coverAssetId } : "skip"
+	);
+
+	return (
+		<ImageUpload
+			value={coverAssetId}
+			imageUrl={coverAsset?.url}
+			onChange={setCoverAssetId}
+			label="Cover Image"
+		/>
+	);
+}
 ```
+
+#### Usage in Admin Workshop Create/Edit
+```typescript
+// In src/routes/admin/workshops/create.tsx or edit.tsx
+import { ImageUpload } from "@/components/common/ImageUpload";
+
+export default function WorkshopCreatePage() {
+	const [coverAssetId, setCoverAssetId] = useState<Id<"mediaAssets"> | undefined>();
+
+	// The ImageUpload component handles:
+	// - Uploading new images
+	// - Opening ImageLibrary modal to browse existing images
+	// - Preview before saving
+	// - 16:9 aspect ratio enforcement
+
+	return (
+		<form>
+			<ImageUpload
+				value={coverAssetId}
+				imageUrl={coverAsset?.url}
+				onChange={(assetId) => {
+					setCoverAssetId(assetId);
+					// Optionally update form state
+					form.setValue("coverAssetId", assetId);
+				}}
+				label="Workshop Cover Image"
+			/>
+		</form>
+	);
+}
+```
+
+#### Direct ImageLibrary Usage
+```typescript
+// For custom implementations where you need just the library browser
+import { ImageLibrary } from "@/components/common/ImageLibrary";
+
+function CustomImageSelector() {
+	const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+	const [selectedAssetId, setSelectedAssetId] = useState<Id<"mediaAssets"> | undefined>();
+
+	return (
+		<>
+			<Button onClick={() => setIsLibraryOpen(true)}>
+				Browse Image Library
+			</Button>
+
+			<ImageLibrary
+				open={isLibraryOpen}
+				onOpenChange={setIsLibraryOpen}
+				onSelect={(assetId) => {
+					setSelectedAssetId(assetId);
+					setIsLibraryOpen(false);
+				}}
+			/>
+		</>
+	);
+}
+```
+
+#### Real-World Implementation Reference
+See these files for complete examples:
+- `src/routes/admin/workshops/create.tsx` - Workshop creation with image upload
+- `src/routes/admin/workshops/$workshopId.edit.tsx` - Workshop editing with existing image
+- `src/components/admin/CourseForm.tsx` - Course form with cover image
 
 ### ImageUpload Component Features
 - Upload new images with preview before saving

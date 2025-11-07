@@ -1,26 +1,6 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
-import { ensureUniqueSlug } from "./utils"
-
-/**
- * Helper to verify admin role
- */
-async function requireAdmin(ctx: any, clerkId: string) {
-	const user = await ctx.db
-		.query("users")
-		.withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
-		.first()
-
-	if (!user) {
-		throw new Error("User not found")
-	}
-
-	if (user.role !== "admin") {
-		throw new Error("Admin access required")
-	}
-
-	return user
-}
+import { ensureUniqueSlug, requireAdmin } from "./utils"
 
 const writeFields = {
 	title: v.string(),
@@ -307,11 +287,10 @@ export const getBySlug = query({
 	handler: async (ctx, args) => {
 		const workshop = await ctx.db
 			.query("workshops")
-			.withIndex("by_slug", (q) => q.eq("slug", args.slug))
-			.filter((q) => q.eq(q.field("isDeleted"), false))
-			.first()
+ 		.withIndex("by_slug", (q) => q.eq("slug", args.slug))
+		.first()
 
-		if (!workshop) {
+	if (!workshop || workshop.isDeleted) {
 			return null
 		}
 

@@ -248,12 +248,12 @@ function EditWorkshopPage() {
 				currentParticipants: formData.currentParticipants
 					? Number(formData.currentParticipants)
 					: undefined,
-				videoProvider: formData.videoId
-					? formData.videoProvider || "youtube"
+				videoProvider: formData.videoId && formData.videoProvider
+					? formData.videoProvider
 					: undefined,
 				videoId: formData.videoId || undefined,
 				videoUrl: formData.videoUrl || undefined,
-				accessLevel: formData.accessLevel,
+				accessLevel: formData.accessLevel || "authenticated",
 				requiredTier: formData.requiredTier || undefined,
 				isPublished: formData.isPublished,
 				isFeatured: formData.isFeatured,
