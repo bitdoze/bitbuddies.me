@@ -13,6 +13,7 @@
     "check": "biome check"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.64",
     "@clerk/clerk-react": "^5.53.4",
     "@convex-dev/react-query": "0.0.0-alpha.11",
     "@floating-ui/dom": "^1.7.4",
@@ -55,6 +56,7 @@
     "@tiptap/react": "^3.10.1",
     "@tiptap/starter-kit": "^3.10.1",
     "@tiptap/suggestion": "^3.10.1",
+    "ai": "^5.0.89",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

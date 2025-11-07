@@ -2,13 +2,19 @@ import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
 	BookOpen,
 	Calendar,
+	FileImage,
 	FileText,
+	FileVideo,
 	Home,
 	Info,
 	LayoutDashboard,
 	Mail,
+	Megaphone,
+	PenLine,
 	Plus,
 	Shield,
+	Sparkles,
+	Type,
 	X,
 	Youtube,
 } from "lucide-react";
@@ -74,6 +80,39 @@ const menuItems = [
 		url: "/contact",
 		icon: Mail,
 		isRoute: true,
+	},
+];
+
+const toolMenuItems = [
+	{
+		title: "Tools Hub",
+		url: "/tools",
+		icon: Sparkles,
+	},
+	{
+		title: "AI Title Generator",
+		url: "/tools/title-generator",
+		icon: Type,
+	},
+	{
+		title: "AI Humanizer",
+		url: "/tools/ai-humanizer",
+		icon: PenLine,
+	},
+	{
+		title: "Social Post Generator",
+		url: "/tools/social-post-generator",
+		icon: Megaphone,
+	},
+	{
+		title: "YouTube Script Generator",
+		url: "/tools/youtube-script-generator",
+		icon: FileVideo,
+	},
+	{
+		title: "YouTube Thumbnail Ideas",
+		url: "/tools/youtube-thumbnail-generator",
+		icon: FileImage,
 	},
 ];
 
@@ -147,6 +186,43 @@ export function AppSidebar() {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
+
+	<SidebarGroup>
+		<SidebarGroupLabel className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
+			AI Tools
+		</SidebarGroupLabel>
+		<SidebarGroupContent>
+			<SidebarMenu>
+				{toolMenuItems.map((item) => {
+					const isActive = matchRoute({ to: item.url as any, fuzzy: true });
+					return (
+						<SidebarMenuItem key={item.title}>
+							<SidebarMenuButton
+								asChild
+								className={cn(
+									"group relative overflow-hidden rounded-xl border border-transparent bg-transparent px-3 py-2 text-sm font-medium transition-all",
+									isActive
+										? "bg-primary/15 text-primary shadow-sm"
+										: "hover:border-sidebar-border hover:bg-sidebar-accent/40",
+								)}
+								data-active={isActive ? "true" : undefined}
+							>
+								<Link to={item.url} className="flex items-center gap-3">
+									<item.icon
+										className={cn(
+											"h-4 w-4 transition-transform",
+											isActive && "scale-110",
+										)}
+									/>
+									<span>{item.title}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					);
+				})}
+			</SidebarMenu>
+		</SidebarGroupContent>
+	</SidebarGroup>
 
 				{isAdmin && (
 					<SidebarGroup>

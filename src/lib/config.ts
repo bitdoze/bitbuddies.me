@@ -11,6 +11,16 @@ const getEnvVar = (key: string, fallback: string = ""): string => {
 	return fallback;
 };
 
+const getServerEnvVar = (key: string): string | undefined => {
+	if (typeof process !== "undefined" && process.env?.[key]) {
+		return process.env[key];
+	}
+	if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
+		return import.meta.env[key];
+	}
+	return undefined;
+};
+
 // Site URLs
 export const SITE_URL =
 	getEnvVar("VITE_SITE_URL") ||
@@ -56,6 +66,28 @@ export const API_CONFIG = {
 	convex: getEnvVar("VITE_CONVEX_URL"),
 	clerk: getEnvVar("VITE_CLERK_PUBLISHABLE_KEY"),
 } as const;
+
+export const AI_CONFIG = {
+	provider: getEnvVar("VITE_AI_PROVIDER", "openai"),
+	model: getEnvVar("VITE_AI_MODEL", "gpt-4o-mini"),
+	gatewayUrl: getEnvVar(
+		"VITE_AI_GATEWAY_URL",
+		"https://ai-gateway.vercel.sh/v1",
+	),
+} as const;
+
+export const AI_SECRET_CONFIG = {
+	apiKey: getServerEnvVar("AI_GATEWAY_API_KEY") ?? "",
+} as const;
+
+export const getAiModelId = (): string => {
+	const provider = AI_CONFIG.provider.trim();
+	const model = AI_CONFIG.model.trim();
+	if (provider && model) {
+		return model.includes("/") ? model : `${provider}/${model}`;
+	}
+	return provider || model;
+};
 
 // Theme Configuration
 export const THEME_CONFIG = {

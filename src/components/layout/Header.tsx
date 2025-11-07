@@ -4,6 +4,7 @@ import {
 	Calendar,
 	FileText,
 	LayoutDashboard,
+	Sparkles,
 	Shield,
 	Youtube,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
+import { TOOL_REGISTRY } from "@/lib/ai-tools";
 import HeaderUser from "@/integrations/clerk/header-user";
 
 const primaryLinks = [
@@ -47,7 +49,7 @@ export default function Header() {
 						<LogoHeader className="h-10 w-auto" />
 					</Link>
 				</div>
-				<nav className="hidden h-full items-center justify-center gap-1  px-2 py-1 lg:flex">
+	<nav className="hidden h-full items-center justify-center gap-1 px-2 py-1 lg:flex">
 					{primaryLinks.map((link) => {
 						return (
 							<Link
@@ -64,6 +66,41 @@ export default function Header() {
 							</Link>
 						);
 					})}
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<button
+					type="button"
+					className="group relative rounded-full px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
+				>
+					<span className="flex items-center gap-2">
+						<Sparkles className="h-4 w-4 text-primary" />
+						Tools
+					</span>
+					<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 origin-left scale-x-0 rounded-full bg-primary transition-transform duration-200 group-data-[state=open]:scale-x-100" />
+				</button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="center" className="w-64">
+				<DropdownMenuLabel>AI Tools</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem asChild>
+					<Link to="/tools" className="cursor-pointer">
+						Overview
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
+				{TOOL_REGISTRY.map((tool) => (
+					<DropdownMenuItem key={tool.slug} asChild>
+						<Link to="/tools/$toolSlug" params={{ toolSlug: tool.slug }} className="flex items-center gap-2">
+							<span
+								className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10"
+								dangerouslySetInnerHTML={{ __html: tool.icon }}
+							/>
+							<span className="flex-1 text-sm">{tool.name}</span>
+						</Link>
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
 				</nav>
 				<div className="flex items-center gap-2">
 					<ThemeToggle />

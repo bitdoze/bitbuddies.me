@@ -18,10 +18,12 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as YoutubeIndexRouteImport } from './routes/youtube.index'
 import { Route as WorkshopsIndexRouteImport } from './routes/workshops.index'
+import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as PostsIndexRouteImport } from './routes/posts.index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
+import { Route as ToolsToolSlugRouteImport } from './routes/tools/$toolSlug'
 import { Route as PostsSlugRouteImport } from './routes/posts.$slug'
 import { Route as DebugMigrateWorkshopsRouteImport } from './routes/debug.migrate-workshops'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
@@ -102,6 +104,11 @@ const WorkshopsIndexRoute = WorkshopsIndexRouteImport.update({
   path: '/workshops/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostsIndexRoute = PostsIndexRouteImport.update({
   id: '/posts/',
   path: '/posts/',
@@ -120,6 +127,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
   id: '/workshops/$slug',
   path: '/workshops/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsToolSlugRoute = ToolsToolSlugRouteImport.update({
+  id: '/tools/$toolSlug',
+  path: '/tools/$toolSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostsSlugRoute = PostsSlugRouteImport.update({
@@ -225,10 +237,12 @@ export interface FileRoutesByFullPath {
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
+  '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/courses': typeof CoursesIndexRoute
   '/posts': typeof PostsIndexRoute
+  '/tools': typeof ToolsIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
   '/youtube': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesLayoutRoute
@@ -257,9 +271,11 @@ export interface FileRoutesByTo {
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
+  '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/courses': typeof CoursesIndexRoute
   '/posts': typeof PostsIndexRoute
+  '/tools': typeof ToolsIndexRoute
   '/workshops': typeof WorkshopsIndexRoute
   '/youtube': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
@@ -287,10 +303,12 @@ export interface FileRoutesById {
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
   '/posts/$slug': typeof PostsSlugRoute
+  '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/courses/': typeof CoursesIndexRoute
   '/posts/': typeof PostsIndexRoute
+  '/tools/': typeof ToolsIndexRoute
   '/workshops/': typeof WorkshopsIndexRoute
   '/youtube/': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesRouteWithChildren
@@ -324,10 +342,12 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/debug/migrate-workshops'
     | '/posts/$slug'
+    | '/tools/$toolSlug'
     | '/workshops/$slug'
     | '/admin/'
     | '/courses'
     | '/posts'
+    | '/tools'
     | '/workshops'
     | '/youtube'
     | '/admin/courses'
@@ -356,9 +376,11 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/debug/migrate-workshops'
     | '/posts/$slug'
+    | '/tools/$toolSlug'
     | '/workshops/$slug'
     | '/courses'
     | '/posts'
+    | '/tools'
     | '/workshops'
     | '/youtube'
     | '/admin/courses'
@@ -385,10 +407,12 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/debug/migrate-workshops'
     | '/posts/$slug'
+    | '/tools/$toolSlug'
     | '/workshops/$slug'
     | '/admin/'
     | '/courses/'
     | '/posts/'
+    | '/tools/'
     | '/workshops/'
     | '/youtube/'
     | '/admin/courses'
@@ -421,9 +445,11 @@ export interface RootRouteChildren {
   CoursesSlugRoute: typeof CoursesSlugRoute
   DebugMigrateWorkshopsRoute: typeof DebugMigrateWorkshopsRoute
   PostsSlugRoute: typeof PostsSlugRoute
+  ToolsToolSlugRoute: typeof ToolsToolSlugRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
+  ToolsIndexRoute: typeof ToolsIndexRoute
   WorkshopsIndexRoute: typeof WorkshopsIndexRoute
   YoutubeIndexRoute: typeof YoutubeIndexRoute
   CoursesCourseSlugLessonSlugRoute: typeof CoursesCourseSlugLessonSlugRoute
@@ -508,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkshopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/': {
+      id: '/tools/'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/posts/': {
       id: '/posts/'
       path: '/posts'
@@ -534,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/workshops/$slug'
       fullPath: '/workshops/$slug'
       preLoaderRoute: typeof WorkshopsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/$toolSlug': {
+      id: '/tools/$toolSlug'
+      path: '/tools/$toolSlug'
+      fullPath: '/tools/$toolSlug'
+      preLoaderRoute: typeof ToolsToolSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/posts/$slug': {
@@ -758,9 +798,11 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesSlugRoute: CoursesSlugRoute,
   DebugMigrateWorkshopsRoute: DebugMigrateWorkshopsRoute,
   PostsSlugRoute: PostsSlugRoute,
+  ToolsToolSlugRoute: ToolsToolSlugRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
+  ToolsIndexRoute: ToolsIndexRoute,
   WorkshopsIndexRoute: WorkshopsIndexRoute,
   YoutubeIndexRoute: YoutubeIndexRoute,
   CoursesCourseSlugLessonSlugRoute: CoursesCourseSlugLessonSlugRoute,
