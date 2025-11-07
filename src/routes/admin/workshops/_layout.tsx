@@ -1,13 +1,13 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import {
 	Card,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "../components/ui/card";
-import { useAuth } from "../hooks/useAuth";
+} from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/admin/workshops")({
+export const Route = createFileRoute("/admin/workshops/_layout")({
 	component: AdminWorkshopsLayout,
 });
 
@@ -19,7 +19,7 @@ function AdminWorkshopsLayout() {
 			<div className="container mx-auto py-8">
 				<div className="text-center">Loading...</div>
 			</div>
-		);
+		)
 	}
 
 	if (!isAuthenticated) {
@@ -34,7 +34,7 @@ function AdminWorkshopsLayout() {
 					</CardHeader>
 				</Card>
 			</div>
-		);
+		)
 	}
 
 	if (!isAdmin) {
@@ -49,7 +49,7 @@ function AdminWorkshopsLayout() {
 					</CardHeader>
 				</Card>
 			</div>
-		);
+		)
 	}
 
 	return <Outlet />;

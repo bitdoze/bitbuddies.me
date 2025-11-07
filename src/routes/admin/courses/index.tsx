@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConvexHttpClient } from "convex/browser";
 import {
 	AlertCircle,
+	BookOpen,
 	Edit,
 	Eye,
 	ImageIcon,
@@ -35,48 +36,54 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { useAuth } from "@/hooks/useAuth";
-import { useDeleteWorkshop, useWorkshops } from "@/hooks/useWorkshops";
-import { api } from "../../convex/_generated/api";
+import { useCourses, useDeleteCourse } from "@/hooks/useCourses";
+import { api } from "@/convex/_generated/api";
+import type { Doc } from "@/convex/_generated/dataModel";
 
-export const Route = createFileRoute("/admin/workshops/")({
-	component: AdminWorkshopsPage,
+type EnrichedCourse = Doc<"courses"> & {
+	coverAsset: Doc<"mediaAssets"> | null;
+};
+
+export const Route = createFileRoute("/admin/courses/")({
+	component: AdminCoursesPage,
 	loader: async () => {
-		// Prefetch all workshops (including unpublished) on the server
+		// Prefetch all courses (including unpublished) on the server
 		try {
 			const convexUrl = import.meta.env.VITE_CONVEX_URL;
 			if (!convexUrl) {
 				console.warn(
 					"VITE_CONVEX_URL not found, skipping server-side prefetch",
 				);
-				return { workshops: null };
+				return { courses: null };
 			}
 
 			const client = new ConvexHttpClient(convexUrl);
-			const workshops = await client.query(api.workshops.list, {
+			const courses = await client.query(api.courses.list, {
 				publishedOnly: false,
 			});
-			return { workshops };
+			return { courses };
 		} catch (error) {
-			console.error("Failed to prefetch workshops:", error);
-			return { workshops: null };
+			console.error("Failed to prefetch courses:", error);
+			return { courses: null };
 		}
 	},
 });
 
-function AdminWorkshopsPage() {
+function AdminCoursesPage() {
 	const { isAuthenticated, isLoading, isAdmin, user } = useAuth();
 
 	// Use prefetched data from loader, fallback to client-side fetch
 	const loaderData = Route.useLoaderData();
-	const clientWorkshops = useWorkshops({ publishedOnly: false });
+	const clientCourses = useCourses({ publishedOnly: false });
 
 	// Prefer loader data, fallback to client fetch
-	const workshops = loaderData?.workshops ?? clientWorkshops;
-	const deleteWorkshop = useDeleteWorkshop();
+	const courses = ((loaderData as any)?.courses ?? clientCourses) as
+		| EnrichedCourse[]
+		| null
+		| undefined;
+	const deleteCourse = useDeleteCourse();
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(
-		null,
-	);
+	const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
 
 	if (isLoading) {
 		return (
@@ -84,7 +91,7 @@ function AdminWorkshopsPage() {
 				<div className="container mx-auto px-4 py-20">
 					<div className="text-center">
 						<div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-						<p className="mt-4 text-muted-foreground">Loading workshops...</p>
+						<p className="mt-4 text-muted-foreground">Loading courses...</p>
 					</div>
 				</div>
 			</div>
@@ -132,17 +139,17 @@ function AdminWorkshopsPage() {
 	}
 
 	const handleDelete = async () => {
-		if (!selectedWorkshopId || !user) return;
+		if (!selectedCourseId || !user) return;
 
 		try {
-			await deleteWorkshop({
+			await deleteCourse({
 				clerkId: user.id,
-				workshopId: selectedWorkshopId as any,
+				courseId: selectedCourseId as any,
 			});
 			setDeleteDialogOpen(false);
-			setSelectedWorkshopId(null);
+			setSelectedCourseId(null);
 		} catch (error) {
-			console.error("Failed to delete workshop:", error);
+			console.error("Failed to delete course:", error);
 		}
 	};
 
@@ -151,111 +158,104 @@ function AdminWorkshopsPage() {
 		return new Date(timestamp).toLocaleDateString();
 	};
 
-	const totalWorkshops = workshops?.length ?? 0;
-	const publishedWorkshops =
-		workshops?.filter((workshop) => workshop.isPublished).length ?? 0;
-	const draftWorkshops = totalWorkshops - publishedWorkshops;
-	const liveWorkshops =
-		workshops?.filter((workshop) => workshop.isLive).length ?? 0;
-	const upcomingWorkshops =
-		workshops?.filter(
-			(workshop) => workshop.startDate && workshop.startDate > Date.now(),
-		).length ?? 0;
-	const featuredWorkshopsCount =
-		workshops?.filter((workshop) => workshop.isFeatured).length ?? 0;
-	const recordingCount =
-		workshops?.filter((workshop) => Boolean(workshop.videoUrl)).length ?? 0;
-	const durations = (workshops ?? [])
-		.map((workshop) => workshop.duration)
+	const totalCourses = courses?.length ?? 0;
+	const publishedCourses =
+		courses?.filter((course) => course.isPublished).length ?? 0;
+	const draftCourses = totalCourses - publishedCourses;
+	const featuredCoursesCount =
+		courses?.filter((course) => course.isFeatured).length ?? 0;
+	const totalEnrollment =
+		courses?.reduce((sum, course) => sum + (course.enrollmentCount ?? 0), 0) ??
+		0;
+	const durations = (courses ?? [])
+		.map((course) => course.duration)
 		.filter((value): value is number => typeof value === "number" && value > 0);
 	const averageDuration = durations.length
 		? `${Math.round(durations.reduce((sum, value) => sum + value, 0) / durations.length)} mins`
 		: "—";
-	const seats = (workshops ?? []).reduce(
-		(acc, workshop) => {
-			acc.registered += workshop.currentParticipants ?? 0;
-			acc.capacity += workshop.maxParticipants ?? 0;
+	const accessCounts = (courses ?? []).reduce(
+		(acc, course) => {
+			acc[course.accessLevel as keyof typeof acc] += 1;
 			return acc;
 		},
-		{ registered: 0, capacity: 0 },
+		{ public: 0, authenticated: 0, subscription: 0 },
 	);
-	const capacityFill =
-		seats.capacity > 0
-			? `${Math.min(100, Math.round((seats.registered / seats.capacity) * 100))}%`
-			: "—";
 
 	return (
 		<>
 			<SEO
-				title="Manage Workshops"
-				description="Admin dashboard for managing workshops, creating new content, and editing existing workshops."
+				title="Manage Courses"
+				description="Admin dashboard for managing courses, creating new content, and editing existing courses."
 				noIndex={true}
 			/>
 			<div className="container space-y-12 py-12">
 				<AdminShell>
 					<AdminHeader
 						eyebrow="Content management"
-						title="Manage workshops"
-						description="Track live sessions, recordings, and upcoming programming to keep momentum in the community."
+						title="Manage courses"
+						description="Keep learning paths current, highlight premium tracks, and monitor student progress at a glance."
 						actions={
 							<Button asChild size="lg" className="gap-2">
-								<Link to="/admin/workshops/create">
+								<Link to="/admin/courses/create">
 									<Plus className="h-5 w-5" />
-									New workshop
+									New course
 								</Link>
 							</Button>
 						}
 						stats={[
-							{ label: "Published", value: publishedWorkshops },
-							{ label: "Drafts", value: draftWorkshops },
-							{ label: "Live now", value: liveWorkshops },
-							{ label: "Upcoming", value: upcomingWorkshops },
+							{ label: "Published", value: publishedCourses },
+							{ label: "Drafts", value: draftCourses },
+							{ label: "Featured", value: featuredCoursesCount },
+							{
+								label: "Total students",
+								value: totalEnrollment.toLocaleString(),
+							},
 						]}
 					/>
 					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 						<AdminStatCard
 							label="Average duration"
 							value={averageDuration}
-							description="Across scheduled workshops"
+							description="Across published courses"
 						/>
 						<AdminStatCard
-							label="Recordings available"
-							value={recordingCount}
-							description="Sessions with video archives"
+							label="Public access"
+							value={accessCounts.public}
+							description="Open to all visitors"
 						/>
 						<AdminStatCard
-							label="Featured sessions"
-							value={featuredWorkshopsCount}
-							description="Highlighted for visibility"
+							label="Members"
+							value={accessCounts.authenticated}
+							description="Requires sign-in"
 						/>
 						<AdminStatCard
-							label="Seats filled"
-							value={capacityFill}
-							description={`${seats.registered} of ${seats.capacity || "—"} reserved`}
+							label="Premium"
+							value={accessCounts.subscription}
+							description="Subscription exclusive"
 						/>
 					</div>
 					<AdminTable
-						title="All workshops"
-						description="Manage live, upcoming, and recorded sessions from a single place."
-						badge={<Badge variant="secondary">{totalWorkshops}</Badge>}
+						title="All courses"
+						description="Maintain curricula, enrollment, and visibility in one place."
+						badge={<Badge variant="secondary">{totalCourses}</Badge>}
 					>
-						{!workshops || workshops.length === 0 ? (
+						{!courses || courses.length === 0 ? (
 							<div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
 								<div className="rounded-full bg-muted p-5 text-muted-foreground">
-									<LayoutGrid className="h-10 w-10" />
+									<BookOpen className="h-10 w-10" />
 								</div>
 								<div className="space-y-2">
 									<h3 className="text-lg font-semibold text-foreground">
-										No workshops yet
+										No courses yet
 									</h3>
 									<p className="text-sm text-muted-foreground">
-										Set up your first live session to kickstart engagement.
+										Launch your first curriculum to onboard learners.
 									</p>
 								</div>
 								<Button asChild size="sm" className="gap-2">
-									<Link to="/admin/workshops/create">
+									<Link to="/admin/courses/create">
 										<Plus className="h-4 w-4" />
-										Create workshop
+										Create course
 									</Link>
 								</Button>
 							</div>
@@ -265,25 +265,24 @@ function AdminWorkshopsPage() {
 									<TableHeader>
 										<TableRow>
 											<TableHead className="w-20">Cover</TableHead>
-											<TableHead>Workshop</TableHead>
+											<TableHead>Course</TableHead>
 											<TableHead>Level</TableHead>
-											<TableHead>Access</TableHead>
 											<TableHead>Status</TableHead>
-											<TableHead>Start</TableHead>
-											<TableHead>Participants</TableHead>
+											<TableHead>Published</TableHead>
+											<TableHead>Students</TableHead>
 											<TableHead className="text-right">Actions</TableHead>
 										</TableRow>
 									</TableHeader>
 									<TableBody>
-										{workshops.map((workshop) => (
-											<WorkshopRow
-												key={workshop._id}
-												workshop={workshop}
+										{courses.map((course) => (
+											<CourseRow
+												key={course._id}
+												course={course}
 												handleDelete={handleDelete}
-												setSelectedWorkshopId={setSelectedWorkshopId}
+												setSelectedCourseId={setSelectedCourseId}
 												setDeleteDialogOpen={setDeleteDialogOpen}
 												deleteDialogOpen={deleteDialogOpen}
-												selectedWorkshopId={selectedWorkshopId}
+												selectedCourseId={selectedCourseId}
 												formatDate={formatDate}
 											/>
 										))}
@@ -298,23 +297,31 @@ function AdminWorkshopsPage() {
 	);
 }
 
-function WorkshopRow({
-	workshop,
+function CourseRow({
+	course,
 	handleDelete,
-	setSelectedWorkshopId,
+	setSelectedCourseId,
 	setDeleteDialogOpen,
 	deleteDialogOpen,
-	selectedWorkshopId,
+	selectedCourseId,
 	formatDate,
-}: any) {
+}: {
+	course: EnrichedCourse;
+	handleDelete: () => void;
+	setSelectedCourseId: (id: string | null) => void;
+	setDeleteDialogOpen: (open: boolean) => void;
+	deleteDialogOpen: boolean;
+	selectedCourseId: string | null;
+	formatDate: (timestamp?: number) => string;
+}) {
 	return (
 		<TableRow>
 			<TableCell>
-				{workshop.coverAsset?.url ? (
+				{course.coverAsset?.url ? (
 					<div className="relative h-16 w-16 overflow-hidden rounded-xl border border-border bg-muted">
 						<img
-							src={workshop.coverAsset.url}
-							alt={workshop.title}
+							src={course.coverAsset.url}
+							alt={course.title}
 							className="h-full w-full object-cover"
 						/>
 					</div>
@@ -326,88 +333,70 @@ function WorkshopRow({
 			</TableCell>
 			<TableCell>
 				<div className="space-y-1">
-					<p className="font-medium text-foreground">{workshop.title}</p>
-					<p className="line-clamp-1 text-xs text-muted-foreground">
-						{workshop.shortDescription}
-					</p>
-					<div className="flex flex-wrap items-center gap-2">
-						{workshop.isFeatured ? (
-							<Badge variant="secondary">Featured</Badge>
-						) : null}
-					</div>
+					<p className="font-medium text-foreground">{course.title}</p>
+					{course.shortDescription ? (
+						<p className="line-clamp-1 text-xs text-muted-foreground">
+							{course.shortDescription}
+						</p>
+					) : null}
+					{course.isFeatured ? (
+						<Badge variant="secondary">Featured</Badge>
+					) : null}
 				</div>
 			</TableCell>
 			<TableCell>
-				<Badge variant="outline">{workshop.level}</Badge>
+				<Badge variant="outline">{course.level}</Badge>
 			</TableCell>
 			<TableCell>
-				<Badge
-					variant={
-						workshop.accessLevel === "public"
-							? "secondary"
-							: workshop.accessLevel === "authenticated"
-								? "default"
-								: "destructive"
-					}
-				>
-					{workshop.accessLevel === "public"
-						? "Free"
-						: workshop.accessLevel === "authenticated"
-							? "Login"
-							: "Subscription"}
+				<Badge variant={course.isPublished ? "default" : "secondary"}>
+					{course.isPublished ? "Published" : "Draft"}
 				</Badge>
 			</TableCell>
-			<TableCell>
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge variant={workshop.isPublished ? "default" : "secondary"}>
-						{workshop.isPublished ? "Published" : "Draft"}
-					</Badge>
-					{workshop.isLive ? <Badge variant="destructive">Live</Badge> : null}
-				</div>
-			</TableCell>
-			<TableCell>{formatDate(workshop.startDate)}</TableCell>
-			<TableCell>
-				{workshop.currentParticipants ?? 0}
-				{workshop.maxParticipants ? ` / ${workshop.maxParticipants}` : null}
-			</TableCell>
-			<TableCell>
+			<TableCell>{formatDate(course.publishedAt)}</TableCell>
+			<TableCell>{course.enrollmentCount || 0}</TableCell>
+			<TableCell className="text-right">
 				<div className="flex justify-end gap-2">
 					<Button variant="ghost" size="icon" asChild>
 						<Link
-							to="/workshops/$slug"
-							params={{ slug: workshop.slug }}
+							to="/courses/$slug"
+							params={{ slug: course.slug }}
 							target="_blank"
 						>
 							<Eye className="h-4 w-4" />
 						</Link>
 					</Button>
 					<Button variant="ghost" size="icon" asChild>
-						<Link to="/admin/workshops/$id/edit" params={{ id: workshop._id }}>
+						<Link to="/admin/courses/$id/edit" params={{ id: course._id }}>
 							<Edit className="h-4 w-4" />
 						</Link>
 					</Button>
+					<Button variant="ghost" size="icon" asChild>
+						<a href={`/admin/courses/${course._id}/lessons`}>
+							<LayoutGrid className="h-4 w-4" />
+						</a>
+					</Button>
 					<Dialog
-						open={deleteDialogOpen && selectedWorkshopId === workshop._id}
+						open={deleteDialogOpen && selectedCourseId === course._id}
 						onOpenChange={(open) => {
 							setDeleteDialogOpen(open);
-							if (!open) setSelectedWorkshopId(null);
+							if (!open) setSelectedCourseId(null);
 						}}
 					>
 						<DialogTrigger asChild>
 							<Button
 								variant="ghost"
 								size="icon"
-								onClick={() => setSelectedWorkshopId(workshop._id)}
+								onClick={() => setSelectedCourseId(course._id)}
 							>
 								<Trash2 className="h-4 w-4 text-destructive" />
 							</Button>
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>
-								<DialogTitle>Delete workshop</DialogTitle>
+								<DialogTitle>Delete course</DialogTitle>
 								<DialogDescription>
-									Are you sure you want to delete "{workshop.title}"? This
-									action cannot be undone.
+									Are you sure you want to delete "{course.title}"? This action
+									cannot be undone.
 								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>
@@ -415,7 +404,7 @@ function WorkshopRow({
 									variant="outline"
 									onClick={() => {
 										setDeleteDialogOpen(false);
-										setSelectedWorkshopId(null);
+										setSelectedCourseId(null);
 									}}
 								>
 									Cancel

@@ -13,10 +13,10 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Id } from "../../convex/_generated/dataModel";
-import { SEO } from "../components/common/SEO";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
+import type { Id } from "@/convex/_generated/dataModel";
+import { SEO } from "@/components/common/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -25,40 +25,40 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "../components/ui/dialog";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../components/ui/select";
-import { Switch } from "../components/ui/switch";
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
-} from "../components/ui/tabs";
-import { Textarea } from "../components/ui/textarea";
-import { useAuth } from "../hooks/useAuth";
+} from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
 import {
 	useChaptersByCourse,
 	useCreateChapter,
 	useDeleteChapter,
 	useUpdateChapter,
-} from "../hooks/useChapters";
-import { useCourse } from "../hooks/useCourses";
+} from "@/hooks/useChapters";
+import { useCourse } from "@/hooks/useCourses";
 import {
 	useCreateLesson,
 	useDeleteLesson,
 	useLessonsByCourse,
 	useUpdateLesson,
-} from "../hooks/useLessons";
+} from "@/hooks/useLessons";
 
-export const Route = createFileRoute("/admin/courses/$id/lessons" as any)({
+export const Route = createFileRoute("/admin/courses/$id/lessons")({
 	component: ManageLessonsPage,
 });
 
@@ -222,187 +222,187 @@ function ManageLessonsPage() {
 								</Button>
 							</div>
 						</div>
-					</div>
 
-					{/* Decorative elements */}
-					<div className="absolute left-0 top-0 -z-10 h-full w-full">
-						<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-						<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
-					</div>
-				</section>
-
-				{/* Tabs for Chapters and Lessons */}
-				<section className="py-12">
-					<div className="container mx-auto px-4">
-						<div className="max-w-5xl mx-auto">
-							<Tabs defaultValue="lessons" className="w-full">
-								<TabsList className="grid w-full grid-cols-2 mb-8">
-									<TabsTrigger value="chapters">
-										<Folder className="mr-2 h-4 w-4" />
-										Chapters ({chapters?.length ?? 0})
-									</TabsTrigger>
-									<TabsTrigger value="lessons">
-										<BookOpen className="mr-2 h-4 w-4" />
-										Lessons ({lessons?.length ?? 0})
-									</TabsTrigger>
-								</TabsList>
-
-								{/* Chapters Tab */}
-								<TabsContent value="chapters">
-									{!chapters || chapters.length === 0 ? (
-										<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
-											<div className="mb-4 inline-flex rounded-full bg-muted p-4">
-												<Folder className="h-12 w-12 text-muted-foreground" />
-											</div>
-											<h3 className="text-xl font-semibold mb-2">
-												No Chapters Yet
-											</h3>
-											<p className="text-muted-foreground mb-6">
-												Add chapters to organize your lessons.
-											</p>
-											<Button
-												size="lg"
-												onClick={() => setCreateChapterDialogOpen(true)}
-											>
-												<Plus className="mr-2 h-5 w-5" />
-												Add Chapter
-											</Button>
-										</div>
-									) : (
-										<div className="space-y-4">
-											{chapters.map((chapter, index) => (
-												<ChapterCard
-													key={chapter._id}
-													chapter={chapter}
-													index={index}
-													lessons={lessons || []}
-													onEdit={(chapter) => {
-														setSelectedChapter(chapter);
-														setEditChapterDialogOpen(true);
-													}}
-													onDelete={(chapter) => {
-														setSelectedChapter(chapter);
-														setDeleteChapterDialogOpen(true);
-													}}
-												/>
-											))}
-										</div>
-									)}
-								</TabsContent>
-
-								{/* Lessons Tab */}
-								<TabsContent value="lessons">
-									{!lessons || lessons.length === 0 ? (
-										<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
-											<div className="mb-4 inline-flex rounded-full bg-muted p-4">
-												<BookOpen className="h-12 w-12 text-muted-foreground" />
-											</div>
-											<h3 className="text-xl font-semibold mb-2">
-												No Lessons Yet
-											</h3>
-											<p className="text-muted-foreground mb-6">
-												Add your first lesson to get started.
-											</p>
-											<Button
-												size="lg"
-												onClick={() => setCreateLessonDialogOpen(true)}
-											>
-												<Plus className="mr-2 h-5 w-5" />
-												Add Lesson
-											</Button>
-										</div>
-									) : (
-										<div className="space-y-4">
-											{lessons.map((lesson, index) => (
-												<LessonCard
-													key={lesson._id}
-													lesson={lesson}
-													index={index}
-													chapters={chapters || []}
-													onEdit={(lesson) => {
-														setSelectedLesson(lesson);
-														setEditLessonDialogOpen(true);
-													}}
-													onDelete={(lesson) => {
-														setSelectedLesson(lesson);
-														setDeleteLessonDialogOpen(true);
-													}}
-												/>
-											))}
-										</div>
-									)}
-								</TabsContent>
-							</Tabs>
+						{/* Decorative elements */}
+						<div className="absolute left-0 top-0 -z-10 h-full w-full">
+							<div className="absolute left-1/4 top-1/4 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+							<div className="absolute bottom-1/4 right-1/4 h-72 w-72 rounded-full bg-accent/5 blur-3xl" />
 						</div>
-					</div>
-				</section>
 			</div>
+					</section>
 
-			{/* Create Chapter Dialog */}
-			<ChapterFormDialog
-				open={createChapterDialogOpen}
-				onOpenChange={setCreateChapterDialogOpen}
-				courseId={courseId as any}
-				userId={user.id}
-				nextOrder={(chapters?.length ?? 0) + 1}
-			/>
+					{/* Tabs for Chapters and Lessons */}
+					<section className="py-12">
+						<div className="container mx-auto px-4">
+							<div className="max-w-5xl mx-auto">
+								<Tabs defaultValue="lessons" className="w-full">
+									<TabsList className="grid w-full grid-cols-2 mb-8">
+										<TabsTrigger value="chapters">
+											<Folder className="mr-2 h-4 w-4" />
+											Chapters ({chapters?.length ?? 0})
+										</TabsTrigger>
+										<TabsTrigger value="lessons">
+											<BookOpen className="mr-2 h-4 w-4" />
+											Lessons ({lessons?.length ?? 0})
+										</TabsTrigger>
+									</TabsList>
 
-			{/* Edit Chapter Dialog */}
-			{selectedChapter && (
+									{/* Chapters Tab */}
+									<TabsContent value="chapters">
+										{!chapters || chapters.length === 0 ? (
+											<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
+												<div className="mb-4 inline-flex rounded-full bg-muted p-4">
+													<Folder className="h-12 w-12 text-muted-foreground" />
+												</div>
+												<h3 className="text-xl font-semibold mb-2">
+													No Chapters Yet
+												</h3>
+												<p className="text-muted-foreground mb-6">
+													Add chapters to organize your lessons.
+												</p>
+												<Button
+													size="lg"
+													onClick={() => setCreateChapterDialogOpen(true)}
+												>
+													<Plus className="mr-2 h-5 w-5" />
+													Add Chapter
+												</Button>
+											</div>
+										) : (
+											<div className="space-y-4">
+												{chapters.map((chapter, index) => (
+													<ChapterCard
+														key={chapter._id}
+														chapter={chapter}
+														index={index}
+														lessons={lessons || []}
+														onEdit={(chapter) => {
+															setSelectedChapter(chapter);
+															setEditChapterDialogOpen(true);
+														}}
+														onDelete={(chapter) => {
+															setSelectedChapter(chapter);
+															setDeleteChapterDialogOpen(true);
+														}}
+													/>
+												))}
+										</div>
+										)}
+									</TabsContent>
+
+									{/* Lessons Tab */}
+									<TabsContent value="lessons">
+										{!lessons || lessons.length === 0 ? (
+											<div className="rounded-2xl border border-border bg-card p-12 text-center shadow-lg">
+												<div className="mb-4 inline-flex rounded-full bg-muted p-4">
+													<BookOpen className="h-12 w-12 text-muted-foreground" />
+												</div>
+												<h3 className="text-xl font-semibold mb-2">
+													No Lessons Yet
+												</h3>
+												<p className="text-muted-foreground mb-6">
+													Add your first lesson to get started.
+												</p>
+												<Button
+													size="lg"
+													onClick={() => setCreateLessonDialogOpen(true)}
+												>
+													<Plus className="mr-2 h-5 w-5" />
+													Add Lesson
+												</Button>
+											</div>
+										) : (
+											<div className="space-y-4">
+												{lessons.map((lesson, index) => (
+													<LessonCard
+														key={lesson._id}
+														lesson={lesson}
+														index={index}
+														chapters={chapters || []}
+														onEdit={(lesson) => {
+															setSelectedLesson(lesson);
+															setEditLessonDialogOpen(true);
+														}}
+														onDelete={(lesson) => {
+															setSelectedLesson(lesson);
+															setDeleteLessonDialogOpen(true);
+														}}
+													/>
+												))}
+										</div>
+										)}
+									</TabsContent>
+								</Tabs>
+							</div>
+						</div>
+					</section>
+				</div>
+
+				{/* Create Chapter Dialog */}
 				<ChapterFormDialog
-					open={editChapterDialogOpen}
-					onOpenChange={setEditChapterDialogOpen}
+					open={createChapterDialogOpen}
+					onOpenChange={setCreateChapterDialogOpen}
 					courseId={courseId as any}
 					userId={user.id}
-					chapter={selectedChapter}
+					nextOrder={(chapters?.length ?? 0) + 1}
 				/>
-			)}
 
-			{/* Delete Chapter Dialog */}
-			<DeleteChapterDialog
-				open={deleteChapterDialogOpen}
-				onOpenChange={setDeleteChapterDialogOpen}
-				chapter={selectedChapter}
-				userId={user.id}
-				onDeleted={() => {
-					setDeleteChapterDialogOpen(false);
-					setSelectedChapter(null);
-				}}
-			/>
+				{/* Edit Chapter Dialog */}
+				{selectedChapter && (
+					<ChapterFormDialog
+						open={editChapterDialogOpen}
+						onOpenChange={setEditChapterDialogOpen}
+						courseId={courseId as any}
+						userId={user.id}
+						chapter={selectedChapter}
+					/>
+				)}
 
-			{/* Create Lesson Dialog */}
-			<LessonFormDialog
-				open={createLessonDialogOpen}
-				onOpenChange={setCreateLessonDialogOpen}
-				courseId={courseId as any}
-				userId={user.id}
-				chapters={chapters || []}
-				nextOrder={(lessons?.length ?? 0) + 1}
-			/>
+				{/* Delete Chapter Dialog */}
+				<DeleteChapterDialog
+					open={deleteChapterDialogOpen}
+					onOpenChange={setDeleteChapterDialogOpen}
+					chapter={selectedChapter}
+					userId={user.id}
+					onDeleted={() => {
+						setDeleteChapterDialogOpen(false);
+						setSelectedChapter(null);
+					}}
+				/>
 
-			{/* Edit Lesson Dialog */}
-			{selectedLesson && (
+				{/* Create Lesson Dialog */}
 				<LessonFormDialog
-					open={editLessonDialogOpen}
-					onOpenChange={setEditLessonDialogOpen}
+					open={createLessonDialogOpen}
+					onOpenChange={setCreateLessonDialogOpen}
 					courseId={courseId as any}
 					userId={user.id}
 					chapters={chapters || []}
-					lesson={selectedLesson}
+					nextOrder={(lessons?.length ?? 0) + 1}
 				/>
-			)}
 
-			{/* Delete Lesson Dialog */}
-			<DeleteLessonDialog
-				open={deleteLessonDialogOpen}
-				onOpenChange={setDeleteLessonDialogOpen}
-				lesson={selectedLesson}
-				userId={user.id}
-				onDeleted={() => {
-					setDeleteLessonDialogOpen(false);
-					setSelectedLesson(null);
-				}}
-			/>
+				{/* Edit Lesson Dialog */}
+				{selectedLesson && (
+					<LessonFormDialog
+						open={editLessonDialogOpen}
+						onOpenChange={setEditLessonDialogOpen}
+						courseId={courseId as any}
+						userId={user.id}
+						chapters={chapters || []}
+						lesson={selectedLesson}
+					/>
+				)}
+
+				{/* Delete Lesson Dialog */}
+				<DeleteLessonDialog
+					open={deleteLessonDialogOpen}
+					onOpenChange={setDeleteLessonDialogOpen}
+					lesson={selectedLesson}
+					userId={user.id}
+					onDeleted={() => {
+						setDeleteLessonDialogOpen(false);
+						setSelectedLesson(null);
+					}}
+				/>
 		</>
 	);
 }

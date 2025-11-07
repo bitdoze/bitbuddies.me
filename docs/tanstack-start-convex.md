@@ -19,7 +19,7 @@ Making these changes looks like modifying `app/router.tsx` like this:
 
 app/router.tsx
 
-```codeBlockLines_qo9c
+```js
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import { DefaultCatchBoundary } from './components/DefaultCatchBoundary'
@@ -81,7 +81,7 @@ and modifying `app/routes/__root.tsx` like this:
 
 app/routes/\_\_root.tsx
 
-```codeBlockLines_qo9c
+```js
 import {
   Link,
   Outlet,
@@ -239,7 +239,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     </html>
   )
 }
-
 ```
 
 

@@ -3,7 +3,7 @@ import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/admin" as any)({
+export const Route = createFileRoute("/admin/_layout")({
 	component: AdminLayout,
 });
 
@@ -20,7 +20,7 @@ function AdminLayout() {
 					</div>
 				</div>
 			</div>
-		);
+		)
 	}
 
 	if (!isAdmin) {
@@ -43,12 +43,12 @@ function AdminLayout() {
 					</div>
 				</div>
 			</div>
-		);
+		)
 	}
 
 	return (
 		<div className="w-full">
 			<Outlet />
 		</div>
-	);
+	)
 }

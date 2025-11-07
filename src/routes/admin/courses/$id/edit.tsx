@@ -9,26 +9,26 @@ import {
 	Settings,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Id } from "../../convex/_generated/dataModel";
-import { ImageUpload } from "../components/common/ImageUpload";
-import { SEO } from "../components/common/SEO";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import type { Id } from "@/convex/_generated/dataModel";
+import { ImageUpload } from "@/components/common/ImageUpload";
+import { SEO } from "@/components/common/SEO";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../components/ui/select";
-import { Switch } from "../components/ui/switch";
-import { Textarea } from "../components/ui/textarea";
-import { useAuth } from "../hooks/useAuth";
-import { useCourse, useUpdateCourse } from "../hooks/useCourses";
-import { useMediaAsset } from "../hooks/useMediaAssets";
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
+import { useCourse, useUpdateCourse } from "@/hooks/useCourses";
+import { useMediaAsset } from "@/hooks/useMediaAssets";
 
-export const Route = createFileRoute("/admin/courses/$id/edit" as any)({
+export const Route = createFileRoute("/admin/courses/$id/edit")({
 	component: EditCoursePage,
 });
 
@@ -516,12 +516,12 @@ function EditCoursePage() {
 											<div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
 											Updating...
 										</>
-									) : (
-										<>
-											<Plus className="mr-2 h-4 w-4" />
-											Update Course
-										</>
-									)}
+										) : (
+											<>
+												<Plus className="mr-2 h-4 w-4" />
+												Update Course
+											</>
+										)}
 								</Button>
 								<Button
 									type="button"

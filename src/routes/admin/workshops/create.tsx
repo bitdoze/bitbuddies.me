@@ -11,28 +11,28 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import type { JSONContent } from "@/components/kibo-ui/editor";
-import type { Id } from "../../convex/_generated/dataModel";
-import { ImageUpload } from "../components/common/ImageUpload";
+import type { Id } from "@/convex/_generated/dataModel";
+import { ImageUpload } from "@/components/common/ImageUpload";
 import {
 	createEmptyContent,
 	RichTextEditor,
-} from "../components/common/RichTextEditor";
-import { SEO } from "../components/common/SEO";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "@/components/common/RichTextEditor";
+import { SEO } from "@/components/common/SEO";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../components/ui/select";
-import { Switch } from "../components/ui/switch";
-import { Textarea } from "../components/ui/textarea";
-import { useAuth } from "../hooks/useAuth";
-import { useMediaAsset } from "../hooks/useMediaAssets";
-import { useCreateWorkshop } from "../hooks/useWorkshops";
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
+import { useMediaAsset } from "@/hooks/useMediaAssets";
+import { useCreateWorkshop } from "@/hooks/useWorkshops";
 
 export const Route = createFileRoute("/admin/workshops/create")({
 	component: CreateWorkshopPage,
@@ -219,7 +219,7 @@ function CreateWorkshopPage() {
 							<div className="rounded-lg bg-primary/10 p-2 text-primary">
 								<Plus className="h-6 w-6" />
 							</div>
-							<h1 className="text-3xl md:text-4xl font-bold">
+							<h1 className="text-3xl font-bold md:text-4xl">
 								Create New Workshop
 							</h1>
 						</div>
@@ -237,7 +237,7 @@ function CreateWorkshopPage() {
 
 				{/* Form Section */}
 				<section className="py-12">
-					<div className="container mx-auto px-4 max-w-4xl">
+					<div className="container mx-auto max-w-4xl px-4">
 						<form onSubmit={handleSubmit} className="space-y-8">
 							{/* Basic Information */}
 							<div className="rounded-2xl border border-border bg-card p-8 shadow-md">
@@ -368,12 +368,12 @@ function CreateWorkshopPage() {
 													id="duration"
 													type="number"
 													value={formData.duration}
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															duration: e.target.value,
-														})
-													}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													duration: e.target.value,
+												})
+											}
 													placeholder="120"
 												/>
 											</div>
@@ -434,10 +434,7 @@ function CreateWorkshopPage() {
 														type="datetime-local"
 														value={formData.startDate}
 														onChange={(e) =>
-															setFormData({
-																...formData,
-																startDate: e.target.value,
-															})
+															setFormData({ ...formData, startDate: e.target.value })
 														}
 													/>
 												</div>
@@ -449,18 +446,13 @@ function CreateWorkshopPage() {
 														type="datetime-local"
 														value={formData.endDate}
 														onChange={(e) =>
-															setFormData({
-																...formData,
-																endDate: e.target.value,
-															})
+															setFormData({ ...formData, endDate: e.target.value })
 														}
 													/>
 												</div>
 
 												<div className="space-y-2">
-													<Label htmlFor="maxParticipants">
-														Max Participants
-													</Label>
+													<Label htmlFor="maxParticipants">Max Participants</Label>
 													<Input
 														id="maxParticipants"
 														type="number"
@@ -491,38 +483,35 @@ function CreateWorkshopPage() {
 									</div>
 									<div className="space-y-4">
 										<div className="grid grid-cols-2 gap-4">
-											<div className="space-y-2">
-												<Label htmlFor="videoProvider">Video Provider</Label>
-												<Select
-													value={formData.videoProvider}
-													onValueChange={(value: any) =>
-														setFormData({ ...formData, videoProvider: value })
-													}
-												>
-													<SelectTrigger id="videoProvider">
-														<SelectValue placeholder="Select provider" />
-													</SelectTrigger>
-													<SelectContent>
-														<SelectItem value="youtube">YouTube</SelectItem>
-														<SelectItem value="bunny">Bunny Stream</SelectItem>
-													</SelectContent>
-												</Select>
-											</div>
+									<div className="space-y-2">
+										<Label htmlFor="videoProvider">Video Provider</Label>
+										<Select
+											value={formData.videoProvider}
+											onValueChange={(value: any) =>
+												setFormData({ ...formData, videoProvider: value })
+											}
+										>
+											<SelectTrigger id="videoProvider">
+												<SelectValue placeholder="Select provider" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="youtube">YouTube</SelectItem>
+												<SelectItem value="bunny">Bunny Stream</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
 
-											<div className="space-y-2">
-												<Label htmlFor="videoId">Video ID</Label>
-												<Input
-													id="videoId"
-													value={formData.videoId}
-													onChange={(e) =>
-														setFormData({
-															...formData,
-															videoId: e.target.value,
-														})
-													}
-													placeholder="dQw4w9WgXcQ"
-												/>
-											</div>
+									<div className="space-y-2">
+										<Label htmlFor="videoId">Video ID</Label>
+										<Input
+											id="videoId"
+											value={formData.videoId}
+											onChange={(e) =>
+												setFormData({ ...formData, videoId: e.target.value })
+											}
+											placeholder="dQw4w9WgXcQ"
+										/>
+									</div>
 										</div>
 
 										<div className="space-y-2">
@@ -538,8 +527,7 @@ function CreateWorkshopPage() {
 												placeholder="https://www.youtube.com/watch?v=... or https://www.youtube.com/embed/..."
 											/>
 											<p className="text-sm text-muted-foreground">
-												Paste any YouTube URL - it will be converted to embed
-												format automatically
+												Paste any YouTube URL - it will be converted to embed format automatically
 											</p>
 										</div>
 									</div>

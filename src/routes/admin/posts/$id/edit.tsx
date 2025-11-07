@@ -2,28 +2,28 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, FileText, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { JSONContent } from "@/components/kibo-ui/editor";
-import type { Id } from "../../convex/_generated/dataModel";
-import { ImageUpload } from "../components/common/ImageUpload";
+import type { Id } from "@/convex/_generated/dataModel";
+import { ImageUpload } from "@/components/common/ImageUpload";
 import {
 	createEmptyContent,
 	RichTextEditor,
-} from "../components/common/RichTextEditor";
-import { SEO } from "../components/common/SEO";
-import { Button } from "../components/ui/button";
-import { Checkbox } from "../components/ui/checkbox";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "@/components/common/RichTextEditor";
+import { SEO } from "@/components/common/SEO";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../components/ui/select";
-import { Textarea } from "../components/ui/textarea";
-import { useAuth } from "../hooks/useAuth";
-import { useMediaAsset } from "../hooks/useMediaAssets";
-import { usePost, useUpdatePost } from "../hooks/usePosts";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
+import { useMediaAsset } from "@/hooks/useMediaAssets";
+import { usePost, useUpdatePost } from "@/hooks/usePosts";
 
 export const Route = createFileRoute("/admin/posts/$id/edit")({
 	component: EditPostPage,
@@ -82,22 +82,16 @@ function EditPostPage() {
 
 			// Parse content from JSON string
 			try {
-				console.log("Loading post content:", post.content);
 				if (post.content && typeof post.content === "string") {
 					const parsedContent = JSON.parse(post.content);
-					console.log("Parsed content:", parsedContent);
 					setContent(parsedContent);
 				} else if (post.content && typeof post.content === "object") {
-					// Content is already an object
-					console.log("Content is already an object:", post.content);
 					setContent(post.content as JSONContent);
 				} else {
-					console.warn("No content found, using empty content");
 					setContent(createEmptyContent());
 				}
 			} catch (error) {
 				console.error("Failed to parse content:", error);
-				console.log("Raw content that failed:", post.content);
 				setContent(createEmptyContent());
 			}
 
@@ -573,12 +567,12 @@ function EditPostPage() {
 											<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
 											Updating...
 										</>
-									) : (
-										<>
-											<Save className="h-4 w-4" />
-											Update Post
-										</>
-									)}
+										) : (
+											<>
+												<Save className="h-4 w-4" />
+												Update Post
+											</>
+										)}
 								</Button>
 							</div>
 						</form>

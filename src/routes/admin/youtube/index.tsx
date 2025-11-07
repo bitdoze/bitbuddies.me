@@ -43,8 +43,8 @@ import {
 	useYoutubeStats,
 } from "@/hooks/useYoutubeChannels";
 import { useSyncYoutubeChannel } from "@/hooks/useYoutubeVideos";
-import { api } from "../../convex/_generated/api";
-import type { Doc, Id } from "../../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import type { Doc, Id } from "@/convex/_generated/dataModel";
 
 type LoaderData = {
 	channels: Doc<"youtubeChannels">[] | null;
@@ -122,7 +122,9 @@ function AdminYouTubePage() {
 			);
 		} catch (error) {
 			alert(
-				`Sync failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+				`Sync failed: ${
+					error instanceof Error ? error.message : "Unknown error"
+				}`,
 			);
 		} finally {
 			setIsSyncing(null);
@@ -177,7 +179,6 @@ function AdminYouTubePage() {
 			/>
 
 			<div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-				{/* Hero Section */}
 				<section className="relative overflow-hidden border-b bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-12">
 					<div className="absolute inset-0 -z-10">
 						<div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
@@ -200,7 +201,6 @@ function AdminYouTubePage() {
 							</Button>
 						</div>
 
-						{/* Stats */}
 						<div className="flex flex-wrap gap-4">
 							{heroStats.map((stat) => (
 								<StatBadge key={stat.label} {...stat} />
@@ -218,7 +218,6 @@ function AdminYouTubePage() {
 					</div>
 				</section>
 
-				{/* Channels Table */}
 				<section className="py-12">
 					<div className="container mx-auto px-4">
 						<div className="rounded-2xl border bg-card shadow-md">
@@ -350,16 +349,15 @@ function AdminYouTubePage() {
 													</TableCell>
 												</TableRow>
 											))}
-										</TableBody>
-									</Table>
-								</div>
+									</TableBody>
+								</Table>
+							</div>
 							)}
 						</div>
 					</div>
 				</section>
 			</div>
 
-			{/* Create Channel Dialog */}
 			<CreateChannelDialog
 				open={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
@@ -367,7 +365,6 @@ function AdminYouTubePage() {
 				clerkId={user?.id ?? ""}
 			/>
 
-			{/* Edit Channel Dialog */}
 			{selectedChannel && (
 				<EditChannelDialog
 					open={isEditDialogOpen}
@@ -378,7 +375,6 @@ function AdminYouTubePage() {
 				/>
 			)}
 
-			{/* Delete Channel Dialog */}
 			{selectedChannel && (
 				<DeleteChannelDialog
 					open={isDeleteDialogOpen}
@@ -424,7 +420,6 @@ function CreateChannelDialog({
 				isActive: formData.isActive,
 			});
 
-			// Reset form
 			setFormData({
 				channelId: "",
 				channelName: "",
@@ -435,7 +430,9 @@ function CreateChannelDialog({
 			onOpenChange(false);
 		} catch (error) {
 			alert(
-				`Failed to create channel: ${error instanceof Error ? error.message : "Unknown error"}`,
+				`Failed to create channel: ${
+					error instanceof Error ? error.message : "Unknown error"
+				}`,
 			);
 		} finally {
 			setIsSubmitting(false);
@@ -569,7 +566,9 @@ function EditChannelDialog({
 			onOpenChange(false);
 		} catch (error) {
 			alert(
-				`Failed to update channel: ${error instanceof Error ? error.message : "Unknown error"}`,
+				`Failed to update channel: ${
+					error instanceof Error ? error.message : "Unknown error"
+				}`,
 			);
 		} finally {
 			setIsSubmitting(false);
@@ -680,7 +679,9 @@ function DeleteChannelDialog({
 			onOpenChange(false);
 		} catch (error) {
 			alert(
-				`Failed to delete channel: ${error instanceof Error ? error.message : "Unknown error"}`,
+				`Failed to delete channel: ${
+					error instanceof Error ? error.message : "Unknown error"
+				}`,
 			);
 		} finally {
 			setIsSubmitting(false);
@@ -694,8 +695,7 @@ function DeleteChannelDialog({
 					<DialogTitle>Delete Channel</DialogTitle>
 					<DialogDescription>
 						Are you sure you want to delete this channel? This will also delete
-						all {channel.videoCount} videos associated with it. This action
-						cannot be undone.
+						all {channel.videoCount} videos associated with it. This action cannot be undone.
 					</DialogDescription>
 				</DialogHeader>
 

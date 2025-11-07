@@ -2,28 +2,28 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft, FileText, Save } from "lucide-react";
 import { useState } from "react";
 import type { JSONContent } from "@/components/kibo-ui/editor";
-import type { Id } from "../../convex/_generated/dataModel";
-import { ImageUpload } from "../components/common/ImageUpload";
+import type { Id } from "@/convex/_generated/dataModel";
+import { ImageUpload } from "@/components/common/ImageUpload";
 import {
 	createEmptyContent,
 	RichTextEditor,
-} from "../components/common/RichTextEditor";
-import { SEO } from "../components/common/SEO";
-import { Button } from "../components/ui/button";
-import { Checkbox } from "../components/ui/checkbox";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "@/components/common/RichTextEditor";
+import { SEO } from "@/components/common/SEO";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../components/ui/select";
-import { Textarea } from "../components/ui/textarea";
-import { useAuth } from "../hooks/useAuth";
-import { useMediaAsset } from "../hooks/useMediaAssets";
-import { useCreatePost } from "../hooks/usePosts";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/useAuth";
+import { useMediaAsset } from "@/hooks/useMediaAssets";
+import { useCreatePost } from "@/hooks/usePosts";
 
 export const Route = createFileRoute("/admin/posts/create")({
 	component: CreatePostPage,
@@ -140,7 +140,7 @@ function CreatePostPage() {
 				title: formData.title,
 				slug: formData.slug,
 				excerpt: formData.excerpt || undefined,
-				content: JSON.stringify(content), // Store as JSON string
+				content: JSON.stringify(content),
 				coverAssetId: coverAssetId,
 				category: formData.category || undefined,
 				tags: tagsArray,
@@ -510,12 +510,12 @@ function CreatePostPage() {
 											<div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
 											Creating...
 										</>
-									) : (
-										<>
-											<Save className="h-4 w-4" />
-											Create Post
-										</>
-									)}
+										) : (
+											<>
+												<Save className="h-4 w-4" />
+												Create Post
+											</>
+										)}
 								</Button>
 							</div>
 						</form>

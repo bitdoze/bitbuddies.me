@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeletePost, usePosts } from "@/hooks/usePosts";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 
 export const Route = createFileRoute("/admin/posts/")({
 	component: AdminPostsPage,
@@ -319,7 +319,7 @@ function AdminPostsPage() {
 														variant={
 															post.accessLevel === "public"
 																? "default"
-																: "outline"
+															: "outline"
 														}
 													>
 														{post.accessLevel === "public"

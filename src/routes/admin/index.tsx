@@ -17,7 +17,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { usePosts } from "@/hooks/usePosts";
 import { useWorkshops } from "@/hooks/useWorkshops";
 
-export const Route = createFileRoute("/admin/" as any)({
+export const Route = createFileRoute("/admin/")({
 	component: AdminDashboard,
 });
 
