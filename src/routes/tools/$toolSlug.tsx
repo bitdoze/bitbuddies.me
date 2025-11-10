@@ -313,6 +313,9 @@ function ToolPage() {
 	const [copiedCardId, setCopiedCardId] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState(defaultTab);
 	const abortControllerRef = useRef<AbortController | null>(null);
+	const inputSurfaceClassName =
+		"border-border/60 bg-card/80 text-foreground/90 focus-visible:border-amber-500/40 focus-visible:ring-amber-500/30 dark:bg-slate-900/70 dark:text-foreground";
+	const labelClassName = "text-sm font-medium text-foreground/85 dark:text-foreground";
 
 	useEffect(() => {
 		setInputs(deriveInitialInputs(tool));
@@ -422,14 +425,16 @@ function ToolPage() {
 		if (field.type === "textarea") {
 			return (
 				<div key={key} className={containerClassName}>
-					<Label htmlFor={id}>{field.label}</Label>
+					<Label htmlFor={id} className={labelClassName}>
+						{field.label}
+					</Label>
 					<Textarea
 						id={id}
 						rows={field.rows ?? 4}
 						placeholder={field.placeholder}
 						value={value}
 						onChange={(event) => handleInputChange(key, event.target.value)}
-						className="min-h-[120px]"
+						className={`min-h-[120px] ${inputSurfaceClassName}`}
 					/>
 				</div>
 			);
@@ -438,12 +443,17 @@ function ToolPage() {
 		if (field.type === "select") {
 			return (
 				<div key={key} className={containerClassName}>
-					<Label htmlFor={id}>{field.label}</Label>
+					<Label htmlFor={id} className={labelClassName}>
+						{field.label}
+					</Label>
 					<Select value={value} onValueChange={(selected) => handleInputChange(key, selected)}>
-						<SelectTrigger id={id}>
+						<SelectTrigger
+							id={id}
+							className={`w-full ${inputSurfaceClassName} hover:bg-card/90 dark:hover:bg-slate-900/60`}
+						>
 							<SelectValue placeholder={field.label} />
 						</SelectTrigger>
-						<SelectContent>
+						<SelectContent className="border-border/70 bg-card/95 text-foreground dark:bg-slate-900/95 dark:text-foreground">
 							{field.options.map((option) => (
 								<SelectItem key={option.value} value={option.value}>
 									{option.label}
@@ -457,12 +467,15 @@ function ToolPage() {
 
 		return (
 			<div key={key} className={containerClassName}>
-				<Label htmlFor={id}>{field.label}</Label>
+				<Label htmlFor={id} className={labelClassName}>
+					{field.label}
+				</Label>
 				<Input
 					id={id}
 					placeholder={field.placeholder}
 					value={value}
 					onChange={(event) => handleInputChange(key, event.target.value)}
+					className={inputSurfaceClassName}
 				/>
 			</div>
 		);
@@ -649,7 +662,7 @@ const renderJsonArray = (
 
 			<section className="container mx-auto grid gap-10 px-4 py-12 lg:grid-cols-[minmax(0,1fr)_320px]">
 				<div className="space-y-8">
-					<Card className="border-border/70 bg-card/90 shadow-lg">
+					<Card className="border-border/70 bg-linear-to-br from-amber-500/8 via-orange-500/4 to-transparent text-foreground shadow-lg backdrop-blur-sm dark:from-amber-500/15 dark:via-orange-500/8 dark:to-slate-950/80">
 						<CardHeader>
 							<CardTitle className="text-2xl">Configuration</CardTitle>
 							<CardDescription>Adjust the prompt inputs, then stream the generated output instantly.</CardDescription>
@@ -660,7 +673,7 @@ const renderJsonArray = (
 							</div>
 							{error ? <p className="text-sm text-destructive">{error}</p> : null}
 						</CardContent>
-						<CardFooter className="flex flex-wrap items-center gap-3 border-t border-border/60 bg-background/60 px-6 py-4">
+						<CardFooter className="flex flex-wrap items-center gap-3 border-t border-border/60 bg-card/80 px-6 py-4 dark:bg-slate-900/70">
 							<Button size="lg" onClick={handleSubmit} disabled={isStreaming} className="gap-2 shadow-md">
 								{isStreaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
 								{isStreaming ? "Streaming..." : "Generate"}
