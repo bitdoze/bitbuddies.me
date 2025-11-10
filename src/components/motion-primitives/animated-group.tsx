@@ -1,5 +1,3 @@
-"use client";
-
 import type { ElementType, ReactElement, ReactNode } from "react";
 import {
 	Children,

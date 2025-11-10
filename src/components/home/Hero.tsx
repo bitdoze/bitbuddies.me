@@ -64,24 +64,24 @@ export function Hero({
 				<TextEffect
 					preset="fade-in-blur"
 					speedSegment={0.4}
-					as="h1"
-					className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:mt-12"
-				>
-					Learn, Build, and Ship Together
-				</TextEffect>
+			as="h1"
+			className="mx-auto mt-8 max-w-4xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-5xl lg:mt-12"
+		>
+			Ship modern web apps without the all-nighter hangover
+		</TextEffect>
 
-				<TextEffect
-					per="line"
-					preset="fade-in-blur"
+		<TextEffect
+			per="line"
+			preset="fade-in-blur"
 					speedSegment={0.4}
-					delay={0.4}
-					as="p"
-					className="mx-auto mt-6 max-w-2xl text-balance text-lg text-muted-foreground"
-				>
-					Join a community of developers mastering modern web development through
-					hands-on courses, live workshops, and AI-powered tools. From React to AI
-					integration—build real projects that matter.
-				</TextEffect>
+			delay={0.4}
+			as="p"
+			className="mx-auto mt-6 max-w-3xl text-balance text-lg text-muted-foreground"
+		>
+			Join a crew of builders who binge React, Convex, and AI tooling for fun. We run
+			playful courses, chaotic live workshops, and ship-ready projects so you can build
+			something impressive before your coffee gets cold.
+		</TextEffect>
 
 				<AnimatedGroup
 					variants={{
