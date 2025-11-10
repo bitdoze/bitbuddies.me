@@ -1,45 +1,34 @@
 import { Link } from "@tanstack/react-router";
 import {
-	ArrowRight,
 	Github,
 	Globe,
 	Mail,
+	Rocket,
 	Twitter,
 	Youtube,
 } from "lucide-react";
+import { CallToAction } from "@/components/common/CallToAction";
 import { Logo } from "@/components/common/logo";
-import { Button } from "@/components/ui/button";
 import { SITE_CONFIG, SOCIAL_LINKS } from "@/lib/config";
 
 export default function Footer() {
 	return (
 		<footer className="border-t border-border/60 bg-background/95">
 			<div className="container space-y-12 py-16">
-				<div className="card-surface flex flex-col gap-6 overflow-hidden bg-gradient-to-r from-primary/15 via-primary/10 to-accent/10 px-8 py-10 text-center shadow-lg md:flex-row md:items-center md:justify-between md:text-left">
-					<div className="space-y-3">
-						<span className="inline-flex items-center gap-2 rounded-full bg-background/80 px-4 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-							Ready to build?
-						</span>
-						<h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-							Launch your next project with BitBuddies
-						</h2>
-						<p className="text-base text-muted-foreground md:max-w-2xl">
-							Access workshops, courses, and community support tailored to every
-							stage of your developer journey.
-						</p>
-					</div>
-					<div className="flex flex-col items-center gap-3 md:flex-row">
-						<Button asChild size="lg" className="gap-2">
-							<a href="/workshops">
-								Explore workshops
-								<ArrowRight className="h-4 w-4" />
-							</a>
-						</Button>
-						<Button asChild size="lg" variant="outline">
-							<a href="/courses">Browse courses</a>
-						</Button>
-					</div>
-				</div>
+				<CallToAction
+					badge="Ready to Build?"
+					title="Launch your next project with BitBuddies"
+					description="Access workshops, courses, and community support tailored to every stage of your developer journey."
+					primaryButton={{
+						label: "Explore Workshops",
+						href: "/workshops",
+						icon: <Rocket className="h-5 w-5" />,
+					}}
+					secondaryButton={{
+						label: "Browse Courses",
+						href: "/courses",
+					}}
+				/>
 
 				<div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
 					<div className="space-y-5">

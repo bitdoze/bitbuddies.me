@@ -35,37 +35,40 @@ export function ContentCard({
 	return (
 		<article
 			className={cn(
-				"group relative h-full overflow-hidden rounded-2xl border border-border bg-card shadow-md transition-all duration-300 hover:shadow-xl hover:border-primary/50 hover:-translate-y-1",
+				"group relative h-full overflow-hidden rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 hover:-translate-y-2",
 				className,
 			)}
 		>
-			{/* Cover image with overlay gradient */}
+			{/* Cover image */}
 			{cover ? (
 				<div className="relative overflow-hidden">
 					{cover}
-					{/* Subtle gradient overlay on hover */}
-					<div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+					{/* Gradient overlay */}
+					<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+
+					{/* Shine effect on hover */}
+					<div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/10 to-transparent" />
 				</div>
 			) : null}
 
 			{/* Content */}
-			<div className="flex flex-1 flex-col gap-3 p-5">
+			<div className="flex flex-1 flex-col gap-4 p-6">
 				{/* Badges */}
 				{badges && badges.length > 0 ? (
-					<div className="flex flex-wrap items-center gap-1.5">
+					<div className="flex flex-wrap items-center gap-2">
 						{badges.map((badge, index) => (
 							<span
 								key={`${badge.label}-${index}`}
 								className={cn(
-									"inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+									"inline-flex items-center rounded-lg px-3 py-1 text-xs font-semibold transition-all duration-200",
 									badge.variant === "secondary" &&
-										"bg-muted text-muted-foreground",
+										"bg-secondary/80 text-secondary-foreground hover:bg-secondary",
 									badge.variant === "outline" &&
-										"border border-border bg-transparent text-foreground",
+										"border-2 border-border bg-background/50 text-foreground hover:border-primary/50",
 									badge.variant === "destructive" &&
-										"bg-destructive/10 text-destructive font-semibold",
+										"bg-destructive/15 text-destructive font-bold ring-1 ring-destructive/30",
 									(!badge.variant || badge.variant === "default") &&
-										"bg-primary/10 text-primary",
+										"bg-primary/15 text-primary ring-1 ring-primary/20 hover:bg-primary/25",
 								)}
 							>
 								{badge.label}
@@ -75,21 +78,23 @@ export function ContentCard({
 				) : null}
 
 				{/* Title and description */}
-				<div className="space-y-2 flex-1">
+				<div className="space-y-3 flex-1">
+					{subtitle ? (
+						<p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70">
+							{subtitle}
+						</p>
+					) : null}
+
 					{typeof title === "string" ? (
-						<h3 className="line-clamp-2 text-lg font-bold text-foreground transition-colors group-hover:text-primary">
+						<h3 className="line-clamp-2 text-xl font-bold text-foreground transition-colors group-hover:text-primary leading-tight">
 							{title}
 						</h3>
 					) : (
 						title
 					)}
-					{subtitle ? (
-						<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
-							{subtitle}
-						</p>
-					) : null}
+
 					{description ? (
-						<p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+						<p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground/90">
 							{description}
 						</p>
 					) : null}
@@ -97,13 +102,13 @@ export function ContentCard({
 
 				{/* Meta info */}
 				{meta && meta.length > 0 ? (
-					<ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground border-t border-border/50 pt-3">
-						{meta.map((item) => (
+					<ul className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground border-t border-border/50 pt-4">
+						{meta.map((item, index) => (
 							<li
-								key={item.label}
-								className="flex items-center gap-1.5 font-medium"
+								key={`${item.label}-${index}`}
+								className="flex items-center gap-2 font-medium"
 							>
-								<span className="text-primary/70">{item.icon}</span>
+								<span className="text-primary/80">{item.icon}</span>
 								<span>{item.label}</span>
 							</li>
 						))}
@@ -112,10 +117,7 @@ export function ContentCard({
 			</div>
 
 			{/* Footer */}
-			{footer ? <div className="px-5 pb-5 pt-0">{footer}</div> : null}
-
-			{/* Decorative gradient on hover */}
-			<div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-sky-500/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+			{footer ? <div className="px-6 pb-6 pt-0">{footer}</div> : null}
 		</article>
 	);
 }

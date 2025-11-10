@@ -20,11 +20,11 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "https://bitbuddies.me/",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#6366f1",
   "background_color": "#ffffff",
   "orientation": "portrait-primary",
-  "scope": "https://bitbuddies.me/",
+  "scope": "/",
   "categories": ["education", "productivity", "social"]
 }

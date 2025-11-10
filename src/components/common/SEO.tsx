@@ -30,7 +30,9 @@ export function SEO({
 }: SEOProps) {
 	const siteName = SITE_CONFIG.name;
 	const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
-	const defaultImage = ogImage ? buildUrl(ogImage) : buildUrl("/og-image.png");
+	const defaultImage = ogImage
+		? buildUrl(ogImage)
+		: buildUrl("/android-chrome-512x512.png");
 	const fullCanonicalUrl = canonicalUrl
 		? buildUrl(canonicalUrl)
 		: getCanonicalUrl();

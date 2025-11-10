@@ -1,21 +1,25 @@
-import { ArrowRight, PlayCircle, Sparkles, Star, TrendingUp } from "lucide-react";
-import type { ReactNode } from "react";
-import { StatBadge } from "@/components/common/StatBadge";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { AnimatedGroup } from "@/components/motion-primitives/animated-group";
+import { TextEffect } from "@/components/motion-primitives/text-effect";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
-type HeroStat = {
-	label: string;
-	value: string;
-	icon?: ReactNode;
-};
 
 type HeroProps = {
 	onPrimaryCta?: () => void;
 	onSecondaryCta?: () => void;
 	primaryHref?: string;
 	secondaryHref?: string;
-	stats: HeroStat[];
+};
+
+const transitionVariants = {
+	container: {
+		visible: {
+			transition: {
+				delayChildren: 0.2,
+				staggerChildren: 0.08,
+			},
+		},
+	},
 };
 
 export function Hero({
@@ -23,169 +27,95 @@ export function Hero({
 	onSecondaryCta,
 	primaryHref = "#highlights",
 	secondaryHref = "#community",
-	stats,
 }: HeroProps) {
 	return (
-		<section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
-			{/* Background decorative elements */}
-			<div className="absolute inset-0 -z-10 overflow-hidden">
-				<div className="absolute -left-4 top-20 h-96 w-96 rounded-full bg-primary/10 blur-3xl animate-pulse" />
-				<div className="absolute right-1/4 top-40 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-				<div className="absolute left-1/3 bottom-20 h-80 w-80 rounded-full bg-purple-500/10 blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
-
-				{/* Grid pattern overlay */}
-				<div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:64px_64px]" />
+		<section className="relative overflow-hidden">
+			<div
+				aria-hidden
+				className="absolute inset-0 -z-10 isolate hidden opacity-60 lg:block"
+			>
+				<div className="absolute left-0 top-0 h-[320px] w-[560px] -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
+				<div className="absolute left-0 top-0 h-[320px] w-[240px] -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] translate-x-[5%] -translate-y-1/2" />
+				<div className="absolute left-16 top-10 h-[320px] w-[320px] -rotate-45 rounded-full bg-[radial-gradient(60%_60%_at_40%_30%,hsla(0,0%,85%,.05)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
 			</div>
+			<div
+				aria-hidden
+				className="absolute inset-0 -z-20 bg-[radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"
+			/>
+			<div className="relative mx-auto max-w-4xl px-6 pt-24 pb-16 text-center md:pt-32 md:pb-24">
+				<AnimatedGroup variants={transitionVariants}>
+					<Link
+						to="/workshops"
+						className="group mx-auto flex w-fit items-center gap-4 rounded-full border border-border/50 bg-muted/60 p-1 pl-4 text-sm shadow-md shadow-black/5 transition-colors duration-300 hover:bg-background"
+					>
+						<span className="text-foreground">
+							✨ New workshops launching every month
+						</span>
+						<span
+							className="block h-4 w-0.5 rounded-full bg-border/60"
+							aria-hidden
+						/>
+						<span className="bg-background group-hover:bg-muted flex size-7 items-center justify-center rounded-full transition-colors duration-300">
+							<ArrowRight className="size-3" />
+						</span>
+					</Link>
+				</AnimatedGroup>
 
-			<div className="container relative py-20 sm:py-28 lg:py-32">
-				<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-					{/* Left content */}
-					<div className="space-y-8 motion-safe:animate-fade-up">
-						{/* Announcement badge */}
-						<div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 text-sm font-medium text-primary shadow-sm backdrop-blur-sm">
-							<Star className="h-4 w-4 fill-current" />
-							<span>Trusted by 50+ developers</span>
-						</div>
+				<TextEffect
+					preset="fade-in-blur"
+					speedSegment={0.4}
+					as="h1"
+					className="mx-auto mt-8 max-w-3xl text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:mt-12"
+				>
+					Learn, Build, and Ship Together
+				</TextEffect>
 
-						{/* Main heading */}
-						<h1 className="text-balance text-5xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl">
-							Master development,{" "}
-							<span className="relative inline-block">
-								<span className="relative z-10 bg-gradient-to-r from-primary via-sky-500 to-purple-500 bg-clip-text text-transparent">
-									ship faster
-								</span>
-								<span className="absolute -bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-primary/20 via-sky-500/20 to-purple-500/20 blur-lg" />
-							</span>
-						</h1>
+				<TextEffect
+					per="line"
+					preset="fade-in-blur"
+					speedSegment={0.4}
+					delay={0.4}
+					as="p"
+					className="mx-auto mt-6 max-w-2xl text-balance text-lg text-muted-foreground"
+				>
+					Join a community of developers mastering modern web development through
+					hands-on courses, live workshops, and AI-powered tools. From React to AI
+					integration—build real projects that matter.
+				</TextEffect>
 
-						{/* Subtitle */}
-						<p className="max-w-xl text-xl leading-relaxed text-muted-foreground">
-							Join BitBuddies for hands-on courses, live workshops, and a thriving community.
-							Learn from industry experts and build production-ready projects.
-						</p>
-
-						{/* CTA Buttons */}
-						<div className="flex flex-col gap-4 sm:flex-row">
-							<Button
-								asChild
-								size="lg"
-								className="group gap-2 text-base shadow-lg hover:shadow-xl transition-all"
-								onClick={onPrimaryCta}
-							>
-								<a href={primaryHref}>
-									Start learning free
-									<ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-								</a>
-							</Button>
-							<Button
-								variant="outline"
-								size="lg"
-								className="gap-2 text-base border-2 hover:bg-accent/50"
-								onClick={onSecondaryCta}
-							>
-								<a href={secondaryHref} className="flex items-center gap-2">
-									<PlayCircle className="h-5 w-5" />
-									Watch demo
-								</a>
-							</Button>
-						</div>
-
-						{/* Stats grid */}
-						<div className="mt-12 grid gap-4 sm:grid-cols-2">
-							{stats.map((stat, index) => (
-								<div
-									key={stat.label}
-									className="motion-safe:animate-fade-up"
-									style={{ animationDelay: `${index * 100}ms` }}
-								>
-									<StatBadge
-										label={stat.label}
-										value={stat.value}
-										icon={stat.icon}
-									/>
-								</div>
-							))}
-						</div>
+				<AnimatedGroup
+					variants={{
+						container: {
+							visible: {
+								transition: { staggerChildren: 0.05, delayChildren: 0.6 },
+							},
+						},
+					}}
+					className="mt-10 flex flex-col items-center gap-3 md:flex-row md:justify-center"
+				>
+					<div className="rounded-[calc(var(--radius-xl)+0.125rem)] border border-border/80 bg-foreground/10 p-0.5">
+						<Button
+							asChild
+							size="lg"
+							className="rounded-xl px-5 text-base"
+							onClick={onPrimaryCta}
+						>
+							<a href={primaryHref}>
+								Explore courses
+								<ArrowRight className="ml-2 h-4 w-4" />
+							</a>
+						</Button>
 					</div>
-
-					{/* Right content - Feature showcase */}
-					<div className="relative hidden lg:flex items-center justify-center">
-						{/* Floating decorative cards */}
-						<div className="relative w-full max-w-lg">
-							{/* Main card */}
-							<div className="relative z-10 rounded-3xl border-2 border-border bg-card p-8 shadow-2xl backdrop-blur-sm">
-								<div className="space-y-6">
-									<div className="flex items-center gap-4">
-										<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-sky-500 shadow-lg">
-											<Sparkles className="h-7 w-7 text-white" />
-										</div>
-										<div>
-											<Badge className="mb-2">This Week</Badge>
-											<h3 className="text-xl font-bold text-foreground">
-											Dokploy Setup
-											</h3>
-										</div>
-									</div>
-
-									<div className="space-y-3 rounded-2xl border border-border/50 bg-muted/30 p-4">
-										<div className="flex items-center gap-3">
-											<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
-												<div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-											</div>
-											<span className="text-sm font-medium text-green-600 dark:text-green-400">
-												Live workshop starting soon
-											</span>
-										</div>
-										<p className="text-sm text-muted-foreground">
-											15+ developers already registered
-										</p>
-									</div>
-
-									<ul className="space-y-3 text-sm text-muted-foreground">
-										{[
-											"Build a full-stack app from scratch",
-											"Deploy to production in one session",
-											"Get expert code reviews",
-										].map((item, i) => (
-											<li key={i} className="flex items-start gap-3">
-												<div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary">
-													<span className="text-xs">✓</span>
-												</div>
-												<span>{item}</span>
-											</li>
-										))}
-									</ul>
-								</div>
-							</div>
-
-							{/* Floating badge - top right */}
-							<div className="absolute -right-6 top-8 z-20 rounded-2xl border-2 border-border bg-card px-4 py-3 shadow-xl motion-safe:animate-float backdrop-blur-sm">
-								<div className="flex items-center gap-2">
-									<TrendingUp className="h-5 w-5 text-green-500" />
-									<div>
-										<div className="text-sm font-semibold text-foreground">25+</div>
-										<div className="text-xs text-muted-foreground">Projects shipped</div>
-									</div>
-								</div>
-							</div>
-
-							{/* Floating badge - bottom left */}
-							<div className="absolute -left-8 bottom-12 z-20 rounded-2xl border-2 border-border bg-card px-4 py-3 shadow-xl motion-safe:animate-float backdrop-blur-sm" style={{ animationDelay: "0.5s" }}>
-								<div className="flex items-center gap-2">
-									<div className="flex -space-x-2">
-										<div className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-primary to-sky-500" />
-										<div className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-purple-500 to-pink-500" />
-										<div className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-orange-500 to-red-500" />
-									</div>
-									<div>
-										<div className="text-sm font-semibold text-foreground">50+</div>
-										<div className="text-xs text-muted-foreground">Active learners</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+					<Button
+						asChild
+						size="lg"
+						variant="ghost"
+						className="rounded-xl px-5 text-base"
+						onClick={onSecondaryCta}
+					>
+						<a href={secondaryHref}>Watch tutorials</a>
+					</Button>
+				</AnimatedGroup>
 			</div>
 		</section>
 	);

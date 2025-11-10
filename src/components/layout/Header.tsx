@@ -1,13 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import {
-	BookOpen,
-	Calendar,
-	FileText,
-	LayoutDashboard,
-	Sparkles,
-	Shield,
-	Youtube,
-} from "lucide-react";
+import { Menu, Shield, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { LogoHeader } from "@/components/common/logo";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -21,150 +14,252 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { TOOL_REGISTRY } from "@/lib/ai-tools";
 import HeaderUser from "@/integrations/clerk/header-user";
+import { TOOL_REGISTRY } from "@/lib/ai-tools";
+import { cn } from "@/lib/utils";
 
 const primaryLinks = [
-	{ label: "Home", to: "/" },
 	{ label: "Courses", to: "/courses" },
 	{ label: "Workshops", to: "/workshops" },
 	{ label: "Videos", to: "/youtube" },
 	{ label: "Blog", to: "/posts" },
-	{ label: "About", to: "/about" },
-	{ label: "Contact", to: "/contact" },
 ];
+
+const buildToolIconSrc = (svg: string) =>
+	`data:image/svg+xml,${encodeURIComponent(svg)}`;
 
 export default function Header() {
 	const { isAdmin } = useAuth();
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [isScrolled, setIsScrolled] = useState(false);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 24);
+		};
+
+		handleScroll();
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
+	useEffect(() => {
+		if (!menuOpen) {
+			return;
+		}
+		const closeOnResize = () => {
+			if (window.innerWidth >= 1024) {
+				setMenuOpen(false);
+			}
+		};
+		window.addEventListener("resize", closeOnResize);
+		return () => window.removeEventListener("resize", closeOnResize);
+	}, [menuOpen]);
 
 	return (
-		<header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
-			<div className="container grid h-16 grid-cols-[auto_1fr_auto] items-center gap-6">
-				<div className="flex items-center gap-3">
-					<SidebarTrigger className="rounded-full border border-border/60 bg-background/80 shadow-sm" />
-					<Link
-						to="/"
-						className="flex items-center gap-2 rounded-full px-2 py-1 transition-colors hover:bg-muted/60"
-					>
-						<LogoHeader className="h-10 w-auto" />
-					</Link>
-				</div>
-	<nav className="hidden h-full items-center justify-center gap-1 px-2 py-1 lg:flex">
-					{primaryLinks.map((link) => {
-						return (
-							<Link
-								key={link.label}
-								to={link.to}
-								activeProps={{
-									className: "text-foreground",
-									"data-active": "true",
-								}}
-								className="group relative rounded-full px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
-							>
-								<span>{link.label}</span>
-								<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 scale-x-0 rounded-full bg-primary transition-transform duration-200 group-data-[active=true]:scale-x-100" />
-							</Link>
-						);
-					})}
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					className="group relative rounded-full px-4 py-2 text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
+		<header className="sticky top-0 z-40 w-full">
+			<nav
+				data-state={menuOpen ? "active" : undefined}
+				className="px-3 py-2 sm:px-4 lg:px-6"
+			>
+				<div
+					className={cn(
+						"mx-auto flex max-w-6xl flex-col rounded-3xl border border-transparent bg-transparent px-4 shadow-none transition-all duration-300",
+						isScrolled &&
+							"border-border/60 bg-background/80 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60",
+					)}
 				>
-					<span className="flex items-center gap-2">
-						<Sparkles className="h-4 w-4 text-primary" />
-						Tools
-					</span>
-					<span className="pointer-events-none absolute inset-x-3 -bottom-1 h-0.5 origin-left scale-x-0 rounded-full bg-primary transition-transform duration-200 group-data-[state=open]:scale-x-100" />
-				</button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="center" className="w-64">
-				<DropdownMenuLabel>AI Tools</DropdownMenuLabel>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem asChild>
-					<Link to="/tools" className="cursor-pointer">
-						Overview
-					</Link>
-				</DropdownMenuItem>
-				<DropdownMenuSeparator />
-				{TOOL_REGISTRY.map((tool) => (
-					<DropdownMenuItem key={tool.slug} asChild>
-						<Link to="/tools/$toolSlug" params={{ toolSlug: tool.slug }} className="flex items-center gap-2">
-							<span
-								className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10"
-								dangerouslySetInnerHTML={{ __html: tool.icon }}
-							/>
-							<span className="flex-1 text-sm">{tool.name}</span>
-						</Link>
-					</DropdownMenuItem>
-				))}
-			</DropdownMenuContent>
-		</DropdownMenu>
-				</nav>
-				<div className="flex items-center gap-2">
-					<ThemeToggle />
-					{isAdmin && (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="hidden gap-2 rounded-full border-border/60 bg-background/80 shadow-sm md:inline-flex"
+					<div className="flex flex-wrap items-center justify-between gap-4 py-3">
+						<div className="flex items-center gap-3">
+							<SidebarTrigger className="rounded-full border border-border/60 bg-background/80 p-2 shadow-sm" />
+							<Link
+								to="/"
+								aria-label="Home"
+								className="flex items-center gap-2 rounded-full px-2 py-1 transition-colors hover:bg-muted/60"
+							>
+								<LogoHeader className="h-8 w-auto" />
+							</Link>
+						</div>
+						<nav className="hidden lg:block">
+							<ul className="flex items-center gap-6 text-sm font-medium">
+								{primaryLinks.map((link) => (
+									<li key={link.label}>
+										<Link
+											to={link.to}
+											className="text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-foreground"
+											activeProps={{ "data-status": "active" }}
+										>
+											{link.label}
+										</Link>
+									</li>
+								))}
+								<li>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<button
+												type="button"
+												className="group inline-flex items-center gap-2 rounded-full px-4 py-2 text-muted-foreground transition-colors hover:text-foreground"
+											>
+												<Sparkles className="h-4 w-4 text-primary" />
+												<span>Tools</span>
+											</button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="center" className="w-64">
+											<DropdownMenuLabel>AI Tools</DropdownMenuLabel>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem asChild>
+												<Link to="/tools" className="cursor-pointer">
+													Overview
+												</Link>
+											</DropdownMenuItem>
+											<DropdownMenuSeparator />
+											{TOOL_REGISTRY.map((tool) => (
+												<DropdownMenuItem key={tool.slug} asChild>
+													<Link
+														to="/tools/$toolSlug"
+														params={{ toolSlug: tool.slug }}
+														className="flex items-center gap-2"
+													>
+														<span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+															<img
+																src={buildToolIconSrc(tool.icon)}
+																alt=""
+																className="h-4 w-4"
+																loading="lazy"
+																aria-hidden="true"
+															/>
+														</span>
+														<span className="flex-1 text-sm">{tool.name}</span>
+													</Link>
+												</DropdownMenuItem>
+											))}
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</li>
+								{isAdmin && (
+									<li>
+										<Link
+											to="/admin"
+											className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-foreground"
+											activeProps={{ "data-status": "active" }}
+										>
+											<Shield className="h-4 w-4" />
+											Admin
+										</Link>
+									</li>
+								)}
+							</ul>
+						</nav>
+						<div className="flex items-center gap-2">
+							<ThemeToggle />
+							<HeaderUser />
+							<Button
+								asChild
+								size="sm"
+								className="hidden rounded-full px-4 lg:inline-flex"
+							>
+								<Link to="/courses">Get Started</Link>
+							</Button>
+							<button
+								type="button"
+								onClick={() => setMenuOpen((prev) => !prev)}
+								aria-label={menuOpen ? "Close menu" : "Open menu"}
+								className="inline-flex items-center rounded-full border border-border/60 p-2 lg:hidden"
+							>
+								{menuOpen ? (
+									<X className="h-5 w-5" />
+								) : (
+									<Menu className="h-5 w-5" />
+								)}
+							</button>
+						</div>
+					</div>
+					<div
+						className={cn(
+							"space-y-6 border-t border-border/50 py-4 lg:hidden",
+							menuOpen ? "block" : "hidden",
+						)}
+					>
+						<div className="space-y-4 text-sm font-medium">
+							{primaryLinks.map((item) => (
+								<Link
+									key={item.label}
+									to={item.to}
+									className="block rounded-2xl border border-border/60 bg-muted/40 px-4 py-2 text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-foreground"
+									activeProps={{ "data-status": "active" }}
+									onClick={() => setMenuOpen(false)}
+								>
+									{item.label}
+								</Link>
+							))}
+							<div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
+								<div className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+									<Sparkles className="h-4 w-4 text-primary" />
+									<span>Tools</span>
+								</div>
+								<div className="space-y-2">
+									<Link
+										to="/tools"
+										className="block rounded-xl border border-border/40 bg-background px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+										onClick={() => setMenuOpen(false)}
+									>
+										Overview
+									</Link>
+									<div className="divide-y divide-border/50 rounded-xl border border-border/40 bg-background/70">
+										{TOOL_REGISTRY.map((tool) => (
+											<Link
+												key={tool.slug}
+												to="/tools/$toolSlug"
+												params={{ toolSlug: tool.slug }}
+												className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+												onClick={() => setMenuOpen(false)}
+											>
+												<span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+													<img
+														src={buildToolIconSrc(tool.icon)}
+														alt=""
+														className="h-4 w-4"
+														loading="lazy"
+														aria-hidden="true"
+													/>
+												</span>
+												<span className="flex-1">{tool.name}</span>
+											</Link>
+										))}
+									</div>
+								</div>
+							</div>
+							{isAdmin && (
+								<Link
+									to="/admin"
+									className="flex items-center gap-2 rounded-2xl border border-border/60 bg-muted/40 px-4 py-2 text-muted-foreground transition-colors hover:text-foreground"
+									onClick={() => setMenuOpen(false)}
 								>
 									<Shield className="h-4 w-4" />
 									Admin
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-56">
-								<DropdownMenuLabel>Admin Panel</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem asChild>
-									<Link to="/admin" className="cursor-pointer" {...({} as any)}>
-										<LayoutDashboard className="mr-2 h-4 w-4" />
-										Dashboard
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem asChild>
-									<Link to="/admin/posts" className="cursor-pointer">
-										<FileText className="mr-2 h-4 w-4" />
-										Manage Posts
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link to="/admin/workshops" className="cursor-pointer">
-										<Calendar className="mr-2 h-4 w-4" />
-										Manage Workshops
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link to="/admin/courses" className="cursor-pointer">
-										<BookOpen className="mr-2 h-4 w-4" />
-										Manage Courses
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link to="/admin/youtube" className="cursor-pointer">
-										<Youtube className="mr-2 h-4 w-4" />
-										Manage YouTube
-									</Link>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					)}
-					<HeaderUser />
-					<Button
-						asChild
-						size="sm"
-						className="hidden px-4 shadow-sm md:inline-flex"
-					>
-						<Link to="/" hash="highlights">
-							Get Started
-						</Link>
-					</Button>
+								</Link>
+							)}
+						</div>
+						<div className="flex flex-col gap-3 sm:flex-row">
+							<Button
+								asChild
+								variant="outline"
+								size="sm"
+								className="w-full rounded-2xl border-border/70"
+							>
+								<Link to="/workshops" onClick={() => setMenuOpen(false)}>
+									Explore workshops
+								</Link>
+							</Button>
+							<Button asChild size="sm" className="w-full rounded-2xl">
+								<Link to="/courses" onClick={() => setMenuOpen(false)}>
+									Start learning
+								</Link>
+							</Button>
+						</div>
+					</div>
 				</div>
-			</div>
+			</nav>
 		</header>
 	);
 }

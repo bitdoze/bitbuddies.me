@@ -315,27 +315,6 @@ function ToolsHub() {
 							</Card>
 						))}
 					</div>
-
-					{/* Bottom CTA */}
-					<div className="mt-16 text-center">
-						<Card className="mx-auto max-w-2xl border-primary/20 bg-linear-to-br from-primary/5 via-background to-secondary/5 shadow-lg">
-							<CardContent className="p-8 space-y-4">
-								<div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10 text-primary mb-2">
-									<Sparkles className="h-8 w-8" />
-								</div>
-								<h3 className="text-2xl font-bold">Ready to boost your content creation?</h3>
-								<p className="text-muted-foreground">
-									All tools are free to use and powered by the latest AI models. Start creating better content today.
-								</p>
-								<Button asChild size="lg" className="rounded-full shadow-md">
-									<Link to="/tools/$toolSlug" params={{ toolSlug: "title-generator" }}>
-										Get Started
-										<ArrowRight className="ml-2 h-4 w-4" />
-									</Link>
-								</Button>
-							</CardContent>
-						</Card>
-					</div>
 				</div>
 			</section>
 		</div>
