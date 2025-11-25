@@ -8,6 +8,7 @@ import {
 	Home,
 	Info,
 	LayoutDashboard,
+	Link2,
 	Mail,
 	Megaphone,
 	PenLine,
@@ -295,6 +296,17 @@ export function AppSidebar() {
 										<Link to="/admin/youtube">
 											<Youtube className="h-4 w-4" />
 											<span>Manage YouTube</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
+										<Link to="/admin/links">
+											<Link2 className="h-4 w-4" />
+											<span>Affiliate Links</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>

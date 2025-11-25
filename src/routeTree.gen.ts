@@ -25,28 +25,36 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorkshopsSlugRouteImport } from './routes/workshops.$slug'
 import { Route as ToolsToolSlugRouteImport } from './routes/tools/$toolSlug'
 import { Route as PostsSlugRouteImport } from './routes/posts.$slug'
+import { Route as GoSlugRouteImport } from './routes/go.$slug'
 import { Route as DebugMigrateWorkshopsRouteImport } from './routes/debug.migrate-workshops'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
 import { Route as AdminYoutubeIndexRouteImport } from './routes/admin/youtube/index'
 import { Route as AdminWorkshopsIndexRouteImport } from './routes/admin/workshops/index'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin/posts/index'
+import { Route as AdminLinksIndexRouteImport } from './routes/admin/links/index'
 import { Route as AdminCoursesIndexRouteImport } from './routes/admin/courses/index'
 import { Route as CoursesCourseSlugLessonSlugRouteImport } from './routes/courses.$courseSlug.$lessonSlug'
 import { Route as AdminWorkshopsCreateRouteImport } from './routes/admin/workshops/create'
 import { Route as AdminWorkshopsLayoutRouteImport } from './routes/admin/workshops/_layout'
 import { Route as AdminPostsCreateRouteImport } from './routes/admin/posts/create'
 import { Route as AdminPostsLayoutRouteImport } from './routes/admin/posts/_layout'
+import { Route as AdminLinksStatsRouteImport } from './routes/admin/links/stats'
+import { Route as AdminLinksCreateRouteImport } from './routes/admin/links/create'
+import { Route as AdminLinksCategoriesRouteImport } from './routes/admin/links/categories'
+import { Route as AdminLinksLayoutRouteImport } from './routes/admin/links/_layout'
 import { Route as AdminCoursesCreateRouteImport } from './routes/admin/courses/create'
 import { Route as AdminCoursesLayoutRouteImport } from './routes/admin/courses/_layout'
 import { Route as AdminWorkshopsIdEditRouteImport } from './routes/admin/workshops/$id/edit'
 import { Route as AdminPostsIdEditRouteImport } from './routes/admin/posts/$id/edit'
+import { Route as AdminLinksIdEditRouteImport } from './routes/admin/links/$id/edit'
 import { Route as AdminCoursesIdLessonsRouteImport } from './routes/admin/courses/$id/lessons'
 import { Route as AdminCoursesIdEditRouteImport } from './routes/admin/courses/$id/edit'
 
 const AdminRouteImport = createFileRoute('/admin')()
 const AdminWorkshopsRouteImport = createFileRoute('/admin/workshops')()
 const AdminPostsRouteImport = createFileRoute('/admin/posts')()
+const AdminLinksRouteImport = createFileRoute('/admin/links')()
 const AdminCoursesRouteImport = createFileRoute('/admin/courses')()
 
 const AdminRoute = AdminRouteImport.update({
@@ -87,6 +95,11 @@ const AdminWorkshopsRoute = AdminWorkshopsRouteImport.update({
 const AdminPostsRoute = AdminPostsRouteImport.update({
   id: '/posts',
   path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLinksRoute = AdminLinksRouteImport.update({
+  id: '/links',
+  path: '/links',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCoursesRoute = AdminCoursesRouteImport.update({
@@ -139,6 +152,11 @@ const PostsSlugRoute = PostsSlugRouteImport.update({
   path: '/posts/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoSlugRoute = GoSlugRouteImport.update({
+  id: '/go/$slug',
+  path: '/go/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DebugMigrateWorkshopsRoute = DebugMigrateWorkshopsRouteImport.update({
   id: '/debug/migrate-workshops',
   path: '/debug/migrate-workshops',
@@ -167,6 +185,11 @@ const AdminPostsIndexRoute = AdminPostsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminPostsRoute,
+} as any)
+const AdminLinksIndexRoute = AdminLinksIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminLinksRoute,
 } as any)
 const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
   id: '/',
@@ -197,6 +220,25 @@ const AdminPostsLayoutRoute = AdminPostsLayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => AdminPostsRoute,
 } as any)
+const AdminLinksStatsRoute = AdminLinksStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => AdminLinksRoute,
+} as any)
+const AdminLinksCreateRoute = AdminLinksCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminLinksRoute,
+} as any)
+const AdminLinksCategoriesRoute = AdminLinksCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminLinksRoute,
+} as any)
+const AdminLinksLayoutRoute = AdminLinksLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => AdminLinksRoute,
+} as any)
 const AdminCoursesCreateRoute = AdminCoursesCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -215,6 +257,11 @@ const AdminPostsIdEditRoute = AdminPostsIdEditRouteImport.update({
   id: '/$id/edit',
   path: '/$id/edit',
   getParentRoute: () => AdminPostsRoute,
+} as any)
+const AdminLinksIdEditRoute = AdminLinksIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminLinksRoute,
 } as any)
 const AdminCoursesIdLessonsRoute = AdminCoursesIdLessonsRouteImport.update({
   id: '/$id/lessons',
@@ -236,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminLayoutRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
+  '/go/$slug': typeof GoSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -247,17 +295,23 @@ export interface FileRoutesByFullPath {
   '/youtube': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesLayoutRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
+  '/admin/links': typeof AdminLinksLayoutRoute
+  '/admin/links/categories': typeof AdminLinksCategoriesRoute
+  '/admin/links/create': typeof AdminLinksCreateRoute
+  '/admin/links/stats': typeof AdminLinksStatsRoute
   '/admin/posts': typeof AdminPostsLayoutRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/workshops': typeof AdminWorkshopsLayoutRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
   '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
+  '/admin/links/': typeof AdminLinksIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
   '/admin/youtube': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
+  '/admin/links/$id/edit': typeof AdminLinksIdEditRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
@@ -270,6 +324,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
+  '/go/$slug': typeof GoSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -280,6 +335,10 @@ export interface FileRoutesByTo {
   '/youtube': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesIndexRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
+  '/admin/links': typeof AdminLinksIndexRoute
+  '/admin/links/categories': typeof AdminLinksCategoriesRoute
+  '/admin/links/create': typeof AdminLinksCreateRoute
+  '/admin/links/stats': typeof AdminLinksStatsRoute
   '/admin/posts': typeof AdminPostsIndexRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/workshops': typeof AdminWorkshopsIndexRoute
@@ -288,6 +347,7 @@ export interface FileRoutesByTo {
   '/admin/youtube': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
+  '/admin/links/$id/edit': typeof AdminLinksIdEditRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
@@ -302,6 +362,7 @@ export interface FileRoutesById {
   '/admin/_layout': typeof AdminLayoutRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
+  '/go/$slug': typeof GoSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
@@ -314,6 +375,11 @@ export interface FileRoutesById {
   '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/courses/_layout': typeof AdminCoursesLayoutRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
+  '/admin/links': typeof AdminLinksRouteWithChildren
+  '/admin/links/_layout': typeof AdminLinksLayoutRoute
+  '/admin/links/categories': typeof AdminLinksCategoriesRoute
+  '/admin/links/create': typeof AdminLinksCreateRoute
+  '/admin/links/stats': typeof AdminLinksStatsRoute
   '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/posts/_layout': typeof AdminPostsLayoutRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
@@ -322,11 +388,13 @@ export interface FileRoutesById {
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
   '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
   '/admin/courses/': typeof AdminCoursesIndexRoute
+  '/admin/links/': typeof AdminLinksIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
   '/admin/youtube/': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
+  '/admin/links/$id/edit': typeof AdminLinksIdEditRoute
   '/admin/posts/$id/edit': typeof AdminPostsIdEditRoute
   '/admin/workshops/$id/edit': typeof AdminWorkshopsIdEditRoute
 }
@@ -341,6 +409,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/courses/$slug'
     | '/debug/migrate-workshops'
+    | '/go/$slug'
     | '/posts/$slug'
     | '/tools/$toolSlug'
     | '/workshops/$slug'
@@ -352,17 +421,23 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/admin/courses'
     | '/admin/courses/create'
+    | '/admin/links'
+    | '/admin/links/categories'
+    | '/admin/links/create'
+    | '/admin/links/stats'
     | '/admin/posts'
     | '/admin/posts/create'
     | '/admin/workshops'
     | '/admin/workshops/create'
     | '/courses/$courseSlug/$lessonSlug'
     | '/admin/courses/'
+    | '/admin/links/'
     | '/admin/posts/'
     | '/admin/workshops/'
     | '/admin/youtube'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
+    | '/admin/links/$id/edit'
     | '/admin/posts/$id/edit'
     | '/admin/workshops/$id/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -375,6 +450,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/courses/$slug'
     | '/debug/migrate-workshops'
+    | '/go/$slug'
     | '/posts/$slug'
     | '/tools/$toolSlug'
     | '/workshops/$slug'
@@ -385,6 +461,10 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/admin/courses'
     | '/admin/courses/create'
+    | '/admin/links'
+    | '/admin/links/categories'
+    | '/admin/links/create'
+    | '/admin/links/stats'
     | '/admin/posts'
     | '/admin/posts/create'
     | '/admin/workshops'
@@ -393,6 +473,7 @@ export interface FileRouteTypes {
     | '/admin/youtube'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
+    | '/admin/links/$id/edit'
     | '/admin/posts/$id/edit'
     | '/admin/workshops/$id/edit'
   id:
@@ -406,6 +487,7 @@ export interface FileRouteTypes {
     | '/admin/_layout'
     | '/courses/$slug'
     | '/debug/migrate-workshops'
+    | '/go/$slug'
     | '/posts/$slug'
     | '/tools/$toolSlug'
     | '/workshops/$slug'
@@ -418,6 +500,11 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/courses/_layout'
     | '/admin/courses/create'
+    | '/admin/links'
+    | '/admin/links/_layout'
+    | '/admin/links/categories'
+    | '/admin/links/create'
+    | '/admin/links/stats'
     | '/admin/posts'
     | '/admin/posts/_layout'
     | '/admin/posts/create'
@@ -426,11 +513,13 @@ export interface FileRouteTypes {
     | '/admin/workshops/create'
     | '/courses/$courseSlug/$lessonSlug'
     | '/admin/courses/'
+    | '/admin/links/'
     | '/admin/posts/'
     | '/admin/workshops/'
     | '/admin/youtube/'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
+    | '/admin/links/$id/edit'
     | '/admin/posts/$id/edit'
     | '/admin/workshops/$id/edit'
   fileRoutesById: FileRoutesById
@@ -444,6 +533,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   CoursesSlugRoute: typeof CoursesSlugRoute
   DebugMigrateWorkshopsRoute: typeof DebugMigrateWorkshopsRoute
+  GoSlugRoute: typeof GoSlugRoute
   PostsSlugRoute: typeof PostsSlugRoute
   ToolsToolSlugRoute: typeof ToolsToolSlugRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
@@ -511,6 +601,13 @@ declare module '@tanstack/react-router' {
       path: '/posts'
       fullPath: '/admin/posts'
       preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/links': {
+      id: '/admin/links'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AdminLinksRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/courses': {
@@ -583,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/go/$slug': {
+      id: '/go/$slug'
+      path: '/go/$slug'
+      fullPath: '/go/$slug'
+      preLoaderRoute: typeof GoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/debug/migrate-workshops': {
       id: '/debug/migrate-workshops'
       path: '/debug/migrate-workshops'
@@ -624,6 +728,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/posts/'
       preLoaderRoute: typeof AdminPostsIndexRouteImport
       parentRoute: typeof AdminPostsRoute
+    }
+    '/admin/links/': {
+      id: '/admin/links/'
+      path: '/'
+      fullPath: '/admin/links/'
+      preLoaderRoute: typeof AdminLinksIndexRouteImport
+      parentRoute: typeof AdminLinksRoute
     }
     '/admin/courses/': {
       id: '/admin/courses/'
@@ -667,6 +778,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPostsLayoutRouteImport
       parentRoute: typeof AdminPostsRoute
     }
+    '/admin/links/stats': {
+      id: '/admin/links/stats'
+      path: '/stats'
+      fullPath: '/admin/links/stats'
+      preLoaderRoute: typeof AdminLinksStatsRouteImport
+      parentRoute: typeof AdminLinksRoute
+    }
+    '/admin/links/create': {
+      id: '/admin/links/create'
+      path: '/create'
+      fullPath: '/admin/links/create'
+      preLoaderRoute: typeof AdminLinksCreateRouteImport
+      parentRoute: typeof AdminLinksRoute
+    }
+    '/admin/links/categories': {
+      id: '/admin/links/categories'
+      path: '/categories'
+      fullPath: '/admin/links/categories'
+      preLoaderRoute: typeof AdminLinksCategoriesRouteImport
+      parentRoute: typeof AdminLinksRoute
+    }
+    '/admin/links/_layout': {
+      id: '/admin/links/_layout'
+      path: '/links'
+      fullPath: '/admin/links'
+      preLoaderRoute: typeof AdminLinksLayoutRouteImport
+      parentRoute: typeof AdminLinksRoute
+    }
     '/admin/courses/create': {
       id: '/admin/courses/create'
       path: '/create'
@@ -694,6 +833,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/posts/$id/edit'
       preLoaderRoute: typeof AdminPostsIdEditRouteImport
       parentRoute: typeof AdminPostsRoute
+    }
+    '/admin/links/$id/edit': {
+      id: '/admin/links/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/links/$id/edit'
+      preLoaderRoute: typeof AdminLinksIdEditRouteImport
+      parentRoute: typeof AdminLinksRoute
     }
     '/admin/courses/$id/lessons': {
       id: '/admin/courses/$id/lessons'
@@ -730,6 +876,28 @@ const AdminCoursesRouteChildren: AdminCoursesRouteChildren = {
 
 const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
   AdminCoursesRouteChildren,
+)
+
+interface AdminLinksRouteChildren {
+  AdminLinksLayoutRoute: typeof AdminLinksLayoutRoute
+  AdminLinksCategoriesRoute: typeof AdminLinksCategoriesRoute
+  AdminLinksCreateRoute: typeof AdminLinksCreateRoute
+  AdminLinksStatsRoute: typeof AdminLinksStatsRoute
+  AdminLinksIndexRoute: typeof AdminLinksIndexRoute
+  AdminLinksIdEditRoute: typeof AdminLinksIdEditRoute
+}
+
+const AdminLinksRouteChildren: AdminLinksRouteChildren = {
+  AdminLinksLayoutRoute: AdminLinksLayoutRoute,
+  AdminLinksCategoriesRoute: AdminLinksCategoriesRoute,
+  AdminLinksCreateRoute: AdminLinksCreateRoute,
+  AdminLinksStatsRoute: AdminLinksStatsRoute,
+  AdminLinksIndexRoute: AdminLinksIndexRoute,
+  AdminLinksIdEditRoute: AdminLinksIdEditRoute,
+}
+
+const AdminLinksRouteWithChildren = AdminLinksRoute._addFileChildren(
+  AdminLinksRouteChildren,
 )
 
 interface AdminPostsRouteChildren {
@@ -772,6 +940,7 @@ interface AdminRouteChildren {
   AdminLayoutRoute: typeof AdminLayoutRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminCoursesRoute: typeof AdminCoursesRouteWithChildren
+  AdminLinksRoute: typeof AdminLinksRouteWithChildren
   AdminPostsRoute: typeof AdminPostsRouteWithChildren
   AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
   AdminYoutubeIndexRoute: typeof AdminYoutubeIndexRoute
@@ -781,6 +950,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLayoutRoute: AdminLayoutRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminCoursesRoute: AdminCoursesRouteWithChildren,
+  AdminLinksRoute: AdminLinksRouteWithChildren,
   AdminPostsRoute: AdminPostsRouteWithChildren,
   AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
   AdminYoutubeIndexRoute: AdminYoutubeIndexRoute,
@@ -797,6 +967,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   CoursesSlugRoute: CoursesSlugRoute,
   DebugMigrateWorkshopsRoute: DebugMigrateWorkshopsRoute,
+  GoSlugRoute: GoSlugRoute,
   PostsSlugRoute: PostsSlugRoute,
   ToolsToolSlugRoute: ToolsToolSlugRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,

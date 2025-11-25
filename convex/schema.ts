@@ -636,4 +636,72 @@ export default defineSchema({
 		.searchIndex('search_title', {
 			searchField: 'title',
 		}),
+
+	// ============================================================================
+	// AFFILIATE LINKS
+	// ============================================================================
+
+	/**
+	 * Link categories - organize affiliate links by category
+	 */
+	linkCategories: defineTable({
+		name: v.string(),
+		slug: v.string(),
+		description: v.optional(v.string()),
+		// Timestamps
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_slug', ['slug'])
+		.index('by_name', ['name']),
+
+	/**
+	 * Affiliate links - shortened URLs for tracking
+	 */
+	affiliateLinks: defineTable({
+		// Link identification
+		slug: v.string(), // Short URL path (e.g., "my-link" for /go/my-link)
+		destinationUrl: v.string(), // Full destination URL
+		// Metadata
+		name: v.string(), // Display name for admin
+		description: v.optional(v.string()),
+		categoryId: v.optional(v.id('linkCategories')),
+		// Status
+		isActive: v.boolean(),
+		// Stats (denormalized for quick access)
+		clickCount: v.number(),
+		// Created by
+		createdBy: v.id('users'),
+		// Timestamps
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_slug', ['slug'])
+		.index('by_category', ['categoryId'])
+		.index('by_is_active', ['isActive'])
+		.index('by_created_by', ['createdBy'])
+		.index('by_click_count', ['clickCount'])
+		.searchIndex('search_name', {
+			searchField: 'name',
+			filterFields: ['isActive'],
+		}),
+
+	/**
+	 * Link clicks - track individual clicks on affiliate links
+	 */
+	linkClicks: defineTable({
+		linkId: v.id('affiliateLinks'),
+		// Referrer info
+		referrer: v.optional(v.string()), // Where the click came from
+		// User agent / device info
+		userAgent: v.optional(v.string()),
+		// Geographic info (if available)
+		country: v.optional(v.string()),
+		// Timestamps
+		clickedAt: v.number(),
+	})
+		.index('by_link_id', ['linkId'])
+		.index('by_referrer', ['referrer'])
+		.index('by_clicked_at', ['clickedAt'])
+		.index('by_link_and_date', ['linkId', 'clickedAt']),
 })

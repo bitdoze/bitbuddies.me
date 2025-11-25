@@ -4,6 +4,7 @@ import {
 	Calendar,
 	FileText,
 	LayoutDashboard,
+	Link2,
 	Plus,
 	Settings,
 	TrendingUp,
@@ -13,6 +14,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useLinkSummary } from "@/hooks/useAffiliateLinks";
 import { useCourses } from "@/hooks/useCourses";
 import { usePosts } from "@/hooks/usePosts";
 import { useWorkshops } from "@/hooks/useWorkshops";
@@ -26,6 +28,7 @@ function AdminDashboard() {
 	const posts = usePosts({ publishedOnly: false });
 	const workshops = useWorkshops({ publishedOnly: false });
 	const courses = useCourses({ publishedOnly: false });
+	const linkSummary = useLinkSummary(user?.id);
 
 	if (authLoading) {
 		return (
@@ -115,6 +118,14 @@ function AdminDashboard() {
 			color: "text-purple-500",
 			bgColor: "bg-purple-500/10",
 		},
+		{
+			title: "New Link",
+			description: "Create affiliate link",
+			icon: Link2,
+			href: "/admin/links/create",
+			color: "text-orange-500",
+			bgColor: "bg-orange-500/10",
+		},
 	];
 
 	const managementLinks = [
@@ -154,6 +165,24 @@ function AdminDashboard() {
 					color: "text-green-600",
 				},
 				{ label: "Drafts", value: draftCourses, color: "text-amber-600" },
+			],
+		},
+		{
+			title: "Affiliate Links",
+			description: `${linkSummary?.totalLinks ?? 0} total links`,
+			icon: Link2,
+			href: "/admin/links",
+			stats: [
+				{
+					label: "Active",
+					value: linkSummary?.activeLinks ?? 0,
+					color: "text-green-600",
+				},
+				{
+					label: "Clicks (24h)",
+					value: linkSummary?.clicksLast24h ?? 0,
+					color: "text-blue-600",
+				},
 			],
 		},
 	];
