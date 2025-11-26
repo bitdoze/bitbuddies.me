@@ -5,8 +5,10 @@ import {
 	FileImage,
 	FileText,
 	FileVideo,
+	Gift,
 	Home,
 	Info,
+	Layers,
 	LayoutDashboard,
 	Link2,
 	Mail,
@@ -68,6 +70,12 @@ const menuItems = [
 		title: "Blog",
 		url: "/posts",
 		icon: FileText,
+		isRoute: true,
+	},
+	{
+		title: "Recommended",
+		url: "/recommended",
+		icon: Gift,
 		isRoute: true,
 	},
 	{
@@ -307,6 +315,17 @@ export function AppSidebar() {
 										<Link to="/admin/links">
 											<Link2 className="h-4 w-4" />
 											<span>Affiliate Links</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton
+										asChild
+										className="group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent/40"
+									>
+										<Link to={"/admin/recommended" as any}>
+											<Layers className="h-4 w-4" />
+											<span>Recommended</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>

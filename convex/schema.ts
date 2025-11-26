@@ -704,4 +704,52 @@ export default defineSchema({
 		.index('by_referrer', ['referrer'])
 		.index('by_clicked_at', ['clickedAt'])
 		.index('by_link_and_date', ['linkId', 'clickedAt']),
+
+	// ============================================================================
+	// RECOMMENDED ITEMS
+	// ============================================================================
+
+	/**
+	 * Recommended sections - group recommended items by section
+	 */
+	recommendedSections: defineTable({
+		title: v.string(),
+		slug: v.string(),
+		order: v.number(),
+		isActive: v.boolean(),
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_slug', ['slug'])
+		.index('by_order', ['order'])
+		.index('by_is_active', ['isActive']),
+
+	/**
+	 * Recommended items - products/tools to recommend
+	 */
+	recommendedItems: defineTable({
+		sectionId: v.id('recommendedSections'),
+		title: v.string(),
+		description: v.string(),
+		category: v.string(),
+		badge: v.optional(v.string()),
+		badgeColor: v.optional(v.union(
+			v.literal('red'),
+			v.literal('blue'),
+			v.literal('green'),
+			v.literal('purple'),
+		)),
+		imageUrl: v.string(),
+		ctaText: v.string(),
+		ctaUrl: v.string(),
+		isAffiliate: v.boolean(),
+		order: v.number(),
+		isActive: v.boolean(),
+		createdAt: v.number(),
+		updatedAt: v.number(),
+	})
+		.index('by_section_id', ['sectionId'])
+		.index('by_order', ['order'])
+		.index('by_is_active', ['isActive'])
+		.index('by_section_and_order', ['sectionId', 'order']),
 })

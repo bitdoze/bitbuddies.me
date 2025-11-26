@@ -23,6 +23,7 @@ const primaryLinks = [
 	{ label: "Workshops", to: "/workshops" },
 	{ label: "Videos", to: "/youtube" },
 	{ label: "Blog", to: "/posts" },
+	{ label: "Recommended", to: "/recommended" },
 ];
 
 const buildToolIconSrc = (svg: string) =>

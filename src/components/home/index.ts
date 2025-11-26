@@ -9,3 +9,5 @@ export { ToolCard } from "./ToolCard";
 export { CommunityBanner } from "./CommunityBanner";
 export { JourneySteps } from "./JourneySteps";
 export { ShowcaseCarousel } from "./ShowcaseCarousel";
+export { RecommendedSection, RecommendedSections } from "./RecommendedSection";
+export type { RecommendedItem, RecommendedSectionProps } from "./RecommendedSection";
