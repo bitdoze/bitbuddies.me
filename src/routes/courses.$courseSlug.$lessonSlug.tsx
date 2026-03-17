@@ -154,6 +154,11 @@ function LessonPage() {
 	const totalLessons = lessons?.length || 0;
 	const completedCount =
 		progressRecords?.filter((p) => p.isCompleted).length || 0;
+	const completedLessonIds = new Set(
+		progressRecords
+			?.filter((record) => record.isCompleted)
+			.map((record) => record.lessonId) || [],
+	);
 	const progressPercentage =
 		totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
@@ -188,9 +193,11 @@ function LessonPage() {
 
 				{/* Backdrop overlay for mobile */}
 				{isSidebarOpen && (
-					<div
+					<button
+						type="button"
 						className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
 						onClick={() => setIsSidebarOpen(false)}
+						aria-label="Close lesson list"
 					/>
 				)}
 
@@ -285,10 +292,7 @@ function LessonPage() {
 													lesson={lesson}
 													course={course}
 													isActive={lesson._id === currentLesson._id}
-													isCompleted={useLessonCompletion(
-														progressRecords,
-														lesson._id,
-													)}
+													isCompleted={completedLessonIds.has(lesson._id)}
 													onToggleCompletion={async () => {
 														if (user?.id && course?._id) {
 															await toggleCompletion({
@@ -316,10 +320,7 @@ function LessonPage() {
 												lesson={lesson}
 												course={course}
 												isActive={lesson._id === currentLesson._id}
-												isCompleted={useLessonCompletion(
-													progressRecords,
-													lesson._id,
-												)}
+												isCompleted={completedLessonIds.has(lesson._id)}
 												onToggleCompletion={async () => {
 													if (user?.id && course?._id) {
 														await toggleCompletion({

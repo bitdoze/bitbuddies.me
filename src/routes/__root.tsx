@@ -96,13 +96,6 @@ export const Route = createRootRoute({
 				href: "/site.webmanifest",
 			},
 		],
-		scripts: [
-			{
-				src: "https://an.bitdoze.com/js/script.js",
-				defer: true,
-				"data-domain": "bitbuddies.me",
-			},
-		],
 	}),
 
 	notFoundComponent: () => (
@@ -124,6 +117,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
+				<script
+					async
+					src="https://an3.bitdoze.com/js/pa-k3p8oc81J4oI5N0xOOTDu.js"
+				/>
+				<script>
+					{"window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()"}
+				</script>
 			</head>
 			<body>
 				<HelmetProvider>

@@ -8,8 +8,6 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RecommendedRouteImport } from './routes/recommended'
@@ -57,17 +55,6 @@ import { Route as AdminCoursesIdLessonsRouteImport } from './routes/admin/course
 import { Route as AdminCoursesIdEditRouteImport } from './routes/admin/courses/$id/edit'
 import { Route as AdminRecommendedItemsItemIdEditRouteImport } from './routes/admin/recommended/items/$itemId/edit'
 
-const AdminRouteImport = createFileRoute('/admin')()
-const AdminWorkshopsRouteImport = createFileRoute('/admin/workshops')()
-const AdminPostsRouteImport = createFileRoute('/admin/posts')()
-const AdminLinksRouteImport = createFileRoute('/admin/links')()
-const AdminCoursesRouteImport = createFileRoute('/admin/courses')()
-
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -98,26 +85,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminWorkshopsRoute = AdminWorkshopsRouteImport.update({
-  id: '/workshops',
-  path: '/workshops',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPostsRoute = AdminPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLinksRoute = AdminLinksRouteImport.update({
-  id: '/links',
-  path: '/links',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCoursesRoute = AdminCoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
-  getParentRoute: () => AdminRoute,
-} as any)
 const YoutubeIndexRoute = YoutubeIndexRouteImport.update({
   id: '/youtube/',
   path: '/youtube/',
@@ -144,9 +111,9 @@ const CoursesIndexRoute = CoursesIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WorkshopsSlugRoute = WorkshopsSlugRouteImport.update({
   id: '/workshops/$slug',
@@ -179,38 +146,39 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLayoutRoute = AdminLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/_layout',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminYoutubeIndexRoute = AdminYoutubeIndexRouteImport.update({
-  id: '/youtube/',
-  path: '/youtube/',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/youtube/',
+  path: '/admin/youtube/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWorkshopsIndexRoute = AdminWorkshopsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminWorkshopsRoute,
+  id: '/admin/workshops/',
+  path: '/admin/workshops/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRecommendedIndexRoute = AdminRecommendedIndexRouteImport.update({
-  id: '/recommended/',
-  path: '/recommended/',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/recommended/',
+  path: '/admin/recommended/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminPostsIndexRoute = AdminPostsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminPostsRoute,
+  id: '/admin/posts/',
+  path: '/admin/posts/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksIndexRoute = AdminLinksIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/',
+  path: '/admin/links/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesIndexRoute = AdminCoursesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminCoursesRoute,
+  id: '/admin/courses/',
+  path: '/admin/courses/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesCourseSlugLessonSlugRoute =
   CoursesCourseSlugLessonSlugRouteImport.update({
@@ -219,99 +187,103 @@ const CoursesCourseSlugLessonSlugRoute =
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminWorkshopsCreateRoute = AdminWorkshopsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AdminWorkshopsRoute,
+  id: '/admin/workshops/create',
+  path: '/admin/workshops/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWorkshopsLayoutRoute = AdminWorkshopsLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => AdminWorkshopsRoute,
+  id: '/admin/workshops/_layout',
+  path: '/admin/workshops',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRecommendedCreateSectionRoute =
   AdminRecommendedCreateSectionRouteImport.update({
-    id: '/recommended/create-section',
-    path: '/recommended/create-section',
-    getParentRoute: () => AdminRoute,
+    id: '/admin/recommended/create-section',
+    path: '/admin/recommended/create-section',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AdminRecommendedCreateItemRoute =
   AdminRecommendedCreateItemRouteImport.update({
-    id: '/recommended/create-item',
-    path: '/recommended/create-item',
-    getParentRoute: () => AdminRoute,
+    id: '/admin/recommended/create-item',
+    path: '/admin/recommended/create-item',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AdminPostsCreateRoute = AdminPostsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AdminPostsRoute,
+  id: '/admin/posts/create',
+  path: '/admin/posts/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminPostsLayoutRoute = AdminPostsLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => AdminPostsRoute,
+  id: '/admin/posts/_layout',
+  path: '/admin/posts',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksStatsRoute = AdminLinksStatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/stats',
+  path: '/admin/links/stats',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksCreateRoute = AdminLinksCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/create',
+  path: '/admin/links/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksCategoriesRoute = AdminLinksCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/categories',
+  path: '/admin/links/categories',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksLayoutRoute = AdminLinksLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/_layout',
+  path: '/admin/links',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesCreateRoute = AdminCoursesCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => AdminCoursesRoute,
+  id: '/admin/courses/create',
+  path: '/admin/courses/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesLayoutRoute = AdminCoursesLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => AdminCoursesRoute,
+  id: '/admin/courses/_layout',
+  path: '/admin/courses',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWorkshopsIdEditRoute = AdminWorkshopsIdEditRouteImport.update({
-  id: '/$id/edit',
-  path: '/$id/edit',
-  getParentRoute: () => AdminWorkshopsRoute,
+  id: '/admin/workshops/$id/edit',
+  path: '/admin/workshops/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRecommendedSectionIdEditRoute =
   AdminRecommendedSectionIdEditRouteImport.update({
-    id: '/recommended/$sectionId/edit',
-    path: '/recommended/$sectionId/edit',
-    getParentRoute: () => AdminRoute,
+    id: '/admin/recommended/$sectionId/edit',
+    path: '/admin/recommended/$sectionId/edit',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AdminPostsIdEditRoute = AdminPostsIdEditRouteImport.update({
-  id: '/$id/edit',
-  path: '/$id/edit',
-  getParentRoute: () => AdminPostsRoute,
+  id: '/admin/posts/$id/edit',
+  path: '/admin/posts/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLinksIdEditRoute = AdminLinksIdEditRouteImport.update({
-  id: '/$id/edit',
-  path: '/$id/edit',
-  getParentRoute: () => AdminLinksRoute,
+  id: '/admin/links/$id/edit',
+  path: '/admin/links/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesIdLessonsRoute = AdminCoursesIdLessonsRouteImport.update({
-  id: '/$id/lessons',
-  path: '/$id/lessons',
-  getParentRoute: () => AdminCoursesRoute,
+  id: '/admin/courses/$id/lessons',
+  path: '/admin/courses/$id/lessons',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCoursesIdEditRoute = AdminCoursesIdEditRouteImport.update({
-  id: '/$id/edit',
-  path: '/$id/edit',
-  getParentRoute: () => AdminCoursesRoute,
+  id: '/admin/courses/$id/edit',
+  path: '/admin/courses/$id/edit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRecommendedItemsItemIdEditRoute =
   AdminRecommendedItemsItemIdEditRouteImport.update({
-    id: '/recommended/items/$itemId/edit',
-    path: '/recommended/items/$itemId/edit',
-    getParentRoute: () => AdminRoute,
+    id: '/admin/recommended/items/$itemId/edit',
+    path: '/admin/recommended/items/$itemId/edit',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -329,11 +301,11 @@ export interface FileRoutesByFullPath {
   '/tools/$toolSlug': typeof ToolsToolSlugRoute
   '/workshops/$slug': typeof WorkshopsSlugRoute
   '/admin/': typeof AdminIndexRoute
-  '/courses': typeof CoursesIndexRoute
-  '/posts': typeof PostsIndexRoute
-  '/tools': typeof ToolsIndexRoute
-  '/workshops': typeof WorkshopsIndexRoute
-  '/youtube': typeof YoutubeIndexRoute
+  '/courses/': typeof CoursesIndexRoute
+  '/posts/': typeof PostsIndexRoute
+  '/tools/': typeof ToolsIndexRoute
+  '/workshops/': typeof WorkshopsIndexRoute
+  '/youtube/': typeof YoutubeIndexRoute
   '/admin/courses': typeof AdminCoursesLayoutRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
   '/admin/links': typeof AdminLinksLayoutRoute
@@ -350,9 +322,9 @@ export interface FileRoutesByFullPath {
   '/admin/courses/': typeof AdminCoursesIndexRoute
   '/admin/links/': typeof AdminLinksIndexRoute
   '/admin/posts/': typeof AdminPostsIndexRoute
-  '/admin/recommended': typeof AdminRecommendedIndexRoute
+  '/admin/recommended/': typeof AdminRecommendedIndexRoute
   '/admin/workshops/': typeof AdminWorkshopsIndexRoute
-  '/admin/youtube': typeof AdminYoutubeIndexRoute
+  '/admin/youtube/': typeof AdminYoutubeIndexRoute
   '/admin/courses/$id/edit': typeof AdminCoursesIdEditRoute
   '/admin/courses/$id/lessons': typeof AdminCoursesIdLessonsRoute
   '/admin/links/$id/edit': typeof AdminLinksIdEditRoute
@@ -411,7 +383,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/recommended': typeof RecommendedRoute
   '/terms': typeof TermsRoute
-  '/admin': typeof AdminRouteWithChildren
   '/admin/_layout': typeof AdminLayoutRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/debug/migrate-workshops': typeof DebugMigrateWorkshopsRoute
@@ -425,20 +396,16 @@ export interface FileRoutesById {
   '/tools/': typeof ToolsIndexRoute
   '/workshops/': typeof WorkshopsIndexRoute
   '/youtube/': typeof YoutubeIndexRoute
-  '/admin/courses': typeof AdminCoursesRouteWithChildren
   '/admin/courses/_layout': typeof AdminCoursesLayoutRoute
   '/admin/courses/create': typeof AdminCoursesCreateRoute
-  '/admin/links': typeof AdminLinksRouteWithChildren
   '/admin/links/_layout': typeof AdminLinksLayoutRoute
   '/admin/links/categories': typeof AdminLinksCategoriesRoute
   '/admin/links/create': typeof AdminLinksCreateRoute
   '/admin/links/stats': typeof AdminLinksStatsRoute
-  '/admin/posts': typeof AdminPostsRouteWithChildren
   '/admin/posts/_layout': typeof AdminPostsLayoutRoute
   '/admin/posts/create': typeof AdminPostsCreateRoute
   '/admin/recommended/create-item': typeof AdminRecommendedCreateItemRoute
   '/admin/recommended/create-section': typeof AdminRecommendedCreateSectionRoute
-  '/admin/workshops': typeof AdminWorkshopsRouteWithChildren
   '/admin/workshops/_layout': typeof AdminWorkshopsLayoutRoute
   '/admin/workshops/create': typeof AdminWorkshopsCreateRoute
   '/courses/$courseSlug/$lessonSlug': typeof CoursesCourseSlugLessonSlugRoute
@@ -473,11 +440,11 @@ export interface FileRouteTypes {
     | '/tools/$toolSlug'
     | '/workshops/$slug'
     | '/admin/'
-    | '/courses'
-    | '/posts'
-    | '/tools'
-    | '/workshops'
-    | '/youtube'
+    | '/courses/'
+    | '/posts/'
+    | '/tools/'
+    | '/workshops/'
+    | '/youtube/'
     | '/admin/courses'
     | '/admin/courses/create'
     | '/admin/links'
@@ -494,9 +461,9 @@ export interface FileRouteTypes {
     | '/admin/courses/'
     | '/admin/links/'
     | '/admin/posts/'
-    | '/admin/recommended'
+    | '/admin/recommended/'
     | '/admin/workshops/'
-    | '/admin/youtube'
+    | '/admin/youtube/'
     | '/admin/courses/$id/edit'
     | '/admin/courses/$id/lessons'
     | '/admin/links/$id/edit'
@@ -554,7 +521,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/recommended'
     | '/terms'
-    | '/admin'
     | '/admin/_layout'
     | '/courses/$slug'
     | '/debug/migrate-workshops'
@@ -568,20 +534,16 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/workshops/'
     | '/youtube/'
-    | '/admin/courses'
     | '/admin/courses/_layout'
     | '/admin/courses/create'
-    | '/admin/links'
     | '/admin/links/_layout'
     | '/admin/links/categories'
     | '/admin/links/create'
     | '/admin/links/stats'
-    | '/admin/posts'
     | '/admin/posts/_layout'
     | '/admin/posts/create'
     | '/admin/recommended/create-item'
     | '/admin/recommended/create-section'
-    | '/admin/workshops'
     | '/admin/workshops/_layout'
     | '/admin/workshops/create'
     | '/courses/$courseSlug/$lessonSlug'
@@ -607,30 +569,49 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RecommendedRoute: typeof RecommendedRoute
   TermsRoute: typeof TermsRoute
-  AdminRoute: typeof AdminRouteWithChildren
+  AdminLayoutRoute: typeof AdminLayoutRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
   DebugMigrateWorkshopsRoute: typeof DebugMigrateWorkshopsRoute
   GoSlugRoute: typeof GoSlugRoute
   PostsSlugRoute: typeof PostsSlugRoute
   ToolsToolSlugRoute: typeof ToolsToolSlugRoute
   WorkshopsSlugRoute: typeof WorkshopsSlugRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
   WorkshopsIndexRoute: typeof WorkshopsIndexRoute
   YoutubeIndexRoute: typeof YoutubeIndexRoute
+  AdminCoursesLayoutRoute: typeof AdminCoursesLayoutRoute
+  AdminCoursesCreateRoute: typeof AdminCoursesCreateRoute
+  AdminLinksLayoutRoute: typeof AdminLinksLayoutRoute
+  AdminLinksCategoriesRoute: typeof AdminLinksCategoriesRoute
+  AdminLinksCreateRoute: typeof AdminLinksCreateRoute
+  AdminLinksStatsRoute: typeof AdminLinksStatsRoute
+  AdminPostsLayoutRoute: typeof AdminPostsLayoutRoute
+  AdminPostsCreateRoute: typeof AdminPostsCreateRoute
+  AdminRecommendedCreateItemRoute: typeof AdminRecommendedCreateItemRoute
+  AdminRecommendedCreateSectionRoute: typeof AdminRecommendedCreateSectionRoute
+  AdminWorkshopsLayoutRoute: typeof AdminWorkshopsLayoutRoute
+  AdminWorkshopsCreateRoute: typeof AdminWorkshopsCreateRoute
   CoursesCourseSlugLessonSlugRoute: typeof CoursesCourseSlugLessonSlugRoute
+  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
+  AdminLinksIndexRoute: typeof AdminLinksIndexRoute
+  AdminPostsIndexRoute: typeof AdminPostsIndexRoute
+  AdminRecommendedIndexRoute: typeof AdminRecommendedIndexRoute
+  AdminWorkshopsIndexRoute: typeof AdminWorkshopsIndexRoute
+  AdminYoutubeIndexRoute: typeof AdminYoutubeIndexRoute
+  AdminCoursesIdEditRoute: typeof AdminCoursesIdEditRoute
+  AdminCoursesIdLessonsRoute: typeof AdminCoursesIdLessonsRoute
+  AdminLinksIdEditRoute: typeof AdminLinksIdEditRoute
+  AdminPostsIdEditRoute: typeof AdminPostsIdEditRoute
+  AdminRecommendedSectionIdEditRoute: typeof AdminRecommendedSectionIdEditRoute
+  AdminWorkshopsIdEditRoute: typeof AdminWorkshopsIdEditRoute
+  AdminRecommendedItemsItemIdEditRoute: typeof AdminRecommendedItemsItemIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -673,75 +654,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/workshops': {
-      id: '/admin/workshops'
-      path: '/workshops'
-      fullPath: '/admin/workshops'
-      preLoaderRoute: typeof AdminWorkshopsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/posts': {
-      id: '/admin/posts'
-      path: '/posts'
-      fullPath: '/admin/posts'
-      preLoaderRoute: typeof AdminPostsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/links': {
-      id: '/admin/links'
-      path: '/links'
-      fullPath: '/admin/links'
-      preLoaderRoute: typeof AdminLinksRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/courses': {
-      id: '/admin/courses'
-      path: '/courses'
-      fullPath: '/admin/courses'
-      preLoaderRoute: typeof AdminCoursesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/youtube/': {
       id: '/youtube/'
       path: '/youtube'
-      fullPath: '/youtube'
+      fullPath: '/youtube/'
       preLoaderRoute: typeof YoutubeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/workshops/': {
       id: '/workshops/'
       path: '/workshops'
-      fullPath: '/workshops'
+      fullPath: '/workshops/'
       preLoaderRoute: typeof WorkshopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/': {
       id: '/tools/'
       path: '/tools'
-      fullPath: '/tools'
+      fullPath: '/tools/'
       preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/posts/': {
       id: '/posts/'
       path: '/posts'
-      fullPath: '/posts'
+      fullPath: '/posts/'
       preLoaderRoute: typeof PostsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/courses/': {
       id: '/courses/'
       path: '/courses'
-      fullPath: '/courses'
+      fullPath: '/courses/'
       preLoaderRoute: typeof CoursesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
-      path: '/'
+      path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/workshops/$slug': {
       id: '/workshops/$slug'
@@ -790,49 +743,49 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminLayoutRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/youtube/': {
       id: '/admin/youtube/'
-      path: '/youtube'
-      fullPath: '/admin/youtube'
+      path: '/admin/youtube'
+      fullPath: '/admin/youtube/'
       preLoaderRoute: typeof AdminYoutubeIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/workshops/': {
       id: '/admin/workshops/'
-      path: '/'
+      path: '/admin/workshops'
       fullPath: '/admin/workshops/'
       preLoaderRoute: typeof AdminWorkshopsIndexRouteImport
-      parentRoute: typeof AdminWorkshopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/recommended/': {
       id: '/admin/recommended/'
-      path: '/recommended'
-      fullPath: '/admin/recommended'
+      path: '/admin/recommended'
+      fullPath: '/admin/recommended/'
       preLoaderRoute: typeof AdminRecommendedIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/posts/': {
       id: '/admin/posts/'
-      path: '/'
+      path: '/admin/posts'
       fullPath: '/admin/posts/'
       preLoaderRoute: typeof AdminPostsIndexRouteImport
-      parentRoute: typeof AdminPostsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/': {
       id: '/admin/links/'
-      path: '/'
+      path: '/admin/links'
       fullPath: '/admin/links/'
       preLoaderRoute: typeof AdminLinksIndexRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/courses/': {
       id: '/admin/courses/'
-      path: '/'
+      path: '/admin/courses'
       fullPath: '/admin/courses/'
       preLoaderRoute: typeof AdminCoursesIndexRouteImport
-      parentRoute: typeof AdminCoursesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/courses/$courseSlug/$lessonSlug': {
       id: '/courses/$courseSlug/$lessonSlug'
@@ -843,249 +796,139 @@ declare module '@tanstack/react-router' {
     }
     '/admin/workshops/create': {
       id: '/admin/workshops/create'
-      path: '/create'
+      path: '/admin/workshops/create'
       fullPath: '/admin/workshops/create'
       preLoaderRoute: typeof AdminWorkshopsCreateRouteImport
-      parentRoute: typeof AdminWorkshopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/workshops/_layout': {
       id: '/admin/workshops/_layout'
-      path: '/workshops'
+      path: '/admin/workshops'
       fullPath: '/admin/workshops'
       preLoaderRoute: typeof AdminWorkshopsLayoutRouteImport
-      parentRoute: typeof AdminWorkshopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/recommended/create-section': {
       id: '/admin/recommended/create-section'
-      path: '/recommended/create-section'
+      path: '/admin/recommended/create-section'
       fullPath: '/admin/recommended/create-section'
       preLoaderRoute: typeof AdminRecommendedCreateSectionRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/recommended/create-item': {
       id: '/admin/recommended/create-item'
-      path: '/recommended/create-item'
+      path: '/admin/recommended/create-item'
       fullPath: '/admin/recommended/create-item'
       preLoaderRoute: typeof AdminRecommendedCreateItemRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/posts/create': {
       id: '/admin/posts/create'
-      path: '/create'
+      path: '/admin/posts/create'
       fullPath: '/admin/posts/create'
       preLoaderRoute: typeof AdminPostsCreateRouteImport
-      parentRoute: typeof AdminPostsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/posts/_layout': {
       id: '/admin/posts/_layout'
-      path: '/posts'
+      path: '/admin/posts'
       fullPath: '/admin/posts'
       preLoaderRoute: typeof AdminPostsLayoutRouteImport
-      parentRoute: typeof AdminPostsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/stats': {
       id: '/admin/links/stats'
-      path: '/stats'
+      path: '/admin/links/stats'
       fullPath: '/admin/links/stats'
       preLoaderRoute: typeof AdminLinksStatsRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/create': {
       id: '/admin/links/create'
-      path: '/create'
+      path: '/admin/links/create'
       fullPath: '/admin/links/create'
       preLoaderRoute: typeof AdminLinksCreateRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/categories': {
       id: '/admin/links/categories'
-      path: '/categories'
+      path: '/admin/links/categories'
       fullPath: '/admin/links/categories'
       preLoaderRoute: typeof AdminLinksCategoriesRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/_layout': {
       id: '/admin/links/_layout'
-      path: '/links'
+      path: '/admin/links'
       fullPath: '/admin/links'
       preLoaderRoute: typeof AdminLinksLayoutRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/courses/create': {
       id: '/admin/courses/create'
-      path: '/create'
+      path: '/admin/courses/create'
       fullPath: '/admin/courses/create'
       preLoaderRoute: typeof AdminCoursesCreateRouteImport
-      parentRoute: typeof AdminCoursesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/courses/_layout': {
       id: '/admin/courses/_layout'
-      path: '/courses'
+      path: '/admin/courses'
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesLayoutRouteImport
-      parentRoute: typeof AdminCoursesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/workshops/$id/edit': {
       id: '/admin/workshops/$id/edit'
-      path: '/$id/edit'
+      path: '/admin/workshops/$id/edit'
       fullPath: '/admin/workshops/$id/edit'
       preLoaderRoute: typeof AdminWorkshopsIdEditRouteImport
-      parentRoute: typeof AdminWorkshopsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/recommended/$sectionId/edit': {
       id: '/admin/recommended/$sectionId/edit'
-      path: '/recommended/$sectionId/edit'
+      path: '/admin/recommended/$sectionId/edit'
       fullPath: '/admin/recommended/$sectionId/edit'
       preLoaderRoute: typeof AdminRecommendedSectionIdEditRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/posts/$id/edit': {
       id: '/admin/posts/$id/edit'
-      path: '/$id/edit'
+      path: '/admin/posts/$id/edit'
       fullPath: '/admin/posts/$id/edit'
       preLoaderRoute: typeof AdminPostsIdEditRouteImport
-      parentRoute: typeof AdminPostsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/links/$id/edit': {
       id: '/admin/links/$id/edit'
-      path: '/$id/edit'
+      path: '/admin/links/$id/edit'
       fullPath: '/admin/links/$id/edit'
       preLoaderRoute: typeof AdminLinksIdEditRouteImport
-      parentRoute: typeof AdminLinksRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/courses/$id/lessons': {
       id: '/admin/courses/$id/lessons'
-      path: '/$id/lessons'
+      path: '/admin/courses/$id/lessons'
       fullPath: '/admin/courses/$id/lessons'
       preLoaderRoute: typeof AdminCoursesIdLessonsRouteImport
-      parentRoute: typeof AdminCoursesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/courses/$id/edit': {
       id: '/admin/courses/$id/edit'
-      path: '/$id/edit'
+      path: '/admin/courses/$id/edit'
       fullPath: '/admin/courses/$id/edit'
       preLoaderRoute: typeof AdminCoursesIdEditRouteImport
-      parentRoute: typeof AdminCoursesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/recommended/items/$itemId/edit': {
       id: '/admin/recommended/items/$itemId/edit'
-      path: '/recommended/items/$itemId/edit'
+      path: '/admin/recommended/items/$itemId/edit'
       fullPath: '/admin/recommended/items/$itemId/edit'
       preLoaderRoute: typeof AdminRecommendedItemsItemIdEditRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface AdminCoursesRouteChildren {
-  AdminCoursesLayoutRoute: typeof AdminCoursesLayoutRoute
-  AdminCoursesCreateRoute: typeof AdminCoursesCreateRoute
-  AdminCoursesIndexRoute: typeof AdminCoursesIndexRoute
-  AdminCoursesIdEditRoute: typeof AdminCoursesIdEditRoute
-  AdminCoursesIdLessonsRoute: typeof AdminCoursesIdLessonsRoute
-}
-
-const AdminCoursesRouteChildren: AdminCoursesRouteChildren = {
-  AdminCoursesLayoutRoute: AdminCoursesLayoutRoute,
-  AdminCoursesCreateRoute: AdminCoursesCreateRoute,
-  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
-  AdminCoursesIdEditRoute: AdminCoursesIdEditRoute,
-  AdminCoursesIdLessonsRoute: AdminCoursesIdLessonsRoute,
-}
-
-const AdminCoursesRouteWithChildren = AdminCoursesRoute._addFileChildren(
-  AdminCoursesRouteChildren,
-)
-
-interface AdminLinksRouteChildren {
-  AdminLinksLayoutRoute: typeof AdminLinksLayoutRoute
-  AdminLinksCategoriesRoute: typeof AdminLinksCategoriesRoute
-  AdminLinksCreateRoute: typeof AdminLinksCreateRoute
-  AdminLinksStatsRoute: typeof AdminLinksStatsRoute
-  AdminLinksIndexRoute: typeof AdminLinksIndexRoute
-  AdminLinksIdEditRoute: typeof AdminLinksIdEditRoute
-}
-
-const AdminLinksRouteChildren: AdminLinksRouteChildren = {
-  AdminLinksLayoutRoute: AdminLinksLayoutRoute,
-  AdminLinksCategoriesRoute: AdminLinksCategoriesRoute,
-  AdminLinksCreateRoute: AdminLinksCreateRoute,
-  AdminLinksStatsRoute: AdminLinksStatsRoute,
-  AdminLinksIndexRoute: AdminLinksIndexRoute,
-  AdminLinksIdEditRoute: AdminLinksIdEditRoute,
-}
-
-const AdminLinksRouteWithChildren = AdminLinksRoute._addFileChildren(
-  AdminLinksRouteChildren,
-)
-
-interface AdminPostsRouteChildren {
-  AdminPostsLayoutRoute: typeof AdminPostsLayoutRoute
-  AdminPostsCreateRoute: typeof AdminPostsCreateRoute
-  AdminPostsIndexRoute: typeof AdminPostsIndexRoute
-  AdminPostsIdEditRoute: typeof AdminPostsIdEditRoute
-}
-
-const AdminPostsRouteChildren: AdminPostsRouteChildren = {
-  AdminPostsLayoutRoute: AdminPostsLayoutRoute,
-  AdminPostsCreateRoute: AdminPostsCreateRoute,
-  AdminPostsIndexRoute: AdminPostsIndexRoute,
-  AdminPostsIdEditRoute: AdminPostsIdEditRoute,
-}
-
-const AdminPostsRouteWithChildren = AdminPostsRoute._addFileChildren(
-  AdminPostsRouteChildren,
-)
-
-interface AdminWorkshopsRouteChildren {
-  AdminWorkshopsLayoutRoute: typeof AdminWorkshopsLayoutRoute
-  AdminWorkshopsCreateRoute: typeof AdminWorkshopsCreateRoute
-  AdminWorkshopsIndexRoute: typeof AdminWorkshopsIndexRoute
-  AdminWorkshopsIdEditRoute: typeof AdminWorkshopsIdEditRoute
-}
-
-const AdminWorkshopsRouteChildren: AdminWorkshopsRouteChildren = {
-  AdminWorkshopsLayoutRoute: AdminWorkshopsLayoutRoute,
-  AdminWorkshopsCreateRoute: AdminWorkshopsCreateRoute,
-  AdminWorkshopsIndexRoute: AdminWorkshopsIndexRoute,
-  AdminWorkshopsIdEditRoute: AdminWorkshopsIdEditRoute,
-}
-
-const AdminWorkshopsRouteWithChildren = AdminWorkshopsRoute._addFileChildren(
-  AdminWorkshopsRouteChildren,
-)
-
-interface AdminRouteChildren {
-  AdminLayoutRoute: typeof AdminLayoutRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminCoursesRoute: typeof AdminCoursesRouteWithChildren
-  AdminLinksRoute: typeof AdminLinksRouteWithChildren
-  AdminPostsRoute: typeof AdminPostsRouteWithChildren
-  AdminRecommendedCreateItemRoute: typeof AdminRecommendedCreateItemRoute
-  AdminRecommendedCreateSectionRoute: typeof AdminRecommendedCreateSectionRoute
-  AdminWorkshopsRoute: typeof AdminWorkshopsRouteWithChildren
-  AdminRecommendedIndexRoute: typeof AdminRecommendedIndexRoute
-  AdminYoutubeIndexRoute: typeof AdminYoutubeIndexRoute
-  AdminRecommendedSectionIdEditRoute: typeof AdminRecommendedSectionIdEditRoute
-  AdminRecommendedItemsItemIdEditRoute: typeof AdminRecommendedItemsItemIdEditRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminLayoutRoute: AdminLayoutRoute,
-  AdminIndexRoute: AdminIndexRoute,
-  AdminCoursesRoute: AdminCoursesRouteWithChildren,
-  AdminLinksRoute: AdminLinksRouteWithChildren,
-  AdminPostsRoute: AdminPostsRouteWithChildren,
-  AdminRecommendedCreateItemRoute: AdminRecommendedCreateItemRoute,
-  AdminRecommendedCreateSectionRoute: AdminRecommendedCreateSectionRoute,
-  AdminWorkshopsRoute: AdminWorkshopsRouteWithChildren,
-  AdminRecommendedIndexRoute: AdminRecommendedIndexRoute,
-  AdminYoutubeIndexRoute: AdminYoutubeIndexRoute,
-  AdminRecommendedSectionIdEditRoute: AdminRecommendedSectionIdEditRoute,
-  AdminRecommendedItemsItemIdEditRoute: AdminRecommendedItemsItemIdEditRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -1094,19 +937,45 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RecommendedRoute: RecommendedRoute,
   TermsRoute: TermsRoute,
-  AdminRoute: AdminRouteWithChildren,
+  AdminLayoutRoute: AdminLayoutRoute,
   CoursesSlugRoute: CoursesSlugRoute,
   DebugMigrateWorkshopsRoute: DebugMigrateWorkshopsRoute,
   GoSlugRoute: GoSlugRoute,
   PostsSlugRoute: PostsSlugRoute,
   ToolsToolSlugRoute: ToolsToolSlugRoute,
   WorkshopsSlugRoute: WorkshopsSlugRoute,
+  AdminIndexRoute: AdminIndexRoute,
   CoursesIndexRoute: CoursesIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
   WorkshopsIndexRoute: WorkshopsIndexRoute,
   YoutubeIndexRoute: YoutubeIndexRoute,
+  AdminCoursesLayoutRoute: AdminCoursesLayoutRoute,
+  AdminCoursesCreateRoute: AdminCoursesCreateRoute,
+  AdminLinksLayoutRoute: AdminLinksLayoutRoute,
+  AdminLinksCategoriesRoute: AdminLinksCategoriesRoute,
+  AdminLinksCreateRoute: AdminLinksCreateRoute,
+  AdminLinksStatsRoute: AdminLinksStatsRoute,
+  AdminPostsLayoutRoute: AdminPostsLayoutRoute,
+  AdminPostsCreateRoute: AdminPostsCreateRoute,
+  AdminRecommendedCreateItemRoute: AdminRecommendedCreateItemRoute,
+  AdminRecommendedCreateSectionRoute: AdminRecommendedCreateSectionRoute,
+  AdminWorkshopsLayoutRoute: AdminWorkshopsLayoutRoute,
+  AdminWorkshopsCreateRoute: AdminWorkshopsCreateRoute,
   CoursesCourseSlugLessonSlugRoute: CoursesCourseSlugLessonSlugRoute,
+  AdminCoursesIndexRoute: AdminCoursesIndexRoute,
+  AdminLinksIndexRoute: AdminLinksIndexRoute,
+  AdminPostsIndexRoute: AdminPostsIndexRoute,
+  AdminRecommendedIndexRoute: AdminRecommendedIndexRoute,
+  AdminWorkshopsIndexRoute: AdminWorkshopsIndexRoute,
+  AdminYoutubeIndexRoute: AdminYoutubeIndexRoute,
+  AdminCoursesIdEditRoute: AdminCoursesIdEditRoute,
+  AdminCoursesIdLessonsRoute: AdminCoursesIdLessonsRoute,
+  AdminLinksIdEditRoute: AdminLinksIdEditRoute,
+  AdminPostsIdEditRoute: AdminPostsIdEditRoute,
+  AdminRecommendedSectionIdEditRoute: AdminRecommendedSectionIdEditRoute,
+  AdminWorkshopsIdEditRoute: AdminWorkshopsIdEditRoute,
+  AdminRecommendedItemsItemIdEditRoute: AdminRecommendedItemsItemIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

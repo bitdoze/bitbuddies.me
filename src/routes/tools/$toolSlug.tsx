@@ -32,8 +32,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { runTool } from "@/lib/server/run-tool.server";
 import { getToolBySlug, type ToolConfig, type ToolInputField } from "@/lib/ai-tools";
+import { runTool } from "@/lib/run-tool";
 
 type ParsedOutput =
 	| { type: "empty" }
